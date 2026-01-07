@@ -1,0 +1,9 @@
+[project]
+name = "nassaq-server"
+version = "0.1.0"
+description = "NassaQ Python infrastructure/backend"
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = [
+    "fastapi>=0.128.0",
+]
