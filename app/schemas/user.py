@@ -1,11 +1,11 @@
 from pydantic import BaseModel, EmailStr, Field, ConfigDict, field_validator, UUID4
-from typing import Optional
+# from typing import Optional
 from datetime import datetime
 
 class UserBase(BaseModel):
     email: EmailStr = Field(..., description="unique email address", examples=["user@example.com"])
     full_name: str = Field(..., min_length=3, max_length=100, description="full legal name")
-    org_name: Optional[str] = Field(None, max_length=100, description="name of the user's organization")
+    # org_name: Optional[str] = Field(None, max_length=100, description="name of the user's organization")
 
     model_config = ConfigDict(extra="forbid")
 
@@ -16,6 +16,10 @@ class UserCreate(UserBase):
         max_length=64,
         description="Password must be 8-64 chars, contains digits/special chars",
         examples=["20-Na$$aQ-26"]
+    )
+    role_id: int = Field(
+        ...,
+        description="user's role id"
     )
 
     @field_validator('password')
@@ -38,9 +42,11 @@ class UserResponse(UserBase):
     """
 
     id: UUID4
-    role: str
-    org_id: Optional[UUID4] = None
-    is_active: bool
+    full_name: str
+    role_id: int
+    # role: str
+    # org_id: Optional[UUID4] = None
+    # is_active: bool
     created_at: datetime
 
     model_config = ConfigDict(from_attributes=True)
