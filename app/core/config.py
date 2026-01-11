@@ -14,7 +14,7 @@ class Settings(BaseSettings):
     SQL_DB_NAME: str
     SQL_USER: str
     SQL_PASS: str
-    SQL_DRIVER: str = "ODBC Driver 17 for SQL Server"
+    SQL_DRIVER: str = "ODBC Driver 18 for SQL Server"
 
     model_config = SettingsConfigDict(env_file=".env", env_file_encoding="utf-8", extra="ignore")
 
@@ -30,10 +30,13 @@ class Settings(BaseSettings):
 
     @computed_field
     def SQL_CONNECTION_STRING(self) -> str:
+        encoded_pass = quote_plus(self.SQL_PASS)
+        
         return (
-            f"DRIVER={{{self.SQL_DRIVER}}};SERVER={self.SQL_SERVER};"
-            f"DATABASE={self.SQL_DB_NAME};UID={self.SQL_USER};"
-            f"PWD={self.SQL_PASS};Encrypt=yes;TrustServerCertificate=no;"
+            f"mssql+aioodbc://{self.SQL_USER}:{encoded_pass}@"
+            f"{self.SQL_SERVER}/{self.SQL_DB_NAME}"
+            f"?driver={quote_plus(self.SQL_DRIVER)}"
+            "&TrustServerCertificate=yes"
         )
 
 settings = Settings() # type: ignore
