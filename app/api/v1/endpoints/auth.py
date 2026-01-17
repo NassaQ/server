@@ -1,11 +1,18 @@
-from fastapi import APIRouter, status, HTTPException
+from fastapi import APIRouter, Depends, status, HTTPException
+from fastapi.security import OAuth2PasswordRequestForm
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy import select
 
 from app.models.models import Users
 from app.schemas.user import UserCreate, UserResponse
+from app.schemas.auth import Token
 from app.api.deps import DBSession, gen_username
-from app.core.security import hash_password
+from app.core.security import (
+    hash_password,
+    verify_password,
+    create_access_token,
+    create_refresh_token
+)
 
 router = APIRouter()
     
@@ -55,3 +62,43 @@ async def register (user_info: UserCreate, db: DBSession) -> UserResponse:
         )
     
     return UserResponse.model_validate(new_user)
+
+@router.post("/login", response_model=Token, summary="Login and get access token",
+             description="Authenticate with email and password to receive JWT tokens.")
+async def login (db: DBSession, form_data: OAuth2PasswordRequestForm = Depends()) -> Token:
+    """
+    Login with email and password.
+
+    Uses OAuth2 password flow:
+    - **username**: Email address (OAuth2 spec uses 'username' field)
+    - **password**: User's password
+
+    Returns:
+    - **access_token**: Short-lived JWT for API access
+    - **refresh_token**: Long-lived JWT for getting new access tokens
+    """    
+    query = select(Users).where(Users.email == form_data.username)
+    user = (await db.execute(query)).scalar_one_or_none()
+
+    if not user:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Incorrect email or password",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+    
+    if not verify_password(form_data.password, user.password_hash):
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Incorrect email or password",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+    
+    access_token = create_access_token(subject=user.user_id, role_id=user.role_id)
+    refresh_token = create_refresh_token(subject=user.user_id)
+
+    return Token(
+        access_token=access_token,
+        refresh_token=refresh_token,
+        token_type="bearer"
+    )
