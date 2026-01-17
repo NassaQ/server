@@ -5,13 +5,14 @@ from sqlalchemy import select
 
 from app.models.models import Users
 from app.schemas.user import UserCreate, UserResponse
-from app.schemas.auth import Token
+from app.schemas.auth import Token, RefreshTokenRequest
 from app.api.deps import DBSession, gen_username
 from app.core.security import (
     hash_password,
     verify_password,
     create_access_token,
-    create_refresh_token
+    create_refresh_token,
+    decode_token,
 )
 
 router = APIRouter()
@@ -101,4 +102,66 @@ async def login (db: DBSession, form_data: OAuth2PasswordRequestForm = Depends()
         access_token=access_token,
         refresh_token=refresh_token,
         token_type="bearer"
+    )
+
+@router.post("/refresh", response_model=Token, summary="Refresh access token",
+             description="Use a valid refresh token to get a new access token.")
+async def refresh_token(token_request: RefreshTokenRequest, db: DBSession) -> Token:
+    """
+    Refresh the access token using a valid refresh token.
+
+    - **refresh_token**: The refresh token received during login
+
+    Returns new access and refresh tokens.
+    """
+
+    payload = decode_token(token_request.refresh_token)
+    if not payload:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Invalid refresh token",
+            headers={"WWW-Authenticate": "Bearer"}
+        )
+    
+    token_type = payload.get("type")
+    if token_type != "refresh":
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Invalid token type. Refresh token required.",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+    
+    subject = payload.get("sub")
+    if not subject:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Invalid refresh token",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+
+    try:
+        user_id = int(subject)
+    except ValueError:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Invalid refresh token",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+    
+    query = select(Users).where(Users.user_id == user_id)
+    user = (await db.execute(query)).scalar_one_or_none()
+    if not user:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="User not found",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+    
+    new_access_token = create_access_token(subject=user.user_id, role_id=user.role_id)
+    new_refresh_token = create_refresh_token(subject=user.user_id)
+
+    return Token(
+        access_token=new_access_token,
+        refresh_token=new_refresh_token,
+        token_type="bearer",
     )
