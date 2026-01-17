@@ -16,6 +16,12 @@ class Settings(BaseSettings):
     SQL_PASS: str
     SQL_DRIVER: str = "ODBC Driver 18 for SQL Server"
 
+    # JWT configs
+    ACCESS_TOKEN_EXPIRE_MINUTES: int
+    REFRESH_TOKEN_EXPIRE_DAYS: int 
+    JWT_ALGORITHM: str
+    JWT_SECRET_KEY: str
+
     model_config = SettingsConfigDict(env_file=".env", env_file_encoding="utf-8", extra="ignore")
 
     @computed_field
