@@ -2,7 +2,7 @@ from datetime import timedelta, datetime, timezone
 from typing import Any
 
 import bcrypt
-from jose import jwt
+from jose import jwt, JWTError
 
 from app.core.config import settings
 
@@ -75,3 +75,22 @@ def create_refresh_token(subject: int) -> str:
         to_encode, settings.JWT_SECRET_KEY, algorithm=settings.JWT_ALGORITHM
     )
     return encoded_jwt
+
+def decode_token(token: str) -> dict[str, Any] | None:
+    """
+    Decode and validate a JWT token.
+
+    Args:
+        token: The JWT token string to decode
+
+    Returns:
+        Decoded token payload as dict, or None if invalid
+    """
+
+    try:
+        payload = jwt.decode(
+            token, settings.JWT_SECRET_KEY, algorithms=[settings.JWT_ALGORITHM]
+        )
+        return payload
+    except JWTError:
+        return None
