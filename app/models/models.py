@@ -36,7 +36,7 @@ class Roles(Base):
     description: Mapped[Optional[str]] = mapped_column(Unicode(255, 'SQL_Latin1_General_CP1_CI_AS'))
 
     Role_Actions: Mapped[list['RoleActions']] = relationship('RoleActions', back_populates='role')
-    Users: Mapped[list['Users']] = relationship('Users', back_populates='role')
+    Users: Mapped[list['Users']] = relationship('Users', foreign_keys='[Users.role_id]', back_populates='role')
 
 
 class Sysdiagrams(Base):
@@ -73,20 +73,21 @@ class RoleActions(Base):
 class Users(Base):
     __tablename__ = 'Users'
     __table_args__ = (
-        ForeignKeyConstraint(['role_id'], ['Roles.role_id'], name='FK_User_Role'),
+        ForeignKeyConstraint(['role_id'], ['Roles.role_id'], name='FK_Users_Roles'),
         PrimaryKeyConstraint('user_id', name='PK__Users__B9BE370F5FB662F3'),
         Index('UQ__Users__AB6E61646BFAE4C2', 'email', unique=True),
-        Index('UQ__Users__F3DBC57265EB5883', 'username', unique=True)
+        Index('UQ__Users__F3DBC57265EB5883', 'username', unique=True),
     )
 
     user_id: Mapped[int] = mapped_column(Integer, Identity(start=1, increment=1), primary_key=True)
     username: Mapped[str] = mapped_column(Unicode(50, 'SQL_Latin1_General_CP1_CI_AS'), nullable=False)
     email: Mapped[str] = mapped_column(Unicode(100, 'SQL_Latin1_General_CP1_CI_AS'), nullable=False)
     password_hash: Mapped[str] = mapped_column(String(255, 'SQL_Latin1_General_CP1_CI_AS'), nullable=False)
-    role_id: Mapped[int] = mapped_column(Integer, nullable=False)
     created_at: Mapped[datetime.datetime] = mapped_column(DateTime, nullable=False, server_default=text('(getdate())'))
+    is_active: Mapped[bool] = mapped_column(Boolean, nullable=False, server_default=text('((0))'))
+    role_id: Mapped[Optional[int]] = mapped_column(Integer, server_default=text('((1))'))
 
-    role: Mapped['Roles'] = relationship('Roles', back_populates='Users')
+    role: Mapped[Optional['Roles']] = relationship('Roles', foreign_keys=[role_id], back_populates='Users')
     Folders: Mapped[list['Folders']] = relationship('Folders', back_populates='created_by_user')
     Individual_Permissions: Mapped[list['IndividualPermissions']] = relationship('IndividualPermissions', back_populates='user')
     Logs: Mapped[list['Logs']] = relationship('Logs', back_populates='user')
