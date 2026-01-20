@@ -1,4 +1,4 @@
-from fastapi import APIRouter, HTTPException, status
+from fastapi import APIRouter, HTTPException, status, Request
 from sqlalchemy import select, or_
 from sqlalchemy.orm import selectinload
 from sqlalchemy.exc import IntegrityError
@@ -94,5 +94,54 @@ async def update_user(
         email=user.email,
         is_active=user.is_active,
         role_id=user.role_id, # type: ignore
+        created_at=user.created_at,
+    )
+
+@router.patch("/{user_id}/activate", response_model=UserResponse, summary="Activate a user",
+              description="Specifically sets a user's is_active status to True.",)
+async def activate_user(user_id: int, request: Request, db: DBSession) -> UserResponse:
+    
+    body = await request.body()
+    if body:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Request body is not allowed for this endpoint."
+        )
+    
+    query = select(Users).options(selectinload(Users.role)).where(Users.user_id == user_id)
+    user = (await db.execute(query)).scalar_one_or_none()
+    if user is None:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="User not found",
+        )
+
+    if user.is_active:
+        return UserResponse(
+            user_id=user.user_id,
+            username=user.username,
+            email=user.email,
+            role_id=user.role_id, # type: ignore
+            is_active=user.is_active,
+            created_at=user.created_at,
+        )
+
+    user.is_active = True
+    
+    try:
+        await db.commit()
+    except IntegrityError:
+        await db.rollback()
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Could not activate user",
+        )
+
+    return UserResponse(
+        user_id=user.user_id,
+        username=user.username,
+        email=user.email,
+        role_id=user.role_id, # type: ignore
+        is_active=user.is_active,
         created_at=user.created_at,
     )
