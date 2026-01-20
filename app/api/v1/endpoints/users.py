@@ -1,4 +1,6 @@
-from fastapi import APIRouter, HTTPException, status, Request
+from typing import Annotated
+
+from fastapi import APIRouter, HTTPException, status, Request, Query
 from sqlalchemy import select, or_
 from sqlalchemy.orm import selectinload
 from sqlalchemy.exc import IntegrityError
@@ -8,6 +10,48 @@ from app.models.models import Users, Roles
 from app.schemas.user import UserResponse, UserAdminUpdate
 
 router = APIRouter()
+
+@router.get("/", response_model=list[UserResponse], summary="List all users",
+            description="Get a paginated list of all users. Requires admin role.")
+async def list_users(
+    db: DBSession,
+    current_user: AdminUser,
+    skip: Annotated[int, Query(ge=0, description="Number of records to skip")] = 0,
+    limit: Annotated[int, Query(ge=1, le=100, description="Max records to return")] = 20,
+) -> list[UserResponse]:
+    """
+    List all users with pagination.
+
+    - **skip**: Number of records to skip (default: 0)
+    - **limit**: Maximum number of records to return (default: 20, max: 100)
+
+    Requires an admin role.
+    """
+
+    query = select(Users).options(selectinload(Users.role)).offset(skip).limit(limit).order_by(Users.created_at.desc())
+    users = (await db.execute(query)).scalars().all()
+
+    return [UserResponse.model_validate(user) for user in users]
+
+@router.get("/pending", response_model=list[UserResponse], summary="List users pending role assignment",
+            description="Get all users who haven't been assigned a role yet. Requires 'user:update' permission.",)
+async def list_pending_users(
+    db: DBSession,
+    current_user: AdminUser,
+    limit: Annotated[int, Query(ge=1, le=50, description="Max records to return")] = 20,
+) -> list[UserResponse]:
+    """
+    List all users who are pending role assignment (role_id is NULL).
+    
+    - **limit**: Maximum number of records to return (default: 20, max: 50)
+
+    Requires an admin role.
+    """
+    query = select(Users).where(Users.is_active == 0).limit(limit).order_by(Users.created_at.asc())
+    users = (await db.execute(query)).scalars().all()
+
+    return [UserResponse.model_validate(user) for user in users]
+
 
 @router.put("/{user_id}", response_model=UserResponse, summary="Update any user (admin)",
             description="Update any user's profile including role assignment.")
