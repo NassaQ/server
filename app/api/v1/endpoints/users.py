@@ -3,7 +3,7 @@ from sqlalchemy import select, or_
 from sqlalchemy.orm import selectinload
 from sqlalchemy.exc import IntegrityError
 
-from app.api.deps import DBSession
+from app.api.deps import DBSession, AdminUser
 from app.models.models import Users, Roles
 from app.schemas.user import UserResponse, UserAdminUpdate
 
@@ -15,6 +15,7 @@ async def update_user(
     user_id: int,
     user_update: UserAdminUpdate,
     db: DBSession,
+    current_user: AdminUser
 ) -> UserResponse:
     """
     Update any user's profile (Admin only).
@@ -99,7 +100,7 @@ async def update_user(
 
 @router.patch("/{user_id}/activate", response_model=UserResponse, summary="Activate a user",
               description="Specifically sets a user's is_active status to True.",)
-async def activate_user(user_id: int, request: Request, db: DBSession) -> UserResponse:
+async def activate_user(user_id: int, request: Request, db: DBSession, current_user: AdminUser) -> UserResponse:
     
     body = await request.body()
     if body:

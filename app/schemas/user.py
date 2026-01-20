@@ -3,7 +3,7 @@ from datetime import datetime
 
 class UserBase(BaseModel):
     email: EmailStr = Field(..., description="unique email address", examples=["user@example.com"])
-    username: str = Field(..., min_length=3, max_length=100, description="username")
+    username: str = Field(..., min_length=3, max_length=50, description="username")
 
     model_config = ConfigDict(extra="forbid")
 
@@ -24,6 +24,24 @@ class UserCreate(UserBase):
         if all(c.isalnum() for c in v):
             raise ValueError("Password must contain at least one special character")
         
+        return v
+
+class UserUpdate(BaseModel):
+    """Schema for user self-update (cannot change role)."""
+
+    email: EmailStr | None = Field(None, description="New email address")
+    username: str | None = Field(None, min_length=3, max_length=50, description="New username")
+    password: str | None = Field(None, min_length=8, max_length=64, description="New password")
+
+    @field_validator("password")
+    @classmethod
+    def validate_password(cls, v: str | None) -> str | None:
+        if v is None:
+            return v
+        if not any(c.isdigit() for c in v):
+            raise ValueError("Password must contain at least one digit")
+        if all(c.isalnum() for c in v):
+            raise ValueError("Password must contain at least one special character")
         return v
     
 class UserAdminUpdate(BaseModel):
