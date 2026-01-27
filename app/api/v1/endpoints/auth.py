@@ -47,7 +47,7 @@ async def register (user_info: UserCreate, db: DBSession) -> UserResponse:
         username=username,
         email=user_info.email,
         password_hash=hashed_password,
-        role_id=user_info.role_id,
+        role_id=None,
     )
 
     try:
