@@ -1,5 +1,6 @@
 from fastapi import APIRouter, Depends, status, HTTPException
 from fastapi.security import OAuth2PasswordRequestForm
+from fastapi.concurrency import run_in_threadpool
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy import select
 
@@ -41,7 +42,7 @@ async def register (user_info: UserCreate, db: DBSession) -> UserResponse:
             detail="Username already taken",
         )
 
-    hashed_password = hash_password(user_info.password)
+    hashed_password = await run_in_threadpool(hash_password, user_info.password)
     
     new_user = Users(
         username=username,
@@ -62,7 +63,7 @@ async def register (user_info: UserCreate, db: DBSession) -> UserResponse:
             detail="Registration failed. Please try again.",
         )
     
-    return UserResponse.model_validate(new_user)
+    return new_user
 
 @router.post("/login", response_model=Token, summary="Login and get access token",
              description="Authenticate with email and password to receive JWT tokens.")
@@ -180,4 +181,4 @@ async def get_current_user_profile(current_user: CurrentUser) -> UserResponse:
 
     Requires a valid access token in the Authorization header.
     """
-    return UserResponse.model_validate(current_user)
+    return current_user

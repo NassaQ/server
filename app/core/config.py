@@ -3,6 +3,8 @@ from pydantic import computed_field
 from urllib.parse import quote_plus
 
 class Settings(BaseSettings):
+    ENVIRONMENT: str = "production"
+
     MONGO_USER: str
     MONGO_PASS: str
     MONGO_HOST: str

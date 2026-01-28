@@ -1,7 +1,13 @@
+from app.core.config import settings
+
 from fastapi import FastAPI, status, Response
 from app.api.v1 import api
 
-app = FastAPI(title="NassaQ Backend")
+app = FastAPI(
+    title="NassaQ Backend",
+    docs_url=None if settings.ENVIRONMENT == "production" else "/docs",
+    redoc_url=None if settings.ENVIRONMENT == "production" else "/redoc"
+)
 
 app.include_router(api.api_router, prefix='/api/v1')
 
