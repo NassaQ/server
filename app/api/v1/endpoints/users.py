@@ -31,7 +31,7 @@ async def list_users(
     query = select(Users).options(selectinload(Users.role)).offset(skip).limit(limit).order_by(Users.created_at.desc())
     users = (await db.execute(query)).scalars().all()
 
-    return [UserResponse.model_validate(user) for user in users]
+    return users
 
 @router.get("/pending", response_model=list[UserResponse], summary="List users pending role assignment",
             description="Get all users who haven't been assigned a role yet. Requires 'user:update' permission.",)
@@ -50,7 +50,7 @@ async def list_pending_users(
     query = select(Users).where(Users.is_active == 0).limit(limit).order_by(Users.created_at.asc())
     users = (await db.execute(query)).scalars().all()
 
-    return [UserResponse.model_validate(user) for user in users]
+    return users
 
 
 @router.put("/{user_id}", response_model=UserResponse, summary="Update any user (admin)",
@@ -133,14 +133,7 @@ async def update_user(
             detail="Update failed. Please try again."
         )
     
-    return UserResponse(
-        user_id=user.user_id,
-        username=user.username,
-        email=user.email,
-        is_active=user.is_active,
-        role_id=user.role_id, # type: ignore
-        created_at=user.created_at,
-    )
+    return user
 
 @router.patch("/{user_id}/activate", response_model=UserResponse, summary="Activate a user",
               description="Specifically sets a user's is_active status to True.",)
@@ -162,14 +155,7 @@ async def activate_user(user_id: int, request: Request, db: DBSession, current_u
         )
 
     if user.is_active:
-        return UserResponse(
-            user_id=user.user_id,
-            username=user.username,
-            email=user.email,
-            role_id=user.role_id, # type: ignore
-            is_active=user.is_active,
-            created_at=user.created_at,
-        )
+        return user
 
     user.is_active = True
     
@@ -182,11 +168,4 @@ async def activate_user(user_id: int, request: Request, db: DBSession, current_u
             detail="Could not activate user",
         )
 
-    return UserResponse(
-        user_id=user.user_id,
-        username=user.username,
-        email=user.email,
-        role_id=user.role_id, # type: ignore
-        is_active=user.is_active,
-        created_at=user.created_at,
-    )
+    return user
