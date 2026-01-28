@@ -169,3 +169,39 @@ async def activate_user(user_id: int, request: Request, db: DBSession, current_u
         )
 
     return user
+
+@router.delete("/{user_id}", status_code=status.HTTP_204_NO_CONTENT, summary="Delete a user",
+               description="Delete a user account with the user id.")
+async def delete_user(user_id: int, db: DBSession, current_user: AdminUser) -> None:
+    """
+    Delete a user by their ID.
+
+    Note: This will fail if the user has related records (documents, folders, etc.)
+    that reference this user due to foreign key constraints.
+    """
+
+    if current_user.user_id == user_id:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Cannot delete your own account."
+        )
+    
+    query = select(Users).where(Users.user_id == user_id)
+    user = (await db.execute(query)).scalar_one_or_none()
+
+    if not user:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="User not found",
+        )
+    
+    try:
+        await db.delete(user)
+        await db.commit()
+
+    except IntegrityError:
+        await db.rollback()
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Cannot delete user. Please try again."
+        )
