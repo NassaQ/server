@@ -11,12 +11,16 @@ class Settings(BaseSettings):
     MONGO_PORT: int = 10260
     MONGO_DB_NAME: str = "sdmsdb"
     MONGO_TLS_INSECURE: bool = True
-    
+
     SQL_SERVER: str
     SQL_DB_NAME: str
     SQL_USER: str
     SQL_PASS: str
     SQL_DRIVER: str = "ODBC Driver 18 for SQL Server"
+
+    SQL_CONNECT_TIMEOUT: int = 60
+    SQL_MAX_RETRIES: int = 3
+    SQL_RETRY_DELAY_BASE: int = 2
 
     # JWT configs
     ACCESS_TOKEN_EXPIRE_MINUTES: int
@@ -39,7 +43,7 @@ class Settings(BaseSettings):
     @computed_field
     def SQL_CONNECTION_STRING(self) -> str:
         encoded_pass = quote_plus(self.SQL_PASS)
-        
+
         return (
             f"mssql+aioodbc://{self.SQL_USER}:{encoded_pass}@"
             f"{self.SQL_SERVER}/{self.SQL_DB_NAME}"
