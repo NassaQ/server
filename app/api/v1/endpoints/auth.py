@@ -2,7 +2,7 @@ from fastapi import APIRouter, Depends, status, HTTPException
 from fastapi.security import OAuth2PasswordRequestForm
 from fastapi.concurrency import run_in_threadpool
 from sqlalchemy.exc import IntegrityError
-from sqlalchemy import select
+from sqlalchemy import select, func
 
 from app.models.models import Users
 from app.schemas.user import UserCreate, UserResponse
@@ -22,7 +22,7 @@ router = APIRouter()
     status_code=status.HTTP_201_CREATED, summary="Register a new user"
 )
 async def register (user_info: UserCreate, db: DBSession) -> UserResponse:
-    query = select(1).where(Users.email == user_info.email)
+    query = select(1).where(func.lower(Users.email) == user_info.email.lower())
     isEmailExist = (await db.execute(query)).first()
 
     if isEmailExist:
@@ -33,7 +33,7 @@ async def register (user_info: UserCreate, db: DBSession) -> UserResponse:
     
     username = user_info.username or gen_username(user_info.email)
     
-    query = select(1).where(Users.username == username)
+    query = select(1).where(func.lower(Users.username) == username.lower())
     isUsernameExist = (await db.execute(query)).first() 
 
     if isUsernameExist:
@@ -46,7 +46,7 @@ async def register (user_info: UserCreate, db: DBSession) -> UserResponse:
     
     new_user = Users(
         username=username,
-        email=user_info.email,
+        email=user_info.email.lower(),
         password_hash=hashed_password,
         role_id=None,
     )
@@ -79,7 +79,7 @@ async def login (db: DBSession, form_data: OAuth2PasswordRequestForm = Depends()
     - **access_token**: Short-lived JWT for API access
     - **refresh_token**: Long-lived JWT for getting new access tokens
     """    
-    query = select(Users).where(Users.email == form_data.username)
+    query = select(Users).where(Users.email == form_data.username.lower())
     user = (await db.execute(query)).scalar_one_or_none()
 
     if not user:
