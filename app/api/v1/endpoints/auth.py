@@ -6,7 +6,7 @@ from sqlalchemy import select, func
 
 from app.models.models import Users
 from app.schemas.user import UserCreate, UserResponse
-from app.schemas.auth import Token, RefreshTokenRequest
+from app.schemas.auth import TokenLogin, TokenRefresh, RefreshTokenRequest
 from app.api.deps import DBSession, gen_username, CurrentUser
 from app.core.security import (
     hash_password,
@@ -65,9 +65,9 @@ async def register (user_info: UserCreate, db: DBSession) -> UserResponse:
     
     return new_user
 
-@router.post("/login", response_model=Token, summary="Login and get access token",
+@router.post("/login", response_model=TokenLogin, summary="Login and get access token",
              description="Authenticate with email and password to receive JWT tokens.")
-async def login (db: DBSession, form_data: OAuth2PasswordRequestForm = Depends()) -> Token:
+async def login (db: DBSession, form_data: OAuth2PasswordRequestForm = Depends()) -> TokenLogin:
     """
     Login with email and password.
 
@@ -105,15 +105,15 @@ async def login (db: DBSession, form_data: OAuth2PasswordRequestForm = Depends()
     access_token = create_access_token(subject=user.user_id, role_id=user.role_id)
     refresh_token = create_refresh_token(subject=user.user_id)
 
-    return Token(
+    return TokenLogin(
         access_token=access_token,
         refresh_token=refresh_token,
         token_type="bearer"
     )
 
-@router.post("/refresh", response_model=Token, summary="Refresh access token",
+@router.post("/refresh", response_model=TokenRefresh, summary="Refresh access token",
              description="Use a valid refresh token to get a new access token.")
-async def refresh_token(token_request: RefreshTokenRequest, db: DBSession) -> Token:
+async def refresh_token(token_request: RefreshTokenRequest, db: DBSession) -> TokenRefresh:
     """
     Refresh the access token using a valid refresh token.
 
@@ -165,11 +165,9 @@ async def refresh_token(token_request: RefreshTokenRequest, db: DBSession) -> To
         )
     
     new_access_token = create_access_token(subject=user.user_id, role_id=user.role_id)
-    new_refresh_token = create_refresh_token(subject=user.user_id)
 
-    return Token(
+    return TokenRefresh(
         access_token=new_access_token,
-        refresh_token=new_refresh_token,
         token_type="bearer",
     )
 
