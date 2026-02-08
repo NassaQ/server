@@ -31,7 +31,7 @@ class UserUpdate(BaseModel):
     """Schema for user self-update (cannot change role)."""
 
     full_name: str | None = Field(None, min_length=6, max_length=60, description="new full name")
-    email: EmailStr | None = Field(None, max_length=50, description="New email address")
+    # email: EmailStr | None = Field(None, max_length=50, description="New email address")
     username: str | None = Field(None, min_length=3, max_length=20, description="New username")
     
 class UserAdminUpdate(BaseModel):

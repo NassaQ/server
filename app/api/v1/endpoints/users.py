@@ -5,9 +5,9 @@ from sqlalchemy import select, or_, func
 from sqlalchemy.orm import selectinload
 from sqlalchemy.exc import IntegrityError
 
-from app.api.deps import DBSession, AdminUser
+from app.api.deps import DBSession, AdminUser, ActiveUser, capitalize_full_name
 from app.models.models import Users, Roles
-from app.schemas.user import UserResponse, UserAdminUpdate
+from app.schemas.user import UserResponse, UserAdminUpdate, UserUpdate
 
 router = APIRouter()
 
@@ -52,8 +52,56 @@ async def list_pending_users(
 
     return users
 
+@router.patch("/me", response_model=UserResponse, summary="Update current user",
+              description="Update current user profile data, just the personal ones")
+async def update_current_user(
+    user_update: UserUpdate,
+    db: DBSession,
+    current_user: ActiveUser,
+) -> UserResponse:
+    """
+    Update current user's profile.
 
-@router.put("/{user_id}", response_model=UserResponse, summary="Update any user (admin)",
+    Allowed updates:
+    - **full_name**: New full name
+    - **username**: New username
+    """
+
+    update_data = user_update.model_dump(exclude_unset=True)
+    if not update_data:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="No fields to update",
+        )
+    
+    if user_update.username and user_update.username.lower() != current_user.username.lower():
+        query = select(Users).where(func.lower(Users.username) == user_update.username.lower()).where(Users.user_id != current_user.user_id)
+        conflict = (await db.execute(query)).scalar_one_or_none()
+
+        if conflict:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="username already exists",
+            )
+    
+    setattr(current_user, "username", update_data["username"])
+    setattr(current_user, "full_name", capitalize_full_name(update_data["full_name"]))
+    
+    try:
+        await db.commit()
+        await db.refresh(current_user)
+    except IntegrityError:
+        await db.rollback()
+        raise HTTPException(
+            status.HTTP_400_BAD_REQUEST, 
+            detail="Update failed. Please try again."
+        )
+    
+    return current_user
+
+
+
+@router.patch("/{user_id}", response_model=UserResponse, summary="Update any user (admin)",
             description="Update any user's profile including role assignment.")
 async def update_user(
     user_id: int,
