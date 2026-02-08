@@ -28,7 +28,7 @@ async def list_users(
     Requires an admin role.
     """
 
-    query = select(Users).options(selectinload(Users.role)).offset(skip).limit(limit).order_by(Users.created_at.desc())
+    query = select(Users).offset(skip).limit(limit).order_by(Users.created_at.desc())
     users = (await db.execute(query)).scalars().all()
 
     return users
@@ -71,7 +71,7 @@ async def update_user(
     - **is_active**: Activate or deactivate the user
     """
 
-    query = select(Users).options(selectinload(Users.role)).where(Users.user_id == user_id)
+    query = select(Users).where(Users.user_id == user_id)
     user = (await db.execute(query)).scalar_one_or_none()
     if not user:
         raise HTTPException(

@@ -6,8 +6,8 @@ from sqlalchemy import select, func
 
 from app.models.models import Users
 from app.schemas.user import UserCreate, UserResponse
-from app.schemas.auth import TokenLogin, TokenRefresh, RefreshTokenRequest
-from app.api.deps import DBSession, gen_username, CurrentUser
+from app.schemas.auth import TokenLogin, TokenRefresh
+from app.api.deps import DBSession, gen_username, capitalize_full_name, CurrentUser, TokenDep
 from app.core.security import (
     hash_password,
     verify_password,
@@ -45,6 +45,7 @@ async def register (user_info: UserCreate, db: DBSession) -> UserResponse:
     hashed_password = await run_in_threadpool(hash_password, user_info.password)
     
     new_user = Users(
+        full_name=capitalize_full_name(user_info.full_name),
         username=username,
         email=user_info.email.lower(),
         password_hash=hashed_password,
@@ -113,7 +114,7 @@ async def login (db: DBSession, form_data: OAuth2PasswordRequestForm = Depends()
 
 @router.post("/refresh", response_model=TokenRefresh, summary="Refresh access token",
              description="Use a valid refresh token to get a new access token.")
-async def refresh_token(token_request: RefreshTokenRequest, db: DBSession) -> TokenRefresh:
+async def refresh_token(token: TokenDep, db: DBSession) -> TokenRefresh:
     """
     Refresh the access token using a valid refresh token.
 
@@ -122,7 +123,7 @@ async def refresh_token(token_request: RefreshTokenRequest, db: DBSession) -> To
     Returns new access and refresh tokens.
     """
 
-    payload = decode_token(token_request.refresh_token)
+    payload = decode_token(token)
     if not payload:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
