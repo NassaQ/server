@@ -47,7 +47,7 @@ async def list_pending_users(
 
     Requires an admin role.
     """
-    query = select(Users).where(Users.is_active == 0).limit(limit).order_by(Users.created_at.asc())
+    query = select(Users).options(selectinload(Users.role)).where(Users.is_active == 0).limit(limit).order_by(Users.created_at.asc())
     users = (await db.execute(query)).scalars().all()
 
     return users

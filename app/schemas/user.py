@@ -58,8 +58,17 @@ class UserResponse(UserBase):
     user_id: int
     full_name: str
     username: str
-    role_id: int
+    role: str | None = None
     is_active: bool
     created_at: datetime
 
     model_config = ConfigDict(from_attributes=True)
+
+    @field_validator('role', mode='before')
+    @classmethod
+    def get_role_name(cls, v):
+        if hasattr(v, 'role_name'):
+            return v.role_name
+        if v is None:
+            return None
+        return str(v)

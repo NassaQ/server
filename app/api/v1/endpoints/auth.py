@@ -2,6 +2,7 @@ from fastapi import APIRouter, Depends, status, HTTPException
 from fastapi.security import OAuth2PasswordRequestForm
 from fastapi.concurrency import run_in_threadpool
 from sqlalchemy.exc import IntegrityError
+from sqlalchemy.orm import selectinload
 from sqlalchemy import select, func
 
 from app.models.models import Users
@@ -56,6 +57,9 @@ async def register (user_info: UserCreate, db: DBSession) -> UserResponse:
         db.add(new_user)
         await db.commit()
         await db.refresh(new_user)
+
+        query = select(Users).options(selectinload(Users.role)).where(Users.user_id == new_user.user_id)
+        new_user = (await db.execute(query)).scalar_one()
 
     except IntegrityError:
         await db.rollback()
