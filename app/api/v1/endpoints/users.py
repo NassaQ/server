@@ -1,7 +1,7 @@
 from typing import Annotated
 
 from fastapi import APIRouter, HTTPException, status, Request, Query
-from sqlalchemy import select, or_
+from sqlalchemy import select, or_, func
 from sqlalchemy.orm import selectinload
 from sqlalchemy.exc import IntegrityError
 
@@ -87,17 +87,17 @@ async def update_user(
         )
     
     conflicting_checks = []
-    if user_update.email and user_update.email != user.email:
-        conflicting_checks.append(Users.email == user_update.email)
-    if user_update.username and user_update.username != user.username:
-        conflicting_checks.append(Users.username == user_update.email)
+    if user_update.email and user_update.email.lower() != user.email:
+        conflicting_checks.append(Users.email == user_update.email.lower())
+    if user_update.username and user_update.username.lower() != user.username.lower():
+        conflicting_checks.append(func.lower(Users.username) == user_update.username.lower())
 
     if conflicting_checks:
         query = select(Users).where(or_(*conflicting_checks)).where(Users.user_id != user_id)
         conflict = (await db.execute(query)).scalar_one_or_none()
         
         if conflict:
-            if user_update.email and conflict.email == user_update.email:
+            if user_update.email and conflict.email == user_update.email.lower():
                 detail = "Email already in use"
             else:
                 detail = "Username already in use"
@@ -126,6 +126,7 @@ async def update_user(
     
     try:
         await db.commit()
+        await db.refresh(user)
     except IntegrityError:
         await db.rollback()
         raise HTTPException(
