@@ -8,7 +8,7 @@ from sqlalchemy import select, func
 from app.models.models import Users
 from app.schemas.user import UserCreate, UserResponse
 from app.schemas.auth import TokenLogin, TokenRefresh
-from app.api.deps import DBSession, gen_username, capitalize_full_name, CurrentUser, TokenDep
+from app.api.deps import DBSession, gen_username, capitalize_full_name, TokenDep
 from app.core.security import (
     hash_password,
     verify_password,
@@ -175,13 +175,3 @@ async def refresh_token(token: TokenDep, db: DBSession) -> TokenRefresh:
         access_token=new_access_token,
         token_type="bearer",
     )
-
-@router.get("/me", response_model=UserResponse, summary="Get current user profile",
-            description="Get the profile of the currently authenticated user.")
-async def get_current_user_profile(current_user: CurrentUser) -> UserResponse:
-    """
-    Get the current authenticated user's profile.
-
-    Requires a valid access token in the Authorization header.
-    """
-    return current_user

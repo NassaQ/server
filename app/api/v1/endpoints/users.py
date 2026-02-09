@@ -5,7 +5,7 @@ from sqlalchemy import select, or_, func
 from sqlalchemy.orm import selectinload
 from sqlalchemy.exc import IntegrityError
 
-from app.api.deps import DBSession, AdminUser, ActiveUser, capitalize_full_name
+from app.api.deps import DBSession, AdminUser, ActiveUser, CurrentUser, capitalize_full_name
 from app.models.models import Users, Roles
 from app.schemas.user import UserResponse, UserAdminUpdate, UserUpdate
 
@@ -51,6 +51,16 @@ async def list_pending_users(
     users = (await db.execute(query)).scalars().all()
 
     return users
+
+@router.get("/me", response_model=UserResponse, summary="Get current user profile",
+            description="Get the profile of the currently authenticated user.")
+async def get_current_user_profile(current_user: CurrentUser) -> UserResponse:
+    """
+    Get the current authenticated user's profile.
+
+    Requires a valid access token in the Authorization header.
+    """
+    return current_user
 
 @router.patch("/me", response_model=UserResponse, summary="Update current user",
               description="Update current user profile data, just the personal ones")
