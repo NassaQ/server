@@ -3,9 +3,7 @@ from typing import Annotated
 from fastapi import Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer
 from sqlalchemy import select
-from sqlalchemy.orm import selectinload
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy.orm import selectinload
 from sqlalchemy import select
 
 from app.core.security import decode_token
@@ -24,6 +22,12 @@ def gen_username(email: str) -> str:
     local_part, domain = email.split("@")
     domain_name = domain.split(".")[0]
     return f"{local_part}_{domain_name}"
+
+def capitalize_full_name(name: str) -> str:
+    names = [n.capitalize() for n in name.split()]
+    full_name = ' '.join(names)
+
+    return full_name
 
 async def get_current_user(token: TokenDep, db: DBSession) -> Users:
     """
@@ -49,7 +53,7 @@ async def get_current_user(token: TokenDep, db: DBSession) -> Users:
     except ValueError:
         raise credException
     
-    query = select(Users).options(selectinload(Users.role)).where(Users.user_id == user_id)
+    query = select(Users).where(Users.user_id == user_id)
     user = (await db.execute(query)).scalar_one_or_none()
 
     if not user:

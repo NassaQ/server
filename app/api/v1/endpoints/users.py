@@ -1,13 +1,13 @@
 from typing import Annotated
 
 from fastapi import APIRouter, HTTPException, status, Request, Query
-from sqlalchemy import select, or_
+from sqlalchemy import select, or_, func
 from sqlalchemy.orm import selectinload
 from sqlalchemy.exc import IntegrityError
 
-from app.api.deps import DBSession, AdminUser
+from app.api.deps import DBSession, AdminUser, ActiveUser, CurrentUser, capitalize_full_name
 from app.models.models import Users, Roles
-from app.schemas.user import UserResponse, UserAdminUpdate
+from app.schemas.user import UserResponse, UserAdminUpdate, UserUpdate
 
 router = APIRouter()
 
@@ -28,7 +28,7 @@ async def list_users(
     Requires an admin role.
     """
 
-    query = select(Users).options(selectinload(Users.role)).offset(skip).limit(limit).order_by(Users.created_at.desc())
+    query = select(Users).offset(skip).limit(limit).order_by(Users.created_at.desc())
     users = (await db.execute(query)).scalars().all()
 
     return users
@@ -47,13 +47,71 @@ async def list_pending_users(
 
     Requires an admin role.
     """
-    query = select(Users).where(Users.is_active == 0).limit(limit).order_by(Users.created_at.asc())
+    query = select(Users).options(selectinload(Users.role)).where(Users.is_active == 0).limit(limit).order_by(Users.created_at.asc())
     users = (await db.execute(query)).scalars().all()
 
     return users
 
+@router.get("/me", response_model=UserResponse, summary="Get current user profile",
+            description="Get the profile of the currently authenticated user.")
+async def get_current_user_profile(current_user: CurrentUser) -> UserResponse:
+    """
+    Get the current authenticated user's profile.
 
-@router.put("/{user_id}", response_model=UserResponse, summary="Update any user (admin)",
+    Requires a valid access token in the Authorization header.
+    """
+    return current_user
+
+@router.patch("/me", response_model=UserResponse, summary="Update current user",
+              description="Update current user profile data, just the personal ones")
+async def update_current_user(
+    user_update: UserUpdate,
+    db: DBSession,
+    current_user: ActiveUser,
+) -> UserResponse:
+    """
+    Update current user's profile.
+
+    Allowed updates:
+    - **full_name**: New full name
+    - **username**: New username
+    """
+
+    update_data = user_update.model_dump(exclude_unset=True)
+    if not update_data:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="No fields to update",
+        )
+    
+    if user_update.username and user_update.username.lower() != current_user.username.lower():
+        query = select(Users).where(func.lower(Users.username) == user_update.username.lower()).where(Users.user_id != current_user.user_id)
+        conflict = (await db.execute(query)).scalar_one_or_none()
+
+        if conflict:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="username already exists",
+            )
+    
+    setattr(current_user, "username", update_data["username"])
+    setattr(current_user, "full_name", capitalize_full_name(update_data["full_name"]))
+    
+    try:
+        await db.commit()
+        await db.refresh(current_user)
+    except IntegrityError:
+        await db.rollback()
+        raise HTTPException(
+            status.HTTP_400_BAD_REQUEST, 
+            detail="Update failed. Please try again."
+        )
+    
+    return current_user
+
+
+
+@router.patch("/{user_id}", response_model=UserResponse, summary="Update any user (admin)",
             description="Update any user's profile including role assignment.")
 async def update_user(
     user_id: int,
@@ -71,7 +129,7 @@ async def update_user(
     - **is_active**: Activate or deactivate the user
     """
 
-    query = select(Users).options(selectinload(Users.role)).where(Users.user_id == user_id)
+    query = select(Users).where(Users.user_id == user_id)
     user = (await db.execute(query)).scalar_one_or_none()
     if not user:
         raise HTTPException(
@@ -87,17 +145,17 @@ async def update_user(
         )
     
     conflicting_checks = []
-    if user_update.email and user_update.email != user.email:
-        conflicting_checks.append(Users.email == user_update.email)
-    if user_update.username and user_update.username != user.username:
-        conflicting_checks.append(Users.username == user_update.email)
+    if user_update.email and user_update.email.lower() != user.email:
+        conflicting_checks.append(Users.email == user_update.email.lower())
+    if user_update.username and user_update.username.lower() != user.username.lower():
+        conflicting_checks.append(func.lower(Users.username) == user_update.username.lower())
 
     if conflicting_checks:
         query = select(Users).where(or_(*conflicting_checks)).where(Users.user_id != user_id)
         conflict = (await db.execute(query)).scalar_one_or_none()
         
         if conflict:
-            if user_update.email and conflict.email == user_update.email:
+            if user_update.email and conflict.email == user_update.email.lower():
                 detail = "Email already in use"
             else:
                 detail = "Username already in use"
@@ -126,6 +184,7 @@ async def update_user(
     
     try:
         await db.commit()
+        await db.refresh(user)
     except IntegrityError:
         await db.rollback()
         raise HTTPException(

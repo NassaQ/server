@@ -2,12 +2,13 @@ from fastapi import APIRouter, Depends, status, HTTPException
 from fastapi.security import OAuth2PasswordRequestForm
 from fastapi.concurrency import run_in_threadpool
 from sqlalchemy.exc import IntegrityError
-from sqlalchemy import select
+from sqlalchemy.orm import selectinload
+from sqlalchemy import select, func
 
 from app.models.models import Users
 from app.schemas.user import UserCreate, UserResponse
-from app.schemas.auth import Token, RefreshTokenRequest
-from app.api.deps import DBSession, gen_username, CurrentUser
+from app.schemas.auth import TokenLogin, TokenRefresh
+from app.api.deps import DBSession, gen_username, capitalize_full_name, TokenDep
 from app.core.security import (
     hash_password,
     verify_password,
@@ -22,7 +23,7 @@ router = APIRouter()
     status_code=status.HTTP_201_CREATED, summary="Register a new user"
 )
 async def register (user_info: UserCreate, db: DBSession) -> UserResponse:
-    query = select(1).where(Users.email == user_info.email)
+    query = select(1).where(func.lower(Users.email) == user_info.email.lower())
     isEmailExist = (await db.execute(query)).first()
 
     if isEmailExist:
@@ -33,7 +34,7 @@ async def register (user_info: UserCreate, db: DBSession) -> UserResponse:
     
     username = user_info.username or gen_username(user_info.email)
     
-    query = select(1).where(Users.username == username)
+    query = select(1).where(func.lower(Users.username) == username.lower())
     isUsernameExist = (await db.execute(query)).first() 
 
     if isUsernameExist:
@@ -45,8 +46,9 @@ async def register (user_info: UserCreate, db: DBSession) -> UserResponse:
     hashed_password = await run_in_threadpool(hash_password, user_info.password)
     
     new_user = Users(
+        full_name=capitalize_full_name(user_info.full_name),
         username=username,
-        email=user_info.email,
+        email=user_info.email.lower(),
         password_hash=hashed_password,
         role_id=None,
     )
@@ -55,6 +57,9 @@ async def register (user_info: UserCreate, db: DBSession) -> UserResponse:
         db.add(new_user)
         await db.commit()
         await db.refresh(new_user)
+
+        query = select(Users).options(selectinload(Users.role)).where(Users.user_id == new_user.user_id)
+        new_user = (await db.execute(query)).scalar_one()
 
     except IntegrityError:
         await db.rollback()
@@ -65,9 +70,9 @@ async def register (user_info: UserCreate, db: DBSession) -> UserResponse:
     
     return new_user
 
-@router.post("/login", response_model=Token, summary="Login and get access token",
+@router.post("/login", response_model=TokenLogin, summary="Login and get access token",
              description="Authenticate with email and password to receive JWT tokens.")
-async def login (db: DBSession, form_data: OAuth2PasswordRequestForm = Depends()) -> Token:
+async def login (db: DBSession, form_data: OAuth2PasswordRequestForm = Depends()) -> TokenLogin:
     """
     Login with email and password.
 
@@ -79,7 +84,7 @@ async def login (db: DBSession, form_data: OAuth2PasswordRequestForm = Depends()
     - **access_token**: Short-lived JWT for API access
     - **refresh_token**: Long-lived JWT for getting new access tokens
     """    
-    query = select(Users).where(Users.email == form_data.username)
+    query = select(Users).where(Users.email == form_data.username.lower())
     user = (await db.execute(query)).scalar_one_or_none()
 
     if not user:
@@ -105,15 +110,15 @@ async def login (db: DBSession, form_data: OAuth2PasswordRequestForm = Depends()
     access_token = create_access_token(subject=user.user_id, role_id=user.role_id)
     refresh_token = create_refresh_token(subject=user.user_id)
 
-    return Token(
+    return TokenLogin(
         access_token=access_token,
         refresh_token=refresh_token,
         token_type="bearer"
     )
 
-@router.post("/refresh", response_model=Token, summary="Refresh access token",
+@router.post("/refresh", response_model=TokenRefresh, summary="Refresh access token",
              description="Use a valid refresh token to get a new access token.")
-async def refresh_token(token_request: RefreshTokenRequest, db: DBSession) -> Token:
+async def refresh_token(token: TokenDep, db: DBSession) -> TokenRefresh:
     """
     Refresh the access token using a valid refresh token.
 
@@ -122,7 +127,7 @@ async def refresh_token(token_request: RefreshTokenRequest, db: DBSession) -> To
     Returns new access and refresh tokens.
     """
 
-    payload = decode_token(token_request.refresh_token)
+    payload = decode_token(token)
     if not payload:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
@@ -165,20 +170,8 @@ async def refresh_token(token_request: RefreshTokenRequest, db: DBSession) -> To
         )
     
     new_access_token = create_access_token(subject=user.user_id, role_id=user.role_id)
-    new_refresh_token = create_refresh_token(subject=user.user_id)
 
-    return Token(
+    return TokenRefresh(
         access_token=new_access_token,
-        refresh_token=new_refresh_token,
         token_type="bearer",
     )
-
-@router.get("/me", response_model=UserResponse, summary="Get current user profile",
-            description="Get the profile of the currently authenticated user.")
-async def get_current_user_profile(current_user: CurrentUser) -> UserResponse:
-    """
-    Get the current authenticated user's profile.
-
-    Requires a valid access token in the Authorization header.
-    """
-    return current_user

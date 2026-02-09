@@ -2,8 +2,9 @@ from pydantic import BaseModel, EmailStr, Field, ConfigDict, field_validator
 from datetime import datetime
 
 class UserBase(BaseModel):
-    email: EmailStr = Field(..., description="unique email address", examples=["user@example.com"])
-    username: str = Field(..., min_length=3, max_length=50, description="username")
+    full_name: str = Field(..., min_length=6, max_length=60, description="user full name", examples=["Zyad Hossam", "Alaa Awd"])
+    email: EmailStr = Field(..., max_length=50, description="unique email address", examples=["user@example.com"])
+    username: str | None = Field(None, min_length=3, max_length=20, description="username")
 
     model_config = ConfigDict(extra="forbid")
 
@@ -29,26 +30,16 @@ class UserCreate(UserBase):
 class UserUpdate(BaseModel):
     """Schema for user self-update (cannot change role)."""
 
-    email: EmailStr | None = Field(None, description="New email address")
-    username: str | None = Field(None, min_length=3, max_length=50, description="New username")
-    password: str | None = Field(None, min_length=8, max_length=64, description="New password")
-
-    @field_validator("password")
-    @classmethod
-    def validate_password(cls, v: str | None) -> str | None:
-        if v is None:
-            return v
-        if not any(c.isdigit() for c in v):
-            raise ValueError("Password must contain at least one digit")
-        if all(c.isalnum() for c in v):
-            raise ValueError("Password must contain at least one special character")
-        return v
+    full_name: str | None = Field(None, min_length=6, max_length=60, description="new full name")
+    # email: EmailStr | None = Field(None, max_length=50, description="New email address")
+    username: str | None = Field(None, min_length=3, max_length=20, description="New username")
     
 class UserAdminUpdate(BaseModel):
     """Schema for admin updating any user."""
 
-    email: EmailStr | None = Field(None, description="New email address")
-    username: str | None = Field(None, min_length=3, max_length=50, description="New username")
+    full_name: str | None = Field(None, min_length=6, max_length=60, description="New full name")
+    email: EmailStr | None = Field(None, max_length=50, description="New email address")
+    username: str | None = Field(None, min_length=3, max_length=20, description="New username")
     role_id: int | None = Field(None, description="New role ID")
     is_active: bool | None = Field(None, description="New User Status")
 
@@ -65,9 +56,19 @@ class UserResponse(UserBase):
     """
 
     user_id: int
+    full_name: str
     username: str
-    role_id: int
+    role: str | None = None
     is_active: bool
     created_at: datetime
 
     model_config = ConfigDict(from_attributes=True)
+
+    @field_validator('role', mode='before')
+    @classmethod
+    def get_role_name(cls, v):
+        if hasattr(v, 'role_name'):
+            return v.role_name
+        if v is None:
+            return None
+        return str(v)

@@ -2,11 +2,20 @@ from pydantic import BaseModel, Field
 from datetime import datetime
 
 class Token(BaseModel):
-    """Response schema for authentication tokens"""
+    """Base schema for authentication tokens"""
+
+    token_type: str = Field(default="bearer", description="Token type")
+
+class TokenLogin(Token):
+    """Schema for response to the login endpoint"""
 
     access_token: str = Field(..., description="JWT access token")
     refresh_token: str = Field(..., description="JWT refresh token")
-    token_type: str = Field(default="bearer", description="Token type")
+
+class TokenRefresh(Token):
+    """Schema for response to the refresh endpoint"""
+
+    access_token: str = Field(..., description="JWT access token")
 
 class TokenPayload(BaseModel):
     """Schema for decoded JWT token payload."""
