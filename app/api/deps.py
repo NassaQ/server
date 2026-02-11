@@ -1,17 +1,16 @@
-from typing import Annotated
+from typing import Annotated, AsyncIterator
 
 from fastapi import Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer
-from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
 
 from app.core.security import decode_token
-from app.models.models import Users
+from app.core.storage import AzureBlobStorage, StorageBase
+from app.core.config import settings
 
-from app.db.session import get_db
-from app.core.security import decode_token
 from app.models.models import Users
+from app.db.session import get_db
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/api/v1/auth/login")
 
@@ -28,6 +27,28 @@ def capitalize_full_name(name: str) -> str:
     full_name = ' '.join(names)
 
     return full_name
+
+async def get_storage() -> AsyncIterator[StorageBase]:
+    """
+    Dependency that yields the correct storage backend based on config.
+    Handles the lifecycle (opening/closing connections) automatically.
+    """
+    storage_type = settings.BLOB_STORAGE_TYPE
+    
+    storage: StorageBase
+    if storage_type == "azure":
+        storage = AzureBlobStorage(
+            conn_str=settings.BLOB_CONNECTION_STR, 
+            container=settings.BLOB_STORAGE_CONTAINER_NAME
+        )
+    else:
+        pass
+
+    await storage.__aenter__()
+    try:
+        yield storage
+    finally:
+        await storage.__aexit__(None, None, None)
 
 async def get_current_user(token: TokenDep, db: DBSession) -> Users:
     """
