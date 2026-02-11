@@ -19,12 +19,28 @@ async def upload_file(
     Returns the absolute path or URL.
     """
 
+    folder = metadata.folder.strip("/") if metadata.folder else ""
+    clean_path = f"{folder}/{file.filename}" if folder else file.filename
+
     try:
+        MAX_SIZE = 50 * 1024 * 1024
+        
+        if file.size and file.size > MAX_SIZE:
+            raise HTTPException(
+                status_code=status.HTTP_413_CONTENT_TOO_LARGE, 
+                detail="File too large"
+            )
+
         content = await file.read()
-        path = os.path.join(metadata.folder, file.filename)
         
-        result_path = await storage.upload(content, path)
-        
+        if len(content) > MAX_SIZE:
+            raise HTTPException(
+                status_code=status.HTTP_413_CONTENT_TOO_LARGE, 
+                detail="File too large"
+            )
+
+        result_path = await storage.upload(content, clean_path)
+
         return FileUploadResponse(
             filename=file.filename,
             path=result_path,
@@ -32,9 +48,11 @@ async def upload_file(
             size=len(content),
             metadata=metadata
         )
-        
+
+    except HTTPException:
+        raise 
     except Exception as e:
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, 
-            detail=str(e)
+            detail=f"Storage Error: {str(e)}"
         )
