@@ -28,7 +28,7 @@ async def list_users(
     Requires an admin role.
     """
 
-    query = select(Users).offset(skip).limit(limit).order_by(Users.created_at.desc())
+    query = select(Users).options(selectinload(Users.role)).offset(skip).limit(limit).order_by(Users.created_at.desc())
     users = (await db.execute(query)).scalars().all()
 
     return users
