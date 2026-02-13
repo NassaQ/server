@@ -50,6 +50,7 @@ class VirtualPaths(Base):
     full_path: Mapped[str] = mapped_column(Unicode(500, 'SQL_Latin1_General_CP1_CI_AS'), nullable=False)
     created_at: Mapped[datetime.datetime] = mapped_column(DateTime, nullable=False, server_default=text('(getdate())'))
     description: Mapped[Optional[str]] = mapped_column(Unicode(collation='SQL_Latin1_General_CP1_CI_AS'))
+    depth: Mapped[int] = mapped_column(Integer, nullable=False)
 
     Documents: Mapped[list['Documents']] = relationship('Documents', back_populates='path')
 

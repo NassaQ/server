@@ -7,7 +7,7 @@ from app.schemas.docs import FileUploadResponse, FileMetadata
 
 router = APIRouter()
 
-@router.post("/upload", response_model=FileUploadResponse, status_code=status.HTTP_201_CREATED, summary="upload file to process",
+@router.post("/upload", response_model=FileUploadResponse, status_code=status.HTTP_201_CREATED, summary="Upload file to process",
              description="Accepts a file and metadata, then saves it to the configured storage (until now)")
 async def upload_file(
     file: UploadFile = File(..., description="The actual file to be uploaded"),
