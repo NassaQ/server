@@ -20,6 +20,8 @@ class Settings(BaseSettings):
     BLOB_STORAGE_CONTAINER_NAME: str
     MAX_SIZE_UPLOAD: int = 50 * 1024 * 1024
 
+    MESSAGE_BROKER_URL: str
+
     MONGO_USER: str
     MONGO_PASS: str
     MONGO_HOST: str
