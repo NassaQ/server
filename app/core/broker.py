@@ -1,5 +1,6 @@
 from abc import ABC, abstractmethod
 import json
+from typing import Awaitable, Callable
 import aio_pika
 
 class BaseBroker(ABC):
@@ -32,9 +33,23 @@ class RabbitMQBroker(BaseBroker):
         await self.channel.declare_queue(queue_name, durable=True)
         
         await self.channel.default_exchange.publish(
-            aio_pika.Message(body=json.dumps(message).encode()),
+            aio_pika.Message(
+                body=json.dumps(message).encode(),
+                delivery_mode=aio_pika.DeliveryMode.PERSISTENT
+            ),
             routing_key=queue_name,
         )
+    
+    async def consume(self, queue_name: str, callback: Callable[[dict], Awaitable[None]]):
+        await self.channel.set_qos(prefetch_count=1)
+        queue = await self.channel.declare_queue(queue_name, durable=True)
+
+        async def on_message(message: aio_pika.abc.AbstractIncomingMessage):
+            async with message.process(requeue=True):
+                body = json.loads(message.body.decode())
+                await callback(body)
+        
+        await queue.consume(on_message)
 
     async def close(self):
         if self.connection:
@@ -48,7 +63,7 @@ class AzureServiceBusBroker(BaseBroker):
     async def publish(self, queue_name: str, message: dict):
         pass 
 
-    async def consume(self, queue_name: str, callback):
+    async def consume(self, queue_name: str, callback: Callable[[dict], Awaitable[None]]):
         pass 
 
     async def close(self):
