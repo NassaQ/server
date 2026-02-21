@@ -72,10 +72,8 @@ async def upload_file(
             stage_name="OCR",
             status="Queued",
         )
-
         db.add(processing_status)
-        await db.commit()
-        await db.refresh(new_doc)
+        await db.flush()
         
         message_payload = {
             "doc_id": new_doc.doc_id,
@@ -83,20 +81,24 @@ async def upload_file(
             "filename": new_doc.filename,
             "user_id": current_user.user_id,
         }
-        
         await broker.publish("ocr_queue", message_payload)
+        
+        await db.commit()
+        await db.refresh(new_doc)
     
     except IntegrityError:
         await db.rollback()
+        await storage.delete(clean_path) 
         raise HTTPException(
             status_code=status.HTTP_409_CONFLICT,
             detail="A document with this filename already exists at the specified path.",
         )
     except Exception as e:
         await db.rollback()
+        await storage.delete(clean_path)
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"Failed to save document record: {str(e)}",
+            detail=f"Failed to process document: {str(e)}",
         )
 
 
