@@ -1,0 +1,28 @@
+# Git
+.git
+.gitignore
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Environments
+.env
+.venv
+venv/
+env/
+ENV/
+
+# UV
+.uv
+uv.lock
+
+# IDEs
+.vscode/
+.idea/
+*.swp
