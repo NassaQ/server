@@ -1,10 +1,11 @@
 from typing import Annotated, AsyncIterator
 
-from fastapi import Depends, HTTPException, status
+from fastapi import Depends, HTTPException, Request, status
 from fastapi.security import OAuth2PasswordBearer
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
 
+from app.core.broker import BaseBroker, RabbitMQBroker
 from app.core.security import decode_token
 from app.core.storage import AzureBlobStorage, StorageBase
 from app.core.config import settings
@@ -49,6 +50,15 @@ async def get_storage() -> AsyncIterator[StorageBase]:
         yield storage
     finally:
         await storage.__aexit__(None, None, None)
+
+def get_broker() -> BaseBroker:
+    if settings.ENVIRONMENT == "production":
+        raise NotImplementedError("Azure Bus not configured yet")
+    else:
+        return RabbitMQBroker(settings.MESSAGE_BROKER_URL)
+
+def get_event_broker(request: Request) -> BaseBroker:
+    return request.app.state.broker
 
 async def get_current_user(token: TokenDep, db: DBSession) -> Users:
     """

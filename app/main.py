@@ -1,14 +1,20 @@
 from contextlib import asynccontextmanager
 from fastapi import FastAPI, status, Response
 
+from app.api.deps import get_broker
 from app.core.config import settings
 from app.api.v1 import api
 from app.db.session import engine
 
+broker = get_broker()
+
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    yield
+    await broker.connect()
+    app.state.broker = broker
 
+    yield
+    await broker.close()
     await engine.dispose()
 
 app = FastAPI(

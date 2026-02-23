@@ -2,7 +2,8 @@ from fastapi import APIRouter, UploadFile, status, HTTPException, File, Depends
 from sqlalchemy import select
 from sqlalchemy.exc import IntegrityError
 
-from app.api.deps import ActiveUser, DBSession, get_storage
+from app.api.deps import ActiveUser, DBSession, get_event_broker, get_storage
+from app.core.broker import BaseBroker
 from app.core.storage import StorageBase
 from app.models.models import Documents, VirtualPaths
 from app.schemas.docs import FileUploadResponse, FileMetadata
@@ -18,6 +19,7 @@ async def upload_file(
     file: UploadFile = File(..., description="The actual file to be uploaded"),
     metadata: FileMetadata = Depends(FileMetadata.as_form),
     storage: StorageBase = Depends(get_storage),
+    broker: BaseBroker = Depends(get_event_broker)
 ) -> FileUploadResponse:
     """
     Uploads a file to the configured storage backend (Azure or Local).
@@ -66,6 +68,17 @@ async def upload_file(
         try:
             db.add(new_doc)
             await db.commit()
+            await db.refresh(new_doc)
+            
+            message_payload = {
+                "doc_id": new_doc.doc_id,
+                "file_path": result_path,
+                "filename": new_doc.filename,
+                "user_id": current_user.user_id,
+                "mongo_doc_id": "pending" 
+            }
+            
+            await broker.publish("ocr_queue", message_payload)
         
         except IntegrityError:
             await db.rollback()
