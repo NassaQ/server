@@ -1,12 +1,15 @@
-from fastapi import APIRouter, UploadFile, status, HTTPException, File, Depends
-from sqlalchemy import select
-from sqlalchemy.exc import IntegrityError
+from typing import Annotated
 
-from app.api.deps import ActiveUser, DBSession, get_event_broker, get_storage
+from fastapi import APIRouter, Query, UploadFile, status, HTTPException, File, Depends
+from sqlalchemy import func, select
+from sqlalchemy.exc import IntegrityError
+from sqlalchemy.orm import selectinload
+
+from app.api.deps import ActiveUser, AdminUser, DBSession, get_event_broker, get_storage, doc_to_list_item
 from app.core.broker import BaseBroker
 from app.core.storage import StorageBase
 from app.models.models import Documents, VirtualPaths, ProcessingStatus
-from app.schemas.docs import FileUploadResponse, FileMetadata
+from app.schemas.docs import FileUploadResponse, FileMetadata, DocumentListResponse
 from app.core.config import settings
 
 router = APIRouter()
@@ -109,3 +112,45 @@ async def upload_file(
         size=len(content),
         metadata=metadata
     )
+
+@router.get("/", response_model=DocumentListResponse, summary="List all documents (admin)",
+            description="Returns a paginated list of all documents. Supports filtering by user_id.")
+async def list_all_docs(
+    db: DBSession,
+    current_user: AdminUser,
+    skip: Annotated[int, Query(ge=0, description="Number of records to skip")] = 0,
+    limit: Annotated[int, Query(ge=1, le=100, description="Max records to return")] = 20,
+    user_id: int | None = None,
+) -> DocumentListResponse:
+
+    conditions = []
+    if user_id:
+        conditions.append(Documents.uploaded_by_user_id == user_id)
+
+    query = select(func.count(Documents.doc_id))
+    for cond in conditions:
+        query = query.where(cond)
+    
+    total = (await db.execute(query)).scalar_one()
+
+    query = (
+        select(Documents)
+        .options(
+            selectinload(Documents.Processing_Status),
+            selectinload(Documents.path),
+        )
+        .order_by(Documents.uploaded_at.desc())
+        .offset(skip)
+        .limit(limit)
+    )
+
+    for cond in conditions:
+        query = query.where(cond)
+
+    docs = (await db.execute(query)).scalars().all()
+
+    return DocumentListResponse(
+        total=total,
+        items=[doc_to_list_item(doc) for doc in docs],
+    )
+
