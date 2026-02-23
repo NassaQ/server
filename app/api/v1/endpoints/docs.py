@@ -162,3 +162,51 @@ async def list_all_docs(
         items=[doc_to_list_item(doc) for doc in docs],
     )
 
+@router.get("/me", response_model=DocumentListResponse, summary="List my documents",
+            description="Returns a paginated list of the current user's documents.")
+async def list_my_docs(
+    db: DBSession,
+    current_user: ActiveUser,
+    skip: Annotated[int, Query(ge=0, description="Number of records to skip")] = 0,
+    limit: Annotated[int, Query(ge=1, le=100, description="Max records to return")] = 20,
+    status: Annotated[Literal["Finished", "Failed", "Processing", "Queued"] | None, Query(description="Filter by status")] = None,
+) -> DocumentListResponse:
+    
+    conditions = []
+    conditions.append(Documents.uploaded_by_user_id == current_user.user_id)
+    if status:
+        conditions.append(
+            Documents.Processing_Status.any(
+                (ProcessingStatus.status == status) & 
+                (ProcessingStatus.stage_name == "OCR")
+            )
+        )
+
+    query = select(func.count(Documents.doc_id))
+    for cond in conditions:
+        query = query.where(cond)
+    
+    total = (await db.execute(query)).scalar_one()
+
+    query = (
+        select(Documents)
+        .options(
+            selectinload(Documents.Processing_Status),
+            selectinload(Documents.path),
+        )
+        .order_by(Documents.uploaded_at.desc())
+        .offset(skip)
+        .limit(limit)
+    )
+
+    for cond in conditions:
+        query = query.where(cond)
+
+    docs = (await db.execute(query)).scalars().all()
+
+    return DocumentListResponse(
+        total=total,
+        items=[doc_to_list_item(doc) for doc in docs],
+    )
+
+
