@@ -1,4 +1,4 @@
-from typing import Annotated
+from typing import Annotated, Literal
 
 from fastapi import APIRouter, Query, UploadFile, status, HTTPException, File, Depends
 from sqlalchemy import func, select
@@ -120,12 +120,20 @@ async def list_all_docs(
     current_user: AdminUser,
     skip: Annotated[int, Query(ge=0, description="Number of records to skip")] = 0,
     limit: Annotated[int, Query(ge=1, le=100, description="Max records to return")] = 20,
+    status: Annotated[Literal["Finished", "Failed", "Processing", "Queued"] | None, Query(description="Filter by status")] = None,
     user_id: int | None = None,
 ) -> DocumentListResponse:
 
     conditions = []
     if user_id:
         conditions.append(Documents.uploaded_by_user_id == user_id)
+    if status:
+        conditions.append(
+            Documents.Processing_Status.any(
+                (ProcessingStatus.status == status) & 
+                (ProcessingStatus.stage_name == "OCR")
+            )
+        )
 
     query = select(func.count(Documents.doc_id))
     for cond in conditions:
