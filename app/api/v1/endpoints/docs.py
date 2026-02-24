@@ -9,7 +9,7 @@ from app.api.deps import ActiveUser, AdminUser, DBSession, get_event_broker, get
 from app.core.broker import BaseBroker
 from app.core.storage import StorageBase
 from app.models.models import Documents, VirtualPaths, ProcessingStatus
-from app.schemas.docs import FileUploadResponse, FileMetadata, DocumentListResponse
+from app.schemas.docs import DocumentStatusResponse, FileUploadResponse, FileMetadata, DocumentListResponse
 from app.core.config import settings
 
 router = APIRouter()
@@ -209,4 +209,42 @@ async def list_my_docs(
         items=[doc_to_list_item(doc) for doc in docs],
     )
 
+@router.get("/{doc_id}/status", response_model=DocumentStatusResponse, summary="Check document processing status",
+            description="Returns the current OCR processing status for a document.")
+async def get_doc_status(
+    doc_id: int,
+    db: DBSession,
+    current_user: ActiveUser,
+) -> DocumentStatusResponse:
+    
+    query = (
+        select(Documents, ProcessingStatus)
+        .outerjoin(
+            ProcessingStatus, 
+            (Documents.doc_id == ProcessingStatus.doc_id) & (ProcessingStatus.stage_name == "OCR")
+        )
+        .where(
+            Documents.doc_id == doc_id,
+            Documents.uploaded_by_user_id == current_user.user_id
+        )
+    )
+    result = (await db.execute(query)).scalar_one_or_none()
+
+    if not result:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"Document with id {doc_id} not found.",
+        )
+    
+    doc, ps = result
+
+    return DocumentStatusResponse(
+        doc_id=doc.doc_id,
+        filename=doc.filename,
+        stage_name=ps.stage_name,
+        status=ps.status,
+        start_time=ps.start_time,
+        end_time=ps.end_time,
+        error_message=ps.error_message,
+    )
 

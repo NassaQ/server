@@ -44,3 +44,14 @@ class DocumentListResponse(BaseModel):
 
     total: int = Field(..., description="Total number of matching documents")
     items: List[DocumentListItem] = Field(..., description="List of documents for the current page")
+
+class DocumentStatusResponse(BaseModel):
+    """Response schema for checking a document's processing status."""
+
+    doc_id: int = Field(..., description="Document ID")
+    filename: str = Field(..., description="Original filename")
+    stage_name: str = Field(..., description="Processing stage (e.g. OCR)")
+    status: str = Field(..., description="Current status: Queued, Processing, Finished, or Failed")
+    start_time: Optional[datetime] = Field(None, description="When processing started")
+    end_time: Optional[datetime] = Field(None, description="When processing completed or failed")
+    error_message: Optional[str] = Field(None, description="Error details if status is Failed")
