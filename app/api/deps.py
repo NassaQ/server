@@ -6,7 +6,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
 from sqlalchemy.orm import selectinload
 
-from app.core.broker import BaseBroker, RabbitMQBroker
+from app.core.broker import AzureServiceBusBroker, BaseBroker, RabbitMQBroker
 from app.core.security import decode_token
 from app.core.storage import AzureBlobStorage, StorageBase
 from app.core.config import settings
@@ -38,7 +38,7 @@ def doc_to_list_item(doc: Documents) -> DocumentListItem:
         (ps for ps in doc.Processing_Status if ps.stage_name == "OCR"),
         None,
     )
-    
+
     return DocumentListItem(
         doc_id=doc.doc_id,
         filename=doc.filename,
@@ -55,7 +55,7 @@ async def get_storage() -> AsyncIterator[StorageBase]:
     Handles the lifecycle (opening/closing connections) automatically.
     """
     storage_type = settings.BLOB_STORAGE_TYPE
-    
+
     storage: StorageBase
     if storage_type == "azure":
         storage = AzureBlobStorage(
@@ -73,7 +73,7 @@ async def get_storage() -> AsyncIterator[StorageBase]:
 
 def get_broker() -> BaseBroker:
     if settings.ENVIRONMENT == "production":
-        raise NotImplementedError("Azure Bus not configured yet")
+        return AzureServiceBusBroker(settings.MESSAGE_BROKER_URL)
     else:
         return RabbitMQBroker(settings.MESSAGE_BROKER_URL)
 
@@ -109,7 +109,7 @@ async def get_current_user(token: TokenDep, db: DBSession) -> Users:
 
     if not user:
         raise credException
-    
+
     return user
 
 CurrentUser = Annotated[Users, Depends(get_current_user)]
@@ -124,7 +124,7 @@ async def get_current_active_user(current_user: CurrentUser) -> Users:
             status_code=status.HTTP_403_FORBIDDEN,
             detail="Your account is pending role assignment. Please contact an administrator.",
         )
-    
+
     return current_user
 
 ActiveUser = Annotated[Users, Depends(get_current_active_user)]
