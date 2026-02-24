@@ -228,7 +228,7 @@ async def get_doc_status(
             Documents.uploaded_by_user_id == current_user.user_id
         )
     )
-    result = (await db.execute(query)).scalar_one_or_none()
+    result = (await db.execute(query)).first()
 
     if not result:
         raise HTTPException(
