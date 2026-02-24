@@ -55,3 +55,9 @@ class DocumentStatusResponse(BaseModel):
     start_time: Optional[datetime] = Field(None, description="When processing started")
     end_time: Optional[datetime] = Field(None, description="When processing completed or failed")
     error_message: Optional[str] = Field(None, description="Error details if status is Failed")
+
+class DocumentDeleteResponse(BaseModel):
+    """Response schema for deleting a document."""
+
+    doc_id: int = Field(..., description="Deleted document ID")
+    message: str = Field(..., description="Result message")

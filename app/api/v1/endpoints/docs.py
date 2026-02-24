@@ -1,15 +1,15 @@
 from typing import Annotated, Literal
 
 from fastapi import APIRouter, Query, UploadFile, status, HTTPException, File, Depends
-from sqlalchemy import func, select
+from sqlalchemy import delete, func, select
 from sqlalchemy.exc import IntegrityError
-from sqlalchemy.orm import selectinload
+from sqlalchemy.orm import joinedload, selectinload
 
 from app.api.deps import ActiveUser, AdminUser, DBSession, get_event_broker, get_storage, doc_to_list_item
 from app.core.broker import BaseBroker
 from app.core.storage import StorageBase
 from app.models.models import Documents, VirtualPaths, ProcessingStatus
-from app.schemas.docs import DocumentStatusResponse, FileUploadResponse, FileMetadata, DocumentListResponse
+from app.schemas.docs import DocumentDeleteResponse, DocumentStatusResponse, FileUploadResponse, FileMetadata, DocumentListResponse
 from app.core.config import settings
 
 router = APIRouter()
@@ -248,3 +248,63 @@ async def get_doc_status(
         error_message=ps.error_message,
     )
 
+@router.delete("/{doc_id}", response_model=DocumentDeleteResponse, summary="Delete a document (admin)",
+               description="Deletes a document's database records and its blob from storage. Blocked if the document is currently being processed. Admin only.")
+async def delete_document(
+    doc_id: int,
+    db: DBSession,
+    current_user: AdminUser,
+    storage: StorageBase = Depends(get_storage),
+) -> DocumentDeleteResponse:
+
+    query = (
+        select(Documents)
+        .options(joinedload(Documents.path))
+        .where(Documents.doc_id == doc_id)
+    )
+    doc = (await db.execute(query)).scalar_one_or_none()
+
+    if not doc:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"Document with id {doc_id} not found.",
+        )
+
+    active_status_query = select(ProcessingStatus.status).where(
+        ProcessingStatus.doc_id == doc_id,
+        ProcessingStatus.status.in_(["Queued", "Processing"])
+    )
+    active_status = (await db.execute(active_status_query)).scalar_one_or_none()
+
+    if active_status:
+        raise HTTPException(
+            status_code=status.HTTP_409_CONFLICT,
+            detail=f"Cannot delete document while it is '{active_status}'. Wait for processing to complete or fail.",
+        )
+
+    raw_path = doc.path.full_path.strip("/") if doc.path and doc.path.full_path else ""
+    blob_path = f"{raw_path}/{doc.filename}" if raw_path else doc.filename
+
+    try:
+        await db.execute(delete(ProcessingStatus).where(ProcessingStatus.doc_id == doc_id))
+        
+        await db.delete(doc)
+        await db.commit()
+    except IntegrityError:
+        await db.rollback()
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST, 
+            detail="Delete failed. Please try again."
+        )
+
+    try:
+        await storage.delete(blob_path)
+    except Exception:
+        # DB records are already gone. Log but don't fail the request.
+        # The blob becomes orphaned — acceptable; can be cleaned up separately.
+        pass
+
+    return DocumentDeleteResponse(
+        doc_id=doc_id,
+        message="Document deleted successfully.",
+    )
