@@ -4,13 +4,15 @@ from fastapi import Depends, HTTPException, Request, status
 from fastapi.security import OAuth2PasswordBearer
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
+from sqlalchemy.orm import selectinload
 
 from app.core.broker import BaseBroker, RabbitMQBroker
 from app.core.security import decode_token
 from app.core.storage import AzureBlobStorage, StorageBase
 from app.core.config import settings
 
-from app.models.models import Users
+from app.models.models import Documents, Users
+from app.schemas.docs import DocumentListItem
 from app.db.session import get_db
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/api/v1/auth/login")
@@ -28,6 +30,24 @@ def capitalize_full_name(name: str) -> str:
     full_name = ' '.join(names)
 
     return full_name
+
+def doc_to_list_item(doc: Documents) -> DocumentListItem:
+    """Extract OCR status from a Documents object loaded with Processing_Status + path."""
+
+    ocr_status = next(
+        (ps for ps in doc.Processing_Status if ps.stage_name == "OCR"),
+        None,
+    )
+    
+    return DocumentListItem(
+        doc_id=doc.doc_id,
+        filename=doc.filename,
+        path=doc.path.full_path if doc.path else "/",
+        uploaded_by_user_id=doc.uploaded_by_user_id,
+        uploaded_at=doc.uploaded_at,
+        status=ocr_status.status if ocr_status else None,
+        error_message=ocr_status.error_message if ocr_status else None,
+    )
 
 async def get_storage() -> AsyncIterator[StorageBase]:
     """
@@ -84,7 +104,7 @@ async def get_current_user(token: TokenDep, db: DBSession) -> Users:
     except ValueError:
         raise credException
     
-    query = select(Users).where(Users.user_id == user_id)
+    query = select(Users).options(selectinload(Users.role)).where(Users.user_id == user_id)
     user = (await db.execute(query)).scalar_one_or_none()
 
     if not user:
