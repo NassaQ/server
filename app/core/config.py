@@ -1,9 +1,12 @@
+from typing import List
+
 from pydantic_settings import BaseSettings, SettingsConfigDict
 from pydantic import computed_field
 from urllib.parse import quote_plus
 
 class Settings(BaseSettings):
     ENVIRONMENT: str = "production"
+    CORS_ORIGINS: List[str]
 
     SQL_SERVER: str
     SQL_DB_NAME: str
