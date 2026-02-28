@@ -1,17 +1,19 @@
-from typing import Annotated
+from typing import Annotated, AsyncIterator
 
-from fastapi import Depends, HTTPException, status
+from fastapi import Depends, HTTPException, Request, status
 from fastapi.security import OAuth2PasswordBearer
-from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
+from sqlalchemy.orm import selectinload
 
+from app.core.broker import BaseBroker, RabbitMQBroker
 from app.core.security import decode_token
-from app.models.models import Users
+from app.core.storage import AzureBlobStorage, StorageBase
+from app.core.config import settings
 
+from app.models.models import Documents, Users
+from app.schemas.docs import DocumentListItem
 from app.db.session import get_db
-from app.core.security import decode_token
-from app.models.models import Users
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/api/v1/auth/login")
 
@@ -28,6 +30,55 @@ def capitalize_full_name(name: str) -> str:
     full_name = ' '.join(names)
 
     return full_name
+
+def doc_to_list_item(doc: Documents) -> DocumentListItem:
+    """Extract OCR status from a Documents object loaded with Processing_Status + path."""
+
+    ocr_status = next(
+        (ps for ps in doc.Processing_Status if ps.stage_name == "OCR"),
+        None,
+    )
+    
+    return DocumentListItem(
+        doc_id=doc.doc_id,
+        filename=doc.filename,
+        path=doc.path.full_path if doc.path else "/",
+        uploaded_by_user_id=doc.uploaded_by_user_id,
+        uploaded_at=doc.uploaded_at,
+        status=ocr_status.status if ocr_status else None,
+        error_message=ocr_status.error_message if ocr_status else None,
+    )
+
+async def get_storage() -> AsyncIterator[StorageBase]:
+    """
+    Dependency that yields the correct storage backend based on config.
+    Handles the lifecycle (opening/closing connections) automatically.
+    """
+    storage_type = settings.BLOB_STORAGE_TYPE
+    
+    storage: StorageBase
+    if storage_type == "azure":
+        storage = AzureBlobStorage(
+            conn_str=settings.BLOB_CONNECTION_STR, 
+            container=settings.BLOB_STORAGE_CONTAINER_NAME
+        )
+    else:
+        pass
+
+    await storage.__aenter__()
+    try:
+        yield storage
+    finally:
+        await storage.__aexit__(None, None, None)
+
+def get_broker() -> BaseBroker:
+    if settings.ENVIRONMENT == "production":
+        raise NotImplementedError("Azure Bus not configured yet")
+    else:
+        return RabbitMQBroker(settings.MESSAGE_BROKER_URL)
+
+def get_event_broker(request: Request) -> BaseBroker:
+    return request.app.state.broker
 
 async def get_current_user(token: TokenDep, db: DBSession) -> Users:
     """
@@ -53,7 +104,7 @@ async def get_current_user(token: TokenDep, db: DBSession) -> Users:
     except ValueError:
         raise credException
     
-    query = select(Users).where(Users.user_id == user_id)
+    query = select(Users).options(selectinload(Users.role)).where(Users.user_id == user_id)
     user = (await db.execute(query)).scalar_one_or_none()
 
     if not user:

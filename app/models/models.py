@@ -39,6 +39,22 @@ class Roles(Base):
     Users: Mapped[list['Users']] = relationship('Users', back_populates='role')
 
 
+class VirtualPaths(Base):
+    __tablename__ = 'Virtual_Paths'
+    __table_args__ = (
+        PrimaryKeyConstraint('path_id', name='PK_Virtual_Paths'),
+        Index('UQ_Virtual_Paths_FullPath', 'full_path', unique=True)
+    )
+
+    path_id: Mapped[int] = mapped_column(Integer, Identity(start=1, increment=1), primary_key=True)
+    full_path: Mapped[str] = mapped_column(Unicode(500, 'SQL_Latin1_General_CP1_CI_AS'), nullable=False)
+    created_at: Mapped[datetime.datetime] = mapped_column(DateTime, nullable=False, server_default=text('(getdate())'))
+    description: Mapped[Optional[str]] = mapped_column(Unicode(collation='SQL_Latin1_General_CP1_CI_AS'))
+    depth: Mapped[int] = mapped_column(Integer, nullable=False)
+
+    Documents: Mapped[list['Documents']] = relationship('Documents', back_populates='path')
+
+
 class Sysdiagrams(Base):
     __tablename__ = 'sysdiagrams'
     __table_args__ = (
@@ -88,31 +104,31 @@ class Users(Base):
     is_active: Mapped[bool] = mapped_column(Boolean, nullable=False, server_default=text('((0))'))
     role_id: Mapped[Optional[int]] = mapped_column(Integer, server_default=text('((1))'))
 
-    role: Mapped[Optional['Roles']] = relationship('Roles', back_populates='Users', foreign_keys=[role_id], lazy="selectin")
-    Folders: Mapped[list['Folders']] = relationship('Folders', back_populates='created_by_user')
+    role: Mapped[Optional['Roles']] = relationship('Roles', back_populates='Users')
+    Documents: Mapped[list['Documents']] = relationship('Documents', back_populates='uploaded_by_user')
     Individual_Permissions: Mapped[list['IndividualPermissions']] = relationship('IndividualPermissions', back_populates='user')
     Logs: Mapped[list['Logs']] = relationship('Logs', back_populates='user')
-    Documents: Mapped[list['Documents']] = relationship('Documents', back_populates='uploaded_by_user')
 
 
-class Folders(Base):
-    __tablename__ = 'Folders'
+class Documents(Base):
+    __tablename__ = 'Documents'
     __table_args__ = (
-        ForeignKeyConstraint(['created_by_user_id'], ['Users.user_id'], name='FK_Folder_Creator'),
-        ForeignKeyConstraint(['parent_folder_id'], ['Folders.folder_id'], name='FK_Folder_Parent'),
-        PrimaryKeyConstraint('folder_id', name='PK__Folders__0045071B1BA60619')
+        ForeignKeyConstraint(['path_id'], ['Virtual_Paths.path_id'], name='FK_Doc_Path'),
+        ForeignKeyConstraint(['uploaded_by_user_id'], ['Users.user_id'], name='FK_Doc_Uploader'),
+        PrimaryKeyConstraint('doc_id', name='PK__Document__8AD02924828124C8'),
+        Index('UQ_Documents_Filename_Path', 'filename', 'path_id', unique=True)
     )
 
-    folder_id: Mapped[int] = mapped_column(Integer, Identity(start=1, increment=1), primary_key=True)
-    folder_name: Mapped[str] = mapped_column(Unicode(100, 'SQL_Latin1_General_CP1_CI_AS'), nullable=False)
-    created_by_user_id: Mapped[int] = mapped_column(Integer, nullable=False)
-    created_at: Mapped[datetime.datetime] = mapped_column(DateTime, nullable=False, server_default=text('(getdate())'))
-    parent_folder_id: Mapped[Optional[int]] = mapped_column(Integer)
+    doc_id: Mapped[int] = mapped_column(BigInteger, Identity(start=1, increment=1), primary_key=True)
+    filename: Mapped[str] = mapped_column(Unicode(255, 'SQL_Latin1_General_CP1_CI_AS'), nullable=False)
+    path_id: Mapped[int] = mapped_column(Integer, nullable=False)
+    uploaded_by_user_id: Mapped[int] = mapped_column(Integer, nullable=False)
+    mongo_doc_id: Mapped[str] = mapped_column(String(36, 'SQL_Latin1_General_CP1_CI_AS'), nullable=False)
+    uploaded_at: Mapped[datetime.datetime] = mapped_column(DateTime, nullable=False, server_default=text('(getdate())'))
 
-    created_by_user: Mapped['Users'] = relationship('Users', back_populates='Folders')
-    parent_folder: Mapped[Optional['Folders']] = relationship('Folders', remote_side=[folder_id], back_populates='parent_folder_reverse')
-    parent_folder_reverse: Mapped[list['Folders']] = relationship('Folders', remote_side=[parent_folder_id], back_populates='parent_folder')
-    Documents: Mapped[list['Documents']] = relationship('Documents', back_populates='folder')
+    path: Mapped['VirtualPaths'] = relationship('VirtualPaths', back_populates='Documents')
+    uploaded_by_user: Mapped['Users'] = relationship('Users', back_populates='Documents')
+    Processing_Status: Mapped[list['ProcessingStatus']] = relationship('ProcessingStatus', back_populates='doc')
 
 
 class IndividualPermissions(Base):
@@ -150,27 +166,6 @@ class Logs(Base):
     details: Mapped[Optional[str]] = mapped_column(Unicode(collation='SQL_Latin1_General_CP1_CI_AS'))
 
     user: Mapped[Optional['Users']] = relationship('Users', back_populates='Logs')
-
-
-class Documents(Base):
-    __tablename__ = 'Documents'
-    __table_args__ = (
-        ForeignKeyConstraint(['folder_id'], ['Folders.folder_id'], name='FK_Doc_Folder'),
-        ForeignKeyConstraint(['uploaded_by_user_id'], ['Users.user_id'], name='FK_Doc_Uploader'),
-        PrimaryKeyConstraint('doc_id', name='PK__Document__8AD02924828124C8')
-    )
-
-    doc_id: Mapped[int] = mapped_column(BigInteger, Identity(start=1, increment=1), primary_key=True)
-    filename: Mapped[str] = mapped_column(Unicode(255, 'SQL_Latin1_General_CP1_CI_AS'), nullable=False)
-    folder_id: Mapped[int] = mapped_column(Integer, nullable=False)
-    uploaded_by_user_id: Mapped[int] = mapped_column(Integer, nullable=False)
-    azure_blob_path: Mapped[str] = mapped_column(Unicode(255, 'SQL_Latin1_General_CP1_CI_AS'), nullable=False)
-    mongo_doc_id: Mapped[str] = mapped_column(String(36, 'SQL_Latin1_General_CP1_CI_AS'), nullable=False)
-    uploaded_at: Mapped[datetime.datetime] = mapped_column(DateTime, nullable=False, server_default=text('(getdate())'))
-
-    folder: Mapped['Folders'] = relationship('Folders', back_populates='Documents')
-    uploaded_by_user: Mapped['Users'] = relationship('Users', back_populates='Documents')
-    Processing_Status: Mapped[list['ProcessingStatus']] = relationship('ProcessingStatus', back_populates='doc')
 
 
 class ProcessingStatus(Base):
