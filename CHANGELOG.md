@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file. This change log follows the conventions of [keepachangelog.com](https://keepachangelog.com/).
 
+## [Unreleased]
+
+### Added
+
+- New Azure Bus service as a cloud choice for message broker. Set as default in the production environment.
+
 ---
 
 ## [0.1.0] - 2026-02-26
