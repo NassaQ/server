@@ -111,8 +111,7 @@ async def update_user(
     - **is_active**: Activate or deactivate the user
     """
 
-    query = select(Users).where(Users.user_id == user_id)
-    user = (await db.execute(query)).scalar_one_or_none()
+    user = await user_repo.get_user(user_id)
     if not user:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,

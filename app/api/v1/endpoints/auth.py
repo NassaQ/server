@@ -1,14 +1,11 @@
 from fastapi import APIRouter, Depends, status, HTTPException
 from fastapi.security import OAuth2PasswordRequestForm
 from fastapi.concurrency import run_in_threadpool
-from sqlalchemy.exc import IntegrityError
-from sqlalchemy.orm import selectinload
-from sqlalchemy import select
 
 from app.models.models import Users
 from app.schemas.user import UserCreate, UserResponse
 from app.schemas.auth import TokenLogin, TokenRefresh
-from app.api.deps import DBSession, UserRepo, gen_username, capitalize_full_name, TokenDep
+from app.api.deps import UserRepo, gen_username, capitalize_full_name, TokenDep
 from app.core.security import (
     hash_password,
     verify_password,
@@ -22,7 +19,7 @@ router = APIRouter()
 @router.post("/register", response_model=UserResponse,
     status_code=status.HTTP_201_CREATED, summary="Register a new user"
 )
-async def register (user_info: UserCreate, db: DBSession, user_repo: UserRepo) -> UserResponse:
+async def register (user_info: UserCreate, user_repo: UserRepo) -> UserResponse:
     isEmailExist = await user_repo.conflict_exists(email=user_info.email)
     if isEmailExist:
         raise HTTPException(
@@ -50,25 +47,19 @@ async def register (user_info: UserCreate, db: DBSession, user_repo: UserRepo) -
     )
 
     try:
-        db.add(new_user)
-        await db.commit()
-        await db.refresh(new_user)
-
-        query = select(Users).options(selectinload(Users.role)).where(Users.user_id == new_user.user_id)
-        new_user = (await db.execute(query)).scalar_one()
-
-    except IntegrityError:
-        await db.rollback()
+        created_user = await user_repo.create_user(new_user)
+    except ValueError as e:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Registration failed. Please try again.",
+            detail=str(e),
         )
     
-    return new_user
+    return created_user
+
 
 @router.post("/login", response_model=TokenLogin, summary="Login and get access token",
              description="Authenticate with email and password to receive JWT tokens.")
-async def login (db: DBSession, form_data: OAuth2PasswordRequestForm = Depends()) -> TokenLogin:
+async def login (user_repo: UserRepo, form_data: OAuth2PasswordRequestForm = Depends()) -> TokenLogin:
     """
     Login with email and password.
 
@@ -80,8 +71,7 @@ async def login (db: DBSession, form_data: OAuth2PasswordRequestForm = Depends()
     - **access_token**: Short-lived JWT for API access
     - **refresh_token**: Long-lived JWT for getting new access tokens
     """    
-    query = select(Users).where(Users.email == form_data.username.lower())
-    user = (await db.execute(query)).scalar_one_or_none()
+    user = await user_repo.get_user(email=form_data.username)
 
     if not user:
         raise HTTPException(
@@ -114,7 +104,7 @@ async def login (db: DBSession, form_data: OAuth2PasswordRequestForm = Depends()
 
 @router.post("/refresh", response_model=TokenRefresh, summary="Refresh access token",
              description="Use a valid refresh token to get a new access token.")
-async def refresh_token(token: TokenDep, db: DBSession) -> TokenRefresh:
+async def refresh_token(token: TokenDep, user_repo: UserRepo) -> TokenRefresh:
     """
     Refresh the access token using a valid refresh token.
 
@@ -156,8 +146,7 @@ async def refresh_token(token: TokenDep, db: DBSession) -> TokenRefresh:
             headers={"WWW-Authenticate": "Bearer"},
         )
     
-    query = select(Users).where(Users.user_id == user_id)
-    user = (await db.execute(query)).scalar_one_or_none()
+    user = await user_repo.get_user(user_id=user_id)
     if not user:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
