@@ -11,13 +11,16 @@ from app.core.security import decode_token
 from app.core.storage import AzureBlobStorage, StorageBase
 from app.core.config import settings
 
+from app.db.ops import UsersOps
+from app.db.session import get_db
 from app.models.models import Documents, Users
 from app.schemas.docs import DocumentListItem
-from app.db.session import get_db
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/api/v1/auth/login")
 
 DBSession = Annotated[AsyncSession, Depends(get_db)]
+UserRepo = Annotated[UsersOps, Depends()]
+
 TokenDep = Annotated[str, Depends(oauth2_scheme)]
 
 def gen_username(email: str) -> str:

@@ -5,7 +5,7 @@ from sqlalchemy import select, or_, func
 from sqlalchemy.orm import selectinload
 from sqlalchemy.exc import IntegrityError
 
-from app.api.deps import DBSession, AdminUser, ActiveUser, CurrentUser, capitalize_full_name
+from app.api.deps import DBSession, UserRepo, AdminUser, ActiveUser, CurrentUser, capitalize_full_name
 from app.models.models import Users, Roles
 from app.schemas.user import UserResponse, UserAdminUpdate, UserUpdate
 
@@ -14,10 +14,11 @@ router = APIRouter()
 @router.get("/", response_model=list[UserResponse], summary="List all users",
             description="Get a paginated list of all users. Requires admin role.")
 async def list_users(
-    db: DBSession,
+    user_repo: UserRepo,
     current_user: AdminUser,
     skip: Annotated[int, Query(ge=0, description="Number of records to skip")] = 0,
     limit: Annotated[int, Query(ge=1, le=100, description="Max records to return")] = 20,
+    is_active: Annotated[bool | None, Query(description="filter by pending users")] = None,
 ) -> list[UserResponse]:
     """
     List all users with pagination.
@@ -28,27 +29,7 @@ async def list_users(
     Requires an admin role.
     """
 
-    query = select(Users).options(selectinload(Users.role)).offset(skip).limit(limit).order_by(Users.created_at.desc())
-    users = (await db.execute(query)).scalars().all()
-
-    return users
-
-@router.get("/pending", response_model=list[UserResponse], summary="List users pending role assignment",
-            description="Get all users who haven't been assigned a role yet. Requires 'user:update' permission.",)
-async def list_pending_users(
-    db: DBSession,
-    current_user: AdminUser,
-    limit: Annotated[int, Query(ge=1, le=50, description="Max records to return")] = 20,
-) -> list[UserResponse]:
-    """
-    List all users who are pending role assignment (role_id is NULL).
-    
-    - **limit**: Maximum number of records to return (default: 20, max: 50)
-
-    Requires an admin role.
-    """
-    query = select(Users).options(selectinload(Users.role)).where(Users.is_active == 0).limit(limit).order_by(Users.created_at.asc())
-    users = (await db.execute(query)).scalars().all()
+    users = await user_repo.get_all_users(skip, limit, is_active)
 
     return users
 
