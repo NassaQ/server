@@ -3,12 +3,12 @@ from fastapi.security import OAuth2PasswordRequestForm
 from fastapi.concurrency import run_in_threadpool
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import selectinload
-from sqlalchemy import select, func
+from sqlalchemy import select
 
 from app.models.models import Users
 from app.schemas.user import UserCreate, UserResponse
 from app.schemas.auth import TokenLogin, TokenRefresh
-from app.api.deps import DBSession, gen_username, capitalize_full_name, TokenDep
+from app.api.deps import DBSession, UserRepo, gen_username, capitalize_full_name, TokenDep
 from app.core.security import (
     hash_password,
     verify_password,
@@ -22,10 +22,8 @@ router = APIRouter()
 @router.post("/register", response_model=UserResponse,
     status_code=status.HTTP_201_CREATED, summary="Register a new user"
 )
-async def register (user_info: UserCreate, db: DBSession) -> UserResponse:
-    query = select(1).where(func.lower(Users.email) == user_info.email.lower())
-    isEmailExist = (await db.execute(query)).first()
-
+async def register (user_info: UserCreate, db: DBSession, user_repo: UserRepo) -> UserResponse:
+    isEmailExist = await user_repo.conflict_exists(email=user_info.email)
     if isEmailExist:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
@@ -34,9 +32,7 @@ async def register (user_info: UserCreate, db: DBSession) -> UserResponse:
     
     username = user_info.username or gen_username(user_info.email)
     
-    query = select(1).where(func.lower(Users.username) == username.lower())
-    isUsernameExist = (await db.execute(query)).first() 
-
+    isUsernameExist = await user_repo.conflict_exists(email=user_info.email)
     if isUsernameExist:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
