@@ -94,3 +94,29 @@ class UsersOps:
             await self.db.rollback()
             raise ValueError("Registration failed. Please try again.")
         
+    async def update_user(self, user: Users, update_data: dict) -> Users:
+        for key, value in update_data.items():
+            setattr(user, key, value)
+            
+        try:
+            await self.db.commit()
+            await self.db.refresh(user)
+            return user
+        
+        except IntegrityError:
+            await self.db.rollback()
+            raise ValueError("Update failed. Please try again.")
+    
+    async def activate(self, user: Users) -> Users:
+        if user.is_active:
+            return user
+        
+        user.is_active = True
+        try:
+            await self.db.commit()
+            await self.db.refresh(user)
+            return user
+        
+        except IntegrityError:
+            await self.db.rollback()
+            raise ValueError("Activation failed. Please try again.")
