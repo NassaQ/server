@@ -3,8 +3,6 @@ from typing import Annotated, AsyncIterator
 from fastapi import Depends, HTTPException, Request, status
 from fastapi.security import OAuth2PasswordBearer
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy import select
-from sqlalchemy.orm import selectinload
 
 from app.core.broker import BaseBroker, RabbitMQBroker
 from app.core.security import decode_token
@@ -83,7 +81,7 @@ def get_broker() -> BaseBroker:
 def get_event_broker(request: Request) -> BaseBroker:
     return request.app.state.broker
 
-async def get_current_user(token: TokenDep, db: DBSession) -> Users:
+async def get_current_user(token: TokenDep, user_repo: UserRepo) -> Users:
     """
     Validate JWT token and return the current user.
     """
@@ -107,8 +105,7 @@ async def get_current_user(token: TokenDep, db: DBSession) -> Users:
     except ValueError:
         raise credException
     
-    query = select(Users).options(selectinload(Users.role)).where(Users.user_id == user_id)
-    user = (await db.execute(query)).scalar_one_or_none()
+    user = await user_repo.get_user(user_id)
 
     if not user:
         raise credException
