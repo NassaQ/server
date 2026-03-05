@@ -2,10 +2,9 @@ from typing import Annotated
 
 from fastapi import APIRouter, HTTPException, status, Request, Query
 from sqlalchemy import select
-from sqlalchemy.exc import IntegrityError
 
 from app.api.deps import DBSession, UserRepo, AdminUser, ActiveUser, CurrentUser, capitalize_full_name
-from app.models.models import Users, Roles
+from app.models.models import Roles
 from app.schemas.user import UserResponse, UserAdminUpdate, UserUpdate
 
 router = APIRouter()
@@ -175,7 +174,7 @@ async def activate_user(user_id: int, request: Request, user_repo: UserRepo, cur
     
     try:
         user = await user_repo.activate(user)
-    except IntegrityError as e:
+    except ValueError as e:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail=str(e),
@@ -185,7 +184,7 @@ async def activate_user(user_id: int, request: Request, user_repo: UserRepo, cur
 
 @router.delete("/{user_id}", status_code=status.HTTP_204_NO_CONTENT, summary="Delete a user",
                description="Delete a user account with the user id.")
-async def delete_user(user_id: int, db: DBSession, current_user: AdminUser) -> None:
+async def delete_user(user_id: int, user_repo: UserRepo, current_user: AdminUser) -> None:
     """
     Delete a user by their ID.
 
@@ -199,8 +198,7 @@ async def delete_user(user_id: int, db: DBSession, current_user: AdminUser) -> N
             detail="Cannot delete your own account."
         )
     
-    query = select(Users).where(Users.user_id == user_id)
-    user = (await db.execute(query)).scalar_one_or_none()
+    user = await user_repo.get_user(user_id)
 
     if not user:
         raise HTTPException(
@@ -209,12 +207,9 @@ async def delete_user(user_id: int, db: DBSession, current_user: AdminUser) -> N
         )
     
     try:
-        await db.delete(user)
-        await db.commit()
-
-    except IntegrityError:
-        await db.rollback()
+        await user_repo.delete_user(user)
+    except ValueError as e:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Cannot delete user. Please try again."
+            detail=str(e)
         )

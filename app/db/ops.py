@@ -120,3 +120,12 @@ class UsersOps:
         except IntegrityError:
             await self.db.rollback()
             raise ValueError("Activation failed. Please try again.")
+        
+    async def delete_user(self, user: Users) -> None:
+        try:
+            await self.db.delete(user)
+            await self.db.commit()
+        
+        except IntegrityError:
+            await self.db.rollback()
+            raise ValueError("Couldn't delete User")
