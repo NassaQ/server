@@ -8,7 +8,7 @@ The central API gateway for the NassaQ document digitization platform. Handles a
 
 This repository is the **Backend Server** component of NassaQ — an AI-powered platform that processes uploaded documents through bilingual (Arabic/English) OCR pipelines and makes them searchable.
 
-The server is responsible for the full request lifecycle: authenticating users, accepting file uploads, storing files in Azure Blob Storage, recording metadata in Azure SQL Server, and publishing processing jobs to a RabbitMQ queue for the OCR worker to consume asynchronously.
+The server is responsible for the full request lifecycle: authenticating users, accepting file uploads, storing files in Azure Blob Storage, recording metadata in Azure SQL Server, and publishing processing jobs to a Message Broker queue for the OCR worker to consume asynchronously.
 
 For platform-wide documentation, see [docs](https://nassaq.github.io/docs).
 
@@ -24,7 +24,7 @@ NassaQ is composed of three independently deployable services:
 | **OCR Worker** | `NassaQ/ocr-api` | Python 3.11, FastAPI, PaddleOCR, EasyOCR |
 | **User Interface** | `NassaQ/User_Interface` | React 18, TypeScript, Vite 5, Tailwind CSS |
 
-Services communicate via REST (frontend → server) and AMQP (server → OCR worker via RabbitMQ). All persistent storage is on Azure managed services for now, we are planning to support local storage setup soon.
+Services communicate via REST (frontend → server) and AMQP (server → OCR worker via RabbitMQ or AzureBus). All persistent storage is on Azure managed services for now, we are planning to support local storage setup soon.
 
 ---
 
@@ -36,7 +36,7 @@ Services communicate via REST (frontend → server) and AMQP (server → OCR wor
 | **ORM** | SQLAlchemy 2.0 (async, `aioodbc`) | Database access layer |
 | **Primary Database** | Azure SQL Server (ODBC 18) | Users, documents, paths, roles, audit logs |
 | **File Storage** | Azure Blob Storage | Upload and retrieval of original documents |
-| **Message Broker** | RabbitMQ (`aio-pika`) | Async job queue for OCR dispatch |
+| **Message Broker** | RabbitMQ (`aio-pika`) & AzureBus (`azure-servicebus`) | Async job queue for OCR dispatch |
 | **Auth** | `python-jose` + `passlib[bcrypt]` | JWT tokens and password hashing |
 | **Validation** | Pydantic v2 + Pydantic Settings | Request/response schemas and config |
 | **Package Manager** | `uv` | Dependency management and virtual environments |
@@ -72,7 +72,7 @@ Every variable is documented inside `.env.example`. Two connection strings (SQL 
 uv sync
 ```
 
-**2. Start RabbitMQ** (required — the server connects to the broker on startup)
+**2. Start RabbitMQ** (required — only if running in dev environment)
 
 ```bash
 docker compose up rabbitmq -d
@@ -102,7 +102,7 @@ docker run -d \
 
 The image uses a multi-stage build: a builder stage compiles dependencies, and a minimal runtime stage installs Microsoft ODBC Driver 18 and runs the app as a non-root user. Health check is `GET /` (returns `204 No Content`) every 30 seconds.
 
-To run the full platform (server + OCR worker + RabbitMQ) together, see the [Deployment Guide](https://nassaq.github.io/docs/setup/deployment/).
+To run the full platform (server + OCR worker + Message Broker) together, see the [Deployment Guide](https://nassaq.github.io/docs/setup/deployment/).
 
 ---
 
