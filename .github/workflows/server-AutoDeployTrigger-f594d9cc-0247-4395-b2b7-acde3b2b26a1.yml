@@ -5,7 +5,7 @@ on:
   # Automatically trigger it when detected changes in repo
   push:
     branches: 
-      [ main ]
+      [ Os14you-patch-1 ]
     paths:
     - '**'
     - '.github/workflows/server-AutoDeployTrigger-f594d9cc-0247-4395-b2b7-acde3b2b26a1.yml'
