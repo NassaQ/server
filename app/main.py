@@ -10,7 +10,6 @@ from app.db.session import engine
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    # ── FAISS vector store ────────────────────────────────────────────────
     try:
         from app.services.rag import get_store
 
@@ -26,7 +25,6 @@ async def lifespan(app: FastAPI):
     except Exception as e:
         print(f"[RAG] FAISS init skipped: {e}")
 
-    # ── Message broker ────────────────────────────────────────────────────
     broker = None
     if settings.MESSAGE_BROKER_URL:
         try:
@@ -40,7 +38,6 @@ async def lifespan(app: FastAPI):
 
     yield
 
-    # ── Shutdown ──────────────────────────────────────────────────────────
     if broker:
         try:
             await broker.close()

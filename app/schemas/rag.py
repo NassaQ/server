@@ -5,10 +5,6 @@ Pydantic schemas for the RAG endpoints.
 from pydantic import BaseModel, Field
 from typing import Optional
 
-
-# ── Ingest ────────────────────────────────────────────────────────────────
-
-
 class IngestRequest(BaseModel):
     """Request body for ``POST /rag/ingest``."""
 
@@ -83,9 +79,6 @@ class SearchResponse(BaseModel):
     total_results: int = 0
 
 
-# ── Ask (RAG Generation) ─────────────────────────────────────────────────
-
-
 class AskRequest(BaseModel):
     """Request body for ``POST /rag/ask``."""
 
@@ -101,7 +94,6 @@ class AskRequest(BaseModel):
         default=None, description="Filter by document ID"
     )
 
-
 class AskResponse(BaseModel):
     """Response from ``POST /rag/ask``."""
 
@@ -109,9 +101,6 @@ class AskResponse(BaseModel):
     sources: list[SearchResultItem] = []
     tokens_used: int = 0
     cost_usd: float = 0.0
-
-
-# ── Document Management ──────────────────────────────────────────────────
 
 
 class DocumentInfo(BaseModel):

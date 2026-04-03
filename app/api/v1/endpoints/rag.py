@@ -30,7 +30,6 @@ from app.services import file_storage
 router = APIRouter()
 
 
-# ── POST /ingest ──────────────────────────────────────────────────────────
 @router.post("/ingest", response_model=IngestResponse)
 def ingest_document(
     body: IngestRequest,
@@ -64,7 +63,6 @@ def ingest_document(
     return IngestResponse(**result)
 
 
-# ── POST /search ──────────────────────────────────────────────────────────
 @router.post("/search", response_model=SearchResponse)
 def search_documents(
     body: SearchRequest,
@@ -92,7 +90,6 @@ def search_documents(
     )
 
 
-# ── POST /ask ─────────────────────────────────────────────────────────────
 @router.post("/ask", response_model=AskResponse)
 def ask_question(
     body: AskRequest,
@@ -120,8 +117,7 @@ def ask_question(
     )
 
 
-# ── GET /documents ────────────────────────────────────────────────────────
-@router.get("/documents", response_model=list[DocumentInfo])
+@router.get("/", response_model=list[DocumentInfo])
 def list_ingested_documents(
     user: ActiveUser = None,  # type: ignore
 ):
@@ -130,8 +126,7 @@ def list_ingested_documents(
     return [DocumentInfo(**d) for d in docs]
 
 
-# ── DELETE /documents/{document_id} ───────────────────────────────────────
-@router.delete("/documents/{document_id}", response_model=RemoveResponse)
+@router.delete("/doc/{document_id}", response_model=RemoveResponse)
 def remove_ingested_document(
     document_id: str,
     user: ActiveUser = None,  # type: ignore
@@ -152,7 +147,6 @@ def remove_ingested_document(
     return RemoveResponse(**result)
 
 
-# ── GET /stats ────────────────────────────────────────────────────────────
 @router.get("/stats", response_model=StoreStatsResponse)
 def get_store_stats(
     user: ActiveUser = None,  # type: ignore
