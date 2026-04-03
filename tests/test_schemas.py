@@ -12,7 +12,7 @@ from app.schemas.user import (
     UserAdminUpdate,
     UserResponse,
 )
-from app.schemas.auth import Token, TokenPayload, RefreshTokenRequest
+from app.schemas.auth import Token, TokenPayload
 
 
 class TestUserCreateSchema:
@@ -240,14 +240,3 @@ class TestTokenSchemas:
         )
 
         assert token.token_type == "custom"
-
-    def test_refresh_token_request(self):
-        """RefreshTokenRequest schema should work."""
-        request = RefreshTokenRequest(refresh_token="myrefreshtoken")
-
-        assert request.refresh_token == "myrefreshtoken"
-
-    def test_refresh_token_request_missing(self):
-        """Missing refresh token should fail."""
-        with pytest.raises(ValidationError):
-            RefreshTokenRequest()
