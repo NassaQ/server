@@ -1,3 +1,5 @@
+from typing import List
+
 from pydantic_settings import BaseSettings, SettingsConfigDict
 from pydantic import computed_field
 from urllib.parse import quote_plus
@@ -5,13 +7,7 @@ from urllib.parse import quote_plus
 
 class Settings(BaseSettings):
     ENVIRONMENT: str = "production"
-
-    MONGO_USER: str
-    MONGO_PASS: str
-    MONGO_HOST: str
-    MONGO_PORT: int = 10260
-    MONGO_DB_NAME: str = "sdmsdb"
-    MONGO_TLS_INSECURE: bool = True
+    CORS_ORIGINS: List[str]
 
     SQL_SERVER: str
     SQL_DB_NAME: str
@@ -22,6 +18,20 @@ class Settings(BaseSettings):
     SQL_CONNECT_TIMEOUT: int = 60
     SQL_MAX_RETRIES: int = 3
     SQL_RETRY_DELAY_BASE: int = 2
+
+    BLOB_STORAGE_TYPE: str
+    BLOB_CONNECTION_STR: str
+    BLOB_STORAGE_CONTAINER_NAME: str
+    MAX_SIZE_UPLOAD: int = 50 * 1024 * 1024
+
+    MESSAGE_BROKER_URL: str
+
+    MONGO_USER: str
+    MONGO_PASS: str
+    MONGO_HOST: str
+    MONGO_PORT: int = 10260
+    MONGO_DB_NAME: str = "sdmsdb"
+    MONGO_TLS_INSECURE: bool = True
 
     # JWT configs
     ACCESS_TOKEN_EXPIRE_MINUTES: int
