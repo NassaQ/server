@@ -1,5 +1,3 @@
-import sys
-from pathlib import Path
 from contextlib import asynccontextmanager
 from fastapi import FastAPI, status, Response
 from fastapi.middleware.cors import CORSMiddleware
@@ -8,14 +6,6 @@ from app.api.deps import get_broker
 from app.core.config import settings
 from app.api.v1 import api
 from app.db.session import engine
-
-# TODO: move this sys.path manipulation into the service modules that need it
-_PROJECT_ROOT = Path(__file__).resolve().parents[2]
-
-for model_dir in ("ocr-model", "Classification-model"):
-    model_path = str(_PROJECT_ROOT / model_dir)
-    if model_path not in sys.path:
-        sys.path.insert(0, model_path)
 
 
 @asynccontextmanager

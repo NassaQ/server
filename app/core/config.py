@@ -57,6 +57,8 @@ class Settings(BaseSettings):
     # Message Broker
     MESSAGE_BROKER_URL: str = ""
     OCR_QUEUE_NAME: str = "ocr_queue"
+    AI_FOUNDRY_QUEUE_NAME: str = "ai_foundry_queue"
+    PROCESSING_BACKEND: str = "ocr_api"  # "ocr_api" or "ai_foundry"
 
     # CORS
     CORS_ORIGINS: list[str] = [
