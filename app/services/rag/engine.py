@@ -1,8 +1,8 @@
 """
 RAG engine — orchestrates ingest, search, and ask pipelines.
 
-Ingestion:   OCR result → chunk → clean → embed → FAISS + metadata
-Search:      query → clean → embed → FAISS top-K → Cohere rerank top-N
+Ingestion:   OCR result → chunk → clean → embed → Azure AI Search
+Search:      query → clean → embed → Azure AI Search top-K → Cohere rerank top-N
 Ask:         search → assemble context → gpt-4.1-mini → answer
 
 All three pipelines are synchronous (``def``, not ``async def``).
@@ -13,7 +13,6 @@ the event loop.
 from datetime import datetime, timezone
 from typing import Optional
 
-import numpy as np
 from openai import AzureOpenAI
 
 from app.core.config import settings
@@ -23,21 +22,22 @@ from .text_processor import (
     clean_for_embedding,
 )
 from . import embedding_client
-from .vector_store import FAISSVectorStore
+from .vector_store import AzureSearchVectorStore
 from . import reranker as reranker_mod
 
 
-# ── Module-level singletons ──────────────────────────────────────────────
-_store: Optional[FAISSVectorStore] = None
+_store: Optional[AzureSearchVectorStore] = None
 _llm_client: Optional[AzureOpenAI] = None
 
 
-def get_store() -> FAISSVectorStore:
-    """Return (and lazily create) the global FAISS vector store."""
+def get_store() -> AzureSearchVectorStore:
+    """Return (and lazily create) the global Azure AI Search vector store."""
     global _store
     if _store is None:
-        _store = FAISSVectorStore(
-            index_dir=settings.FAISS_INDEX_DIR,
+        _store = AzureSearchVectorStore(
+            endpoint=settings.AZURE_SEARCH_ENDPOINT,
+            api_key=settings.AZURE_SEARCH_API_KEY,
+            index_name=settings.AZURE_SEARCH_INDEX_NAME,
             dimensions=settings.EMBEDDING_DIMENSIONS,
         )
     return _store
@@ -54,10 +54,6 @@ def _get_llm() -> AzureOpenAI:
         )
     return _llm_client
 
-
-# ─────────────────────────────────────────────────────────────────────────
-#  INGEST
-# ─────────────────────────────────────────────────────────────────────────
 
 
 def ingest(
@@ -91,7 +87,6 @@ def ingest(
             "chunks_created": 0,
         }
 
-    # ── 1. Chunk ──────────────────────────────────────────────────────
     chunks: list[Chunk] = chunk_document(
         cleaned_text=cleaned_text,
         tables_markdown=tables_markdown,
@@ -106,7 +101,6 @@ def ingest(
             "chunks_created": 0,
         }
 
-    # ── 2. Embed ──────────────────────────────────────────────────────
     texts = [c.text_clean for c in chunks]
     vectors = embedding_client.embed_texts(
         texts=texts,
@@ -116,7 +110,6 @@ def ingest(
         model=settings.AZURE_OPENAI_EMBEDDING_DEPLOYMENT,
     )
 
-    # ── 3. Build metadata for each chunk ──────────────────────────────
     metadatas: list[dict] = []
     for chunk in chunks:
         metadatas.append(
@@ -135,7 +128,6 @@ def ingest(
             }
         )
 
-    # ── 4. Store in FAISS ─────────────────────────────────────────────
     store.add(vectors=vectors, metadatas=metadatas, document_id=document_id)
 
     total_tokens = sum(c.token_count for c in chunks)
@@ -148,10 +140,6 @@ def ingest(
         "source_file": source_file,
     }
 
-
-# ─────────────────────────────────────────────────────────────────────────
-#  SEARCH
-# ─────────────────────────────────────────────────────────────────────────
 
 
 def search(
@@ -178,12 +166,10 @@ def search(
     if store.total_vectors == 0:
         return []
 
-    # ── A. Clean query ────────────────────────────────────────────────
     clean_query = clean_for_embedding(query)
     if not clean_query.strip():
         return []
 
-    # ── B. Embed query ────────────────────────────────────────────────
     query_vec = embedding_client.embed_query(
         query=clean_query,
         api_key=settings.AZURE_OPENAI_API_KEY,
@@ -192,11 +178,9 @@ def search(
         model=settings.AZURE_OPENAI_EMBEDDING_DEPLOYMENT,
     )
 
-    # ── C. FAISS retrieval (broad recall) ─────────────────────────────
     faiss_k = settings.RAG_TOP_K_RETRIEVAL
     candidates = store.search(query_vec, k=faiss_k)
 
-    # ── D. Apply filters (post-retrieval) ─────────────────────────────
     if filter_classification:
         candidates = [
             c for c in candidates if c.get("classification") == filter_classification
@@ -211,7 +195,6 @@ def search(
     if not candidates:
         return []
 
-    # ── E. Cohere rerank (precision) ──────────────────────────────────
     candidate_texts = [c["text_clean"] for c in candidates]
 
     rerank_results = reranker_mod.rerank(
@@ -223,7 +206,6 @@ def search(
         top_n=min(top_k, len(candidates)),
     )
 
-    # ── F. Build final results ────────────────────────────────────────
     results: list[dict] = []
     for rr in rerank_results:
         candidate = candidates[rr.index]
@@ -237,7 +219,7 @@ def search(
                 "section_heading": candidate.get("section_heading", ""),
                 "classification": candidate.get("classification", ""),
                 "language": candidate.get("language", ""),
-                "faiss_score": candidate.get("score", 0.0),
+                "search_score": candidate.get("score", 0.0),
                 "rerank_score": rr.relevance_score,
             }
         )
@@ -245,9 +227,6 @@ def search(
     return results
 
 
-# ─────────────────────────────────────────────────────────────────────────
-#  ASK  (RAG generation)
-# ─────────────────────────────────────────────────────────────────────────
 
 _SYSTEM_PROMPT = """You are a document assistant for the NassaQ archive system.
 You answer questions based ONLY on the provided context excerpts.
@@ -271,7 +250,6 @@ def ask(
 
     Returns dict with ``answer``, ``sources``, and token usage.
     """
-    # ── 1. Search ─────────────────────────────────────────────────────
     sources = search(
         query=query,
         top_k=top_k,
@@ -291,8 +269,6 @@ def ask(
             "cost_usd": 0.0,
         }
 
-    # ── 2. Assemble context ───────────────────────────────────────────
-    # Order by document position for coherent reading
     context_parts: list[str] = []
     for i, src in enumerate(sources, 1):
         header = f"[{i}] Source: {src['source_file']}, Page {src['page_number']}"
@@ -304,7 +280,6 @@ def ask(
 
     user_message = f"Context:\n{context}\n\nQuestion: {query}"
 
-    # ── 3. Generate answer ────────────────────────────────────────────
     client = _get_llm()
 
     response = client.chat.completions.create(
@@ -333,9 +308,6 @@ def ask(
     }
 
 
-# ─────────────────────────────────────────────────────────────────────────
-#  Document management helpers
-# ─────────────────────────────────────────────────────────────────────────
 
 
 def list_documents() -> list[dict]:

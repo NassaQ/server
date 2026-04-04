@@ -2,8 +2,8 @@
 Azure OpenAI embedding client for the RAG pipeline.
 
 Uses ``text-embedding-3-small`` (1536 dimensions, ~$0.02 / 1M tokens).
-All vectors are L2-normalised so that FAISS ``IndexFlatIP`` inner-product
-search is equivalent to cosine similarity.
+All vectors are L2-normalised for consistent cosine similarity scoring
+in the Azure AI Search vector index.
 """
 
 from typing import Optional
@@ -52,7 +52,7 @@ def embed_texts(
 
     Returns:
         ``np.ndarray`` of shape ``(len(texts), dimensions)`` with
-        **L2-normalised** float32 vectors ready for FAISS ``IndexFlatIP``.
+        **L2-normalised** float32 vectors ready for Azure AI Search.
     """
     if not texts:
         return np.empty((0, 1536), dtype=np.float32)

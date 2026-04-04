@@ -67,7 +67,7 @@ class SearchResultItem(BaseModel):
     section_heading: str = ""
     classification: str = ""
     language: str = ""
-    faiss_score: float = 0.0
+    search_score: float = 0.0
     rerank_score: float = 0.0
 
 

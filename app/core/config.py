@@ -58,8 +58,10 @@ class Settings(BaseSettings):
     # Upload constraints
     MAX_UPLOAD_SIZE_MB: int = 50
 
-    # FAISS Vector Store
-    FAISS_INDEX_DIR: str = "data/faiss"
+    # Azure AI Search (Vector Store)
+    AZURE_SEARCH_ENDPOINT: str = ""
+    AZURE_SEARCH_API_KEY: str = ""
+    AZURE_SEARCH_INDEX_NAME: str = "nassaq-chunks"
 
     # RAG Pipeline
     RAG_CHUNK_SIZE: int = 400

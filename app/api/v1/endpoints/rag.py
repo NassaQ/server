@@ -2,7 +2,7 @@
 RAG endpoints for semantic search and retrieval-augmented generation.
 
 POST /ingest           — Chunk, embed, and store a processed document
-POST /search           — Semantic search (FAISS → Cohere rerank → results)
+POST /search           — Semantic search (Azure AI Search → Cohere rerank → results)
 POST /ask              — Full RAG (search → context → gpt-4.1-mini → answer)
 GET  /documents        — List ingested documents
 DELETE /documents/{id} — Remove a document from the vector store
@@ -70,7 +70,7 @@ def search_documents(
 ):
     """
     Two-stage semantic search:
-      Stage 1: FAISS top-20 (broad recall via embedding similarity)
+      Stage 1: Azure AI Search top-20 (broad recall via embedding similarity)
       Stage 2: Cohere Rerank v4.0 Fast → top-K (precision via cross-attention)
 
     Returns ranked chunks with text, source metadata, and scores.

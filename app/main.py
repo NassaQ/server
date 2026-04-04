@@ -18,12 +18,12 @@ async def lifespan(app: FastAPI):
         chunk_count = store.total_vectors
         if chunk_count > 0:
             print(
-                f"[RAG] FAISS index loaded: {doc_count} documents, {chunk_count} chunks"
+                f"[RAG] Azure AI Search connected: {doc_count} documents, {chunk_count} chunks"
             )
         else:
-            print("[RAG] FAISS index initialized (empty)")
+            print("[RAG] Azure AI Search index initialized (empty)")
     except Exception as e:
-        print(f"[RAG] FAISS init skipped: {e}")
+        print(f"[RAG] Azure AI Search init skipped: {e}")
 
     broker = None
     if settings.MESSAGE_BROKER_URL:
