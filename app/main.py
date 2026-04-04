@@ -9,42 +9,59 @@ from app.core.config import settings
 from app.api.v1 import api
 from app.db.session import engine
 
+# TODO: move this sys.path manipulation into the service modules that need it
+_PROJECT_ROOT = Path(__file__).resolve().parents[2]
 
-# @asynccontextmanager
-# async def lifespan(app: FastAPI):
-#     # ── Load FAISS index from disk on startup (if it exists) ──────────────
-#     try:
-#         from app.services.rag import get_store
+for model_dir in ("ocr-model", "Classification-model"):
+    model_path = str(_PROJECT_ROOT / model_dir)
+    if model_path not in sys.path:
+        sys.path.insert(0, model_path)
 
-#         store = get_store()
-#         doc_count = len(store.list_documents())
-#         chunk_count = store.total_vectors
-#         if chunk_count > 0:
-#             print(
-#                 f"[RAG] FAISS index loaded: {doc_count} documents, {chunk_count} chunks"
-#             )
-#         else:
-#             print("[RAG] FAISS index initialized (empty)")
-#     except Exception as e:
-#         print(f"[RAG] FAISS init skipped: {e}")
-
-#     yield
-
-#     try:
-#         await engine.dispose()
-#     except Exception:
-#         pass  # DB may not be available in demo mode
-
-broker = get_broker()
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    await broker.connect()
-    app.state.broker = broker
+    # ── FAISS vector store ────────────────────────────────────────────────
+    try:
+        from app.services.rag import get_store
+
+        store = get_store()
+        doc_count = len(store.list_documents())
+        chunk_count = store.total_vectors
+        if chunk_count > 0:
+            print(
+                f"[RAG] FAISS index loaded: {doc_count} documents, {chunk_count} chunks"
+            )
+        else:
+            print("[RAG] FAISS index initialized (empty)")
+    except Exception as e:
+        print(f"[RAG] FAISS init skipped: {e}")
+
+    # ── Message broker ────────────────────────────────────────────────────
+    broker = None
+    if settings.MESSAGE_BROKER_URL:
+        try:
+            broker = get_broker()
+            await broker.connect()
+            app.state.broker = broker
+            print(f"[Broker] Connected ({type(broker).__name__})")
+        except Exception as e:
+            print(f"[Broker] Connection skipped: {e}")
+            broker = None
 
     yield
-    await broker.close()
-    await engine.dispose()
+
+    # ── Shutdown ──────────────────────────────────────────────────────────
+    if broker:
+        try:
+            await broker.close()
+        except Exception:
+            pass
+
+    try:
+        await engine.dispose()
+    except Exception:
+        pass
+
 
 app = FastAPI(
     title="NassaQ Backend",

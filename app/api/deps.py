@@ -64,7 +64,9 @@ async def get_storage() -> AsyncIterator[StorageBase]:
             container=settings.BLOB_STORAGE_CONTAINER_NAME
         )
     else:
-        pass
+        raise ValueError(
+            f"Unsupported BLOB_STORAGE_TYPE: '{storage_type}'. Supported: 'azure'."
+        )
 
     await storage.__aenter__()
     try:
