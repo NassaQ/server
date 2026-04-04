@@ -14,12 +14,9 @@ to a no-op (returns the input list unchanged).
 """
 
 import json
-import logging
 import urllib.request
 import urllib.error
 from dataclasses import dataclass
-
-logger = logging.getLogger("nassaq.reranker")
 
 
 @dataclass
@@ -57,10 +54,6 @@ def rerank(
     """
     # ── Guard: not configured ─────────────────────────────────────────
     if not endpoint or not api_key:
-        logger.warning(
-            "Reranker not configured (empty endpoint/key). "
-            "Returning FAISS results as-is."
-        )
         return [
             RerankResult(index=i, relevance_score=0.0, text=doc)
             for i, doc in enumerate(documents[:top_n])
@@ -98,19 +91,12 @@ def rerank(
     try:
         with urllib.request.urlopen(req, timeout=30) as resp:
             body = json.loads(resp.read().decode("utf-8"))
-    except urllib.error.HTTPError as exc:
-        error_body = exc.read().decode("utf-8", errors="replace") if exc.fp else ""
-        logger.error(
-            "Reranker HTTP %d: %s — falling back to FAISS order",
-            exc.code,
-            error_body[:300],
-        )
+    except urllib.error.HTTPError:
         return [
             RerankResult(index=i, relevance_score=0.0, text=doc)
             for i, doc in enumerate(documents[:top_n])
         ]
-    except Exception as exc:
-        logger.error("Reranker call failed: %s — falling back", exc)
+    except Exception:
         return [
             RerankResult(index=i, relevance_score=0.0, text=doc)
             for i, doc in enumerate(documents[:top_n])
@@ -129,10 +115,4 @@ def rerank(
     # Already sorted by relevance (Cohere API returns sorted), but be safe
     results.sort(key=lambda r: r.relevance_score, reverse=True)
 
-    logger.info(
-        "Reranked %d → %d docs (top score: %.3f)",
-        len(documents),
-        len(results),
-        results[0].relevance_score if results else 0.0,
-    )
     return results

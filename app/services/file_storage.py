@@ -10,18 +10,11 @@ Metadata   = original_filename, content_type
 
 from __future__ import annotations
 
-import logging
 from typing import Optional
 
 from azure.storage.blob import ContainerClient, ContentSettings
 
 from app.core.config import settings
-
-logger = logging.getLogger(__name__)
-
-# ---------------------------------------------------------------------------
-#  Singleton container client
-# ---------------------------------------------------------------------------
 
 _container_client: Optional[ContainerClient] = None
 
@@ -40,11 +33,6 @@ def _get_container() -> ContainerClient:
     return _container_client
 
 
-# ---------------------------------------------------------------------------
-#  Public API
-# ---------------------------------------------------------------------------
-
-
 def upload(
     document_id: str,
     file_bytes: bytes,
@@ -60,14 +48,6 @@ def upload(
     container = _get_container()
     blob = container.get_blob_client(document_id)
 
-    logger.info(
-        "[UPLOAD START] doc=%s, file=%s, size=%d, type=%s",
-        document_id,
-        filename,
-        len(file_bytes),
-        content_type,
-    )
-
     blob.upload_blob(
         file_bytes,
         overwrite=True,
@@ -76,14 +56,6 @@ def upload(
             "original_filename": filename,
             "content_type": content_type,
         },
-    )
-
-    # Verify the blob actually exists after upload
-    verified = blob.exists()
-    logger.info(
-        "[UPLOAD DONE] doc=%s, verified_exists=%s",
-        document_id,
-        verified,
     )
 
     return {
@@ -105,18 +77,13 @@ def download(document_id: str) -> tuple[bytes, str, str]:
     container = _get_container()
     blob = container.get_blob_client(document_id)
 
-    logger.info("[DOWNLOAD START] doc=%s", document_id)
-
-    # Quick existence check first
     if not blob.exists():
-        logger.warning("[DOWNLOAD] Blob does NOT exist: %s", document_id)
         raise FileNotFoundError(f"No stored file for document_id={document_id}")
 
     try:
         stream = blob.download_blob()
         props = blob.get_blob_properties()
     except Exception as exc:
-        logger.exception("[DOWNLOAD] Azure error for doc=%s", document_id)
         if "BlobNotFound" in str(exc) or "ResourceNotFound" in str(exc):
             raise FileNotFoundError(
                 f"No stored file for document_id={document_id}"
@@ -125,7 +92,6 @@ def download(document_id: str) -> tuple[bytes, str, str]:
 
     file_bytes = stream.readall()
 
-    # Retrieve metadata we stored during upload
     meta = props.metadata or {}
     content_type = meta.get("content_type", "application/octet-stream")
     original_filename = meta.get("original_filename", document_id)
@@ -143,11 +109,9 @@ def delete(document_id: str) -> bool:
 
     try:
         blob.delete_blob()
-        logger.info("Deleted blob %s", document_id)
         return True
     except Exception as exc:
         if "BlobNotFound" in str(exc) or "ResourceNotFound" in str(exc):
-            logger.debug("Blob %s not found — nothing to delete", document_id)
             return False
         raise
 

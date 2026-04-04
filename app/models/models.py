@@ -77,18 +77,6 @@ class VirtualPaths(Base):
     Documents: Mapped[list['Documents']] = relationship('Documents', back_populates='path')
 
 
-class Sysdiagrams(Base):
-    __tablename__ = 'sysdiagrams'
-    __table_args__ = (
-        PrimaryKeyConstraint('diagram_id', name='PK__sysdiagr__C2B05B6116CEA0A5'),
-        Index('UK_principal_name', 'principal_id', 'name', unique=True)
-    )
-
-    Role_Actions: Mapped[list["RoleActions"]] = relationship(
-        "RoleActions", back_populates="role"
-    )
-    Users: Mapped[list["Users"]] = relationship("Users", back_populates="role")
-
 
 class RoleActions(Base):
     __tablename__ = "Role_Actions"

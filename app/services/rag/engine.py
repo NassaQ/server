@@ -10,7 +10,6 @@ FastAPI runs them in a threadpool automatically so they do not block
 the event loop.
 """
 
-import logging
 from datetime import datetime, timezone
 from typing import Optional
 
@@ -26,8 +25,6 @@ from .text_processor import (
 from . import embedding_client
 from .vector_store import FAISSVectorStore
 from . import reranker as reranker_mod
-
-logger = logging.getLogger("nassaq.rag")
 
 
 # ── Module-level singletons ──────────────────────────────────────────────
@@ -142,13 +139,6 @@ def ingest(
     store.add(vectors=vectors, metadatas=metadatas, document_id=document_id)
 
     total_tokens = sum(c.token_count for c in chunks)
-
-    logger.info(
-        "Ingested document %s: %d chunks, ~%d tokens",
-        document_id,
-        len(chunks),
-        total_tokens,
-    )
 
     return {
         "document_id": document_id,
@@ -334,13 +324,6 @@ def ask(
     input_tokens = response.usage.prompt_tokens if response.usage else 0
     output_tokens = response.usage.completion_tokens if response.usage else 0
     cost_usd = (input_tokens / 1_000_000) * 0.40 + (output_tokens / 1_000_000) * 1.60
-
-    logger.info(
-        "RAG ask: %d sources, %d tokens, $%.6f",
-        len(sources),
-        tokens_used,
-        cost_usd,
-    )
 
     return {
         "answer": answer.strip(),

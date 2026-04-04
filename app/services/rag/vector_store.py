@@ -14,8 +14,6 @@ All vectors MUST be L2-normalised before insertion so that inner-product
 equals cosine similarity.
 """
 
-import logging
-import os
 import pickle
 import threading
 from pathlib import Path
@@ -23,8 +21,6 @@ from typing import Optional
 
 import faiss
 import numpy as np
-
-logger = logging.getLogger("nassaq.vector_store")
 
 # ── Metadata structure (persisted to pickle) ─────────────────────────────
 # {
@@ -61,20 +57,14 @@ class FAISSVectorStore:
                 self._index = faiss.read_index(str(self._index_path))
                 with open(self._meta_path, "rb") as f:
                     self._meta = pickle.load(f)
-                logger.info(
-                    "Loaded FAISS index: %d vectors, %d documents",
-                    self._index.ntotal,
-                    len(self._meta.get("documents", {})),
-                )
                 return
-            except Exception as exc:
-                logger.warning("Failed to load index, creating fresh: %s", exc)
+            except Exception:
+                pass
 
         # Create empty index
         flat = faiss.IndexFlatIP(self._dims)
         self._index = faiss.IndexIDMap2(flat)
         self._meta = {"next_id": 0, "chunks": {}, "documents": {}}
-        logger.info("Created new empty FAISS index (dim=%d)", self._dims)
 
     def _persist(self) -> None:
         """Write index + metadata to disk.  Called under lock."""
@@ -127,12 +117,6 @@ class FAISSVectorStore:
 
             self._persist()
 
-        logger.info(
-            "Added %d vectors for document %s (total: %d)",
-            len(vectors),
-            document_id,
-            self._index.ntotal,
-        )
         return [int(i) for i in ids]
 
     def search(
@@ -194,12 +178,6 @@ class FAISSVectorStore:
 
             self._persist()
 
-        logger.info(
-            "Removed %d vectors for document %s (total: %d)",
-            len(fids),
-            document_id,
-            self._index.ntotal,
-        )
         return len(fids)
 
     def list_documents(self) -> list[dict]:

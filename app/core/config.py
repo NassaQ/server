@@ -6,13 +6,6 @@ from urllib.parse import quote_plus
 class Settings(BaseSettings):
     ENVIRONMENT: str = "production"
 
-    MONGO_USER: str
-    MONGO_PASS: str
-    MONGO_HOST: str
-    MONGO_PORT: int = 10260
-    MONGO_DB_NAME: str = "sdmsdb"
-    MONGO_TLS_INSECURE: bool = True
-
     SQL_SERVER: str
     SQL_DB_NAME: str
     SQL_USER: str
@@ -28,10 +21,6 @@ class Settings(BaseSettings):
     REFRESH_TOKEN_EXPIRE_DAYS: int
     JWT_ALGORITHM: str
     JWT_SECRET_KEY: str
-
-    # Azure Document Intelligence (OCR)
-    AZURE_DOC_INTELLIGENCE_ENDPOINT: str = ""
-    AZURE_DOC_INTELLIGENCE_KEY: str = ""
 
     # Azure OpenAI (Classification + RAG Generation)
     AZURE_OPENAI_API_KEY: str = ""
@@ -68,11 +57,6 @@ class Settings(BaseSettings):
 
     # Upload constraints
     MAX_UPLOAD_SIZE_MB: int = 50
-    SUPPORTED_EXTENSIONS: set[str] = {
-        ".pdf", ".jpg", ".jpeg", ".png",
-        ".tif", ".tiff", ".bmp", ".heif", ".heic",
-        ".docx", ".xlsx", ".pptx",
-    }
 
     # FAISS Vector Store
     FAISS_INDEX_DIR: str = "data/faiss"
@@ -81,21 +65,10 @@ class Settings(BaseSettings):
     RAG_CHUNK_SIZE: int = 400
     RAG_CHUNK_OVERLAP: int = 50
     RAG_TOP_K_RETRIEVAL: int = 20
-    RAG_TOP_N_RERANK: int = 5
 
     model_config = SettingsConfigDict(
         env_file=".env", env_file_encoding="utf-8", extra="ignore"
     )
-
-    @computed_field
-    def MONGO_CONNECTION_STRING(self) -> str:
-        encoded_pass = quote_plus(self.MONGO_PASS)
-        return (
-            f"mongodb://{self.MONGO_USER}:{encoded_pass}@{self.MONGO_HOST}:{self.MONGO_PORT}/"
-            f"?ssl=true&tlsInsecure={str(self.MONGO_TLS_INSECURE).lower()}"
-            "&authMechanism=SCRAM-SHA-256&retrywrites=false"
-            "&maxIdleTimeMS=120000&serverSelectionTimeoutMS=30000"
-        )
 
     @computed_field
     def SQL_CONNECTION_STRING(self) -> str:

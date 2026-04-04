@@ -6,13 +6,10 @@ All vectors are L2-normalised so that FAISS ``IndexFlatIP`` inner-product
 search is equivalent to cosine similarity.
 """
 
-import logging
 from typing import Optional
 
 import numpy as np
 from openai import AzureOpenAI
-
-logger = logging.getLogger("nassaq.embeddings")
 
 # ── Module-level singleton ────────────────────────────────────────────────
 _client: Optional[AzureOpenAI] = None
@@ -69,8 +66,6 @@ def embed_texts(
         # Guard against empty strings (API rejects them)
         batch = [t if t.strip() else "empty" for t in batch]
 
-        logger.debug("Embedding batch %d–%d of %d", i, i + len(batch), len(texts))
-
         response = client.embeddings.create(input=batch, model=model)
 
         for item in sorted(response.data, key=lambda d: d.index):
@@ -83,7 +78,6 @@ def embed_texts(
     norms[norms == 0] = 1.0
     embeddings = embeddings / norms
 
-    logger.info("Embedded %d texts → shape %s", len(texts), embeddings.shape)
     return embeddings
 
 

@@ -9,8 +9,6 @@ DELETE /documents/{id} — Remove a document from the vector store
 GET  /stats            — Vector store statistics
 """
 
-import logging
-
 from fastapi import APIRouter, HTTPException, status
 
 from app.api.deps import ActiveUser
@@ -28,8 +26,6 @@ from app.schemas.rag import (
 )
 from app.services import rag
 from app.services import file_storage
-
-logger = logging.getLogger(__name__)
 
 router = APIRouter()
 
@@ -148,11 +144,10 @@ def remove_ingested_document(
             detail=f"Document {document_id} not found in vector store",
         )
 
-    # Best-effort: also delete the original file from blob storage
     try:
         file_storage.delete(document_id)
     except Exception:
-        logger.warning("Failed to delete blob for document %s (non-fatal)", document_id)
+        pass
 
     return RemoveResponse(**result)
 
