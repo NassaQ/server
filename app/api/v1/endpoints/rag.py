@@ -9,9 +9,11 @@ DELETE /documents/{id} — Remove a document from the vector store
 GET  /stats            — Vector store statistics
 """
 
+import asyncio
+
 from fastapi import APIRouter, HTTPException, status
 
-from app.api.deps import ActiveUser
+from app.api.deps import ActiveUser, DocRepo, RagIngestRepo
 from app.schemas.rag import (
     IngestRequest,
     IngestResponse,
@@ -31,19 +33,18 @@ router = APIRouter()
 
 
 @router.post("/ingest", response_model=IngestResponse)
-def ingest_document(
+async def ingest_document(
     body: IngestRequest,
+    doc_repo: DocRepo,
+    rag_repo: RagIngestRepo,
     user: ActiveUser = None,  # type: ignore
 ):
     """
     Chunk, embed, and store a processed document in the vector store.
 
     Call this after ``POST /documents/process`` to make the document
-    searchable via semantic search / RAG.
-
-    This is synchronous — FastAPI runs ``def`` endpoints in a threadpool,
-    so it won't block the event loop.  Typical time: 3–10 seconds
-    depending on document size.
+    searchable via semantic search / RAG.  Records the ingest outcome
+    (chunks created, tokens used, status) in the ``Rag_Ingest`` table.
     """
     if not body.cleaned_text.strip():
         raise HTTPException(
@@ -51,7 +52,10 @@ def ingest_document(
             detail="cleaned_text is empty — nothing to ingest",
         )
 
-    result = rag.ingest(
+    doc = await doc_repo.get_document_by_mongo_id(body.document_id)
+
+    result = await asyncio.to_thread(
+        rag.ingest,
         document_id=body.document_id,
         cleaned_text=body.cleaned_text,
         tables_markdown=body.tables_markdown or [],
@@ -59,6 +63,17 @@ def ingest_document(
         language=body.language,
         source_file=body.source_file,
     )
+
+    if doc:
+        try:
+            await rag_repo.record_ingest(
+                doc_id=doc.doc_id,
+                status=result["status"],
+                chunks_count=result.get("chunks_created", 0),
+                total_tokens=result.get("total_tokens", 0),
+            )
+        except ValueError:
+            pass
 
     return IngestResponse(**result)
 
@@ -127,17 +142,26 @@ def list_ingested_documents(
 
 
 @router.delete("/doc/{document_id}", response_model=RemoveResponse)
-def remove_ingested_document(
+async def remove_ingested_document(
     document_id: str,
+    doc_repo: DocRepo,
+    rag_repo: RagIngestRepo,
     user: ActiveUser = None,  # type: ignore
 ):
     """Remove a document and all its chunks from the vector store."""
-    result = rag.remove_document(document_id)
+    result = await asyncio.to_thread(rag.remove_document, document_id)
     if result["status"] == "not_found":
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail=f"Document {document_id} not found in vector store",
         )
+
+    doc = await doc_repo.get_document_by_mongo_id(document_id)
+    if doc:
+        try:
+            await rag_repo.delete_by_doc_id(doc.doc_id)
+        except Exception:
+            pass
 
     try:
         file_storage.delete(document_id)

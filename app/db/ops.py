@@ -1,14 +1,20 @@
-from typing import Annotated
+from typing import Annotated, Literal
 
 from fastapi import Depends
-from sqlalchemy import func, insert, select
+from sqlalchemy import delete, func, insert, select
 from sqlalchemy.exc import IntegrityError
-from sqlalchemy.orm import selectinload
+from sqlalchemy.orm import joinedload, selectinload
 from sqlalchemy.ext.asyncio import AsyncSession
 
 
 from app.db.session import get_db
-from app.models.models import Users
+from app.models.models import (
+    Documents,
+    ProcessingStatus,
+    RagIngest,
+    Users,
+    VirtualPaths,
+)
 
 DBSession = Annotated[AsyncSession, Depends(get_db)]
 
@@ -129,3 +135,230 @@ class UsersOps:
         except IntegrityError:
             await self.db.rollback()
             raise ValueError("Couldn't delete User")
+
+
+class VirtualPathsOps:
+    """Data-access layer for the Virtual_Paths table."""
+
+    def __init__(self, db: DBSession):
+        self.db = db
+
+    async def get_all_paths(
+        self, min_depth: int = 0, max_depth: int = 5, prefix: str = ""
+    ) -> list[VirtualPaths]:
+        query = select(VirtualPaths).where(
+            VirtualPaths.depth >= min_depth,
+            VirtualPaths.depth <= max_depth,
+            VirtualPaths.full_path.startswith(prefix),
+        )
+        result = (await self.db.execute(query)).scalars().all()
+        return list(result)
+
+    async def get_path(self, path_id: int) -> VirtualPaths | None:
+        query = select(VirtualPaths).where(VirtualPaths.path_id == path_id)
+        return (await self.db.execute(query)).scalar_one_or_none()
+
+    async def get_path_by_full_path(self, full_path: str) -> VirtualPaths | None:
+        query = select(VirtualPaths).where(VirtualPaths.full_path == full_path)
+        return (await self.db.execute(query)).scalar_one_or_none()
+
+    async def create_path(self, new_path: VirtualPaths) -> VirtualPaths:
+        try:
+            self.db.add(new_path)
+            await self.db.commit()
+            await self.db.refresh(new_path)
+            return new_path
+        except IntegrityError:
+            await self.db.rollback()
+            raise ValueError("Creating path failed. Please try again.")
+
+    async def update_path(self, path: VirtualPaths, update_data: dict) -> VirtualPaths:
+        for key, value in update_data.items():
+            setattr(path, key, value)
+
+        try:
+            await self.db.commit()
+            await self.db.refresh(path)
+            return path
+        except IntegrityError:
+            await self.db.rollback()
+            raise ValueError("Updating path failed. Please try again.")
+
+    async def delete_path(self, path: VirtualPaths) -> None:
+        try:
+            await self.db.delete(path)
+            await self.db.commit()
+        except IntegrityError:
+            await self.db.rollback()
+            raise ValueError("Cannot delete path. Please try again.")
+
+
+class DocumentsOps:
+    """Data-access layer for the Documents and Processing_Status tables."""
+
+    def __init__(self, db: DBSession):
+        self.db = db
+
+    async def get_documents(
+        self,
+        skip: int = 0,
+        limit: int = 20,
+        status_filter: Literal["Finished", "Failed", "Processing", "Queued"] | None = None,
+        user_id: int | None = None,
+    ) -> tuple[int, list[Documents]]:
+        """Return (total_count, page_of_documents) with optional filters."""
+        conditions = []
+        if user_id:
+            conditions.append(Documents.uploaded_by_user_id == user_id)
+        if status_filter:
+            conditions.append(
+                Documents.Processing_Status.any(
+                    (ProcessingStatus.status == status_filter)
+                    & (ProcessingStatus.stage_name == "OCR")
+                )
+            )
+
+        count_query = select(func.count(Documents.doc_id))
+        for cond in conditions:
+            count_query = count_query.where(cond)
+        total = (await self.db.execute(count_query)).scalar_one()
+
+        query = (
+            select(Documents)
+            .options(
+                selectinload(Documents.Processing_Status),
+                selectinload(Documents.path),
+            )
+            .order_by(Documents.uploaded_at.desc())
+            .offset(skip)
+            .limit(limit)
+        )
+        for cond in conditions:
+            query = query.where(cond)
+
+        docs = (await self.db.execute(query)).scalars().all()
+        return total, list(docs)
+
+    async def get_document(self, doc_id: int) -> Documents | None:
+        query = (
+            select(Documents)
+            .options(joinedload(Documents.path))
+            .where(Documents.doc_id == doc_id)
+        )
+        return (await self.db.execute(query)).scalar_one_or_none()
+
+    async def get_document_by_mongo_id(self, mongo_doc_id: str) -> Documents | None:
+        query = select(Documents).where(Documents.mongo_doc_id == mongo_doc_id)
+        return (await self.db.execute(query)).scalar_one_or_none()
+
+    async def get_document_status(
+        self, doc_id: int, user_id: int | None = None
+    ) -> tuple[Documents, ProcessingStatus] | None:
+        """Return (document, ocr_status) or None."""
+        query = (
+            select(Documents, ProcessingStatus)
+            .outerjoin(
+                ProcessingStatus,
+                (Documents.doc_id == ProcessingStatus.doc_id)
+                & (ProcessingStatus.stage_name == "OCR"),
+            )
+            .where(Documents.doc_id == doc_id)
+        )
+        if user_id is not None:
+            query = query.where(Documents.uploaded_by_user_id == user_id)
+
+        return (await self.db.execute(query)).first()  # type: ignore[return-value]
+
+    async def get_active_status(self, doc_id: int) -> str | None:
+        query = select(ProcessingStatus.status).where(
+            ProcessingStatus.doc_id == doc_id,
+            ProcessingStatus.status.in_(["Queued", "Processing"]),
+        )
+        return (await self.db.execute(query)).scalar_one_or_none()
+
+    async def create_document(
+        self, doc: Documents, processing_status: ProcessingStatus
+    ) -> Documents:
+        """Insert a document and its initial processing status in one transaction."""
+        try:
+            self.db.add(doc)
+            await self.db.flush()
+
+            processing_status.doc_id = doc.doc_id
+            self.db.add(processing_status)
+            await self.db.flush()
+            return doc
+        except IntegrityError:
+            await self.db.rollback()
+            raise ValueError("A document with this filename already exists at the specified path.")
+
+    async def commit_and_refresh(self, doc: Documents) -> Documents:
+        await self.db.commit()
+        await self.db.refresh(doc)
+        return doc
+
+    async def rollback(self) -> None:
+        await self.db.rollback()
+
+    async def delete_document(self, doc: Documents) -> None:
+        """Delete a document and all its processing statuses and RAG ingest records."""
+        try:
+            await self.db.execute(
+                delete(RagIngest).where(RagIngest.doc_id == doc.doc_id)
+            )
+            await self.db.execute(
+                delete(ProcessingStatus).where(ProcessingStatus.doc_id == doc.doc_id)
+            )
+            await self.db.delete(doc)
+            await self.db.commit()
+        except IntegrityError:
+            await self.db.rollback()
+            raise ValueError("Delete failed. Please try again.")
+
+
+class RagIngestOps:
+    """Data-access layer for the Rag_Ingest table."""
+
+    def __init__(self, db: DBSession):
+        self.db = db
+
+    async def record_ingest(
+        self,
+        doc_id: int,
+        status: str,
+        chunks_count: int = 0,
+        total_tokens: int = 0,
+        error_message: str | None = None,
+    ) -> RagIngest:
+        """Create a new RAG ingest record for a document."""
+        record = RagIngest(
+            doc_id=doc_id,
+            status=status,
+            chunks_count=chunks_count,
+            total_tokens=total_tokens,
+            error_message=error_message,
+        )
+        try:
+            self.db.add(record)
+            await self.db.commit()
+            await self.db.refresh(record)
+            return record
+        except IntegrityError:
+            await self.db.rollback()
+            raise ValueError("Failed to record RAG ingest status.")
+
+    async def get_by_doc_id(self, doc_id: int) -> RagIngest | None:
+        query = (
+            select(RagIngest)
+            .where(RagIngest.doc_id == doc_id)
+            .order_by(RagIngest.ingested_at.desc())
+        )
+        return (await self.db.execute(query)).scalar_one_or_none()
+
+    async def delete_by_doc_id(self, doc_id: int) -> int:
+        """Delete all ingest records for a document. Returns count removed."""
+        result = await self.db.execute(
+            delete(RagIngest).where(RagIngest.doc_id == doc_id)
+        )
+        await self.db.commit()
+        return result.rowcount  # type: ignore[return-value]

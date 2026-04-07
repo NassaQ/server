@@ -160,6 +160,7 @@ class Documents(Base):
     path: Mapped['VirtualPaths'] = relationship('VirtualPaths', back_populates='Documents')
     uploaded_by_user: Mapped['Users'] = relationship('Users', back_populates='Documents')
     Processing_Status: Mapped[list['ProcessingStatus']] = relationship('ProcessingStatus', back_populates='doc')
+    Rag_Ingests: Mapped[list['RagIngest']] = relationship('RagIngest', back_populates='doc')
 
 
 class IndividualPermissions(Base):
@@ -248,4 +249,34 @@ class ProcessingStatus(Base):
 
     doc: Mapped["Documents"] = relationship(
         "Documents", back_populates="Processing_Status"
+    )
+
+
+class RagIngest(Base):
+    __tablename__ = "Rag_Ingest"
+    __table_args__ = (
+        ForeignKeyConstraint(
+            ["doc_id"], ["Documents.doc_id"], name="FK_RagIngest_Doc"
+        ),
+        PrimaryKeyConstraint("ingest_id", name="PK_Rag_Ingest"),
+    )
+
+    ingest_id: Mapped[int] = mapped_column(
+        BigInteger, Identity(start=1, increment=1), primary_key=True
+    )
+    doc_id: Mapped[int] = mapped_column(BigInteger, nullable=False)
+    status: Mapped[str] = mapped_column(
+        String(20, "SQL_Latin1_General_CP1_CI_AS"), nullable=False
+    )
+    chunks_count: Mapped[int] = mapped_column(Integer, nullable=False, server_default=text("((0))"))
+    total_tokens: Mapped[int] = mapped_column(Integer, nullable=False, server_default=text("((0))"))
+    ingested_at: Mapped[datetime.datetime] = mapped_column(
+        DateTime, nullable=False, server_default=text("(getdate())")
+    )
+    error_message: Mapped[Optional[str]] = mapped_column(
+        Unicode(collation="SQL_Latin1_General_CP1_CI_AS")
+    )
+
+    doc: Mapped["Documents"] = relationship(
+        "Documents", back_populates="Rag_Ingests"
     )
