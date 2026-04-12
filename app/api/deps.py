@@ -9,7 +9,7 @@ from app.core.security import decode_token
 from app.core.storage import AzureBlobStorage, StorageBase
 from app.core.config import settings
 
-from app.db.ops import UsersOps
+from app.db.ops import DocumentsOps, RagIngestOps, UsersOps, VirtualPathsOps
 from app.db.session import get_db
 from app.models.models import Documents, Users
 from app.schemas.docs import DocumentListItem
@@ -18,6 +18,9 @@ oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/api/v1/auth/login")
 
 DBSession = Annotated[AsyncSession, Depends(get_db)]
 UserRepo = Annotated[UsersOps, Depends()]
+PathRepo = Annotated[VirtualPathsOps, Depends()]
+DocRepo = Annotated[DocumentsOps, Depends()]
+RagIngestRepo = Annotated[RagIngestOps, Depends()]
 
 TokenDep = Annotated[str, Depends(oauth2_scheme)]
 
@@ -64,7 +67,9 @@ async def get_storage() -> AsyncIterator[StorageBase]:
             container=settings.BLOB_STORAGE_CONTAINER_NAME
         )
     else:
-        pass
+        raise ValueError(
+            f"Unsupported BLOB_STORAGE_TYPE: '{storage_type}'. Supported: 'azure'."
+        )
 
     await storage.__aenter__()
     try:

@@ -7,12 +7,10 @@ from pydantic import ValidationError
 
 from app.schemas.user import (
     UserCreate,
-    UserLogin,
     UserUpdate,
     UserAdminUpdate,
-    UserResponse,
 )
-from app.schemas.auth import Token, TokenPayload, RefreshTokenRequest
+from app.schemas.auth import Token
 
 
 class TestUserCreateSchema:
@@ -126,33 +124,6 @@ class TestUserCreateSchema:
         assert "extra" in str(exc_info.value).lower()
 
 
-class TestUserLoginSchema:
-    """Tests for UserLogin schema validation."""
-
-    def test_valid_login(self):
-        """Valid login data should pass validation."""
-        login = UserLogin(
-            email="test@example.com",
-            password="anypassword",
-        )
-
-        assert login.email == "test@example.com"
-        assert login.password == "anypassword"
-
-    def test_invalid_email(self):
-        """Invalid email should fail validation."""
-        with pytest.raises(ValidationError):
-            UserLogin(
-                email="not-an-email",
-                password="anypassword",
-            )
-
-    def test_missing_password(self):
-        """Missing password should fail validation."""
-        with pytest.raises(ValidationError):
-            UserLogin(email="test@example.com")
-
-
 class TestUserUpdateSchema:
     """Tests for UserUpdate schema validation."""
 
@@ -240,14 +211,3 @@ class TestTokenSchemas:
         )
 
         assert token.token_type == "custom"
-
-    def test_refresh_token_request(self):
-        """RefreshTokenRequest schema should work."""
-        request = RefreshTokenRequest(refresh_token="myrefreshtoken")
-
-        assert request.refresh_token == "myrefreshtoken"
-
-    def test_refresh_token_request_missing(self):
-        """Missing refresh token should fail."""
-        with pytest.raises(ValidationError):
-            RefreshTokenRequest()

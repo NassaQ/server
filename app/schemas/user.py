@@ -46,10 +46,6 @@ class UserAdminUpdate(BaseModel):
     model_config = ConfigDict(extra="forbid")
 
 
-class UserLogin(BaseModel):
-    email: EmailStr
-    password: str = Field(..., description="Password in plain text")
-
 class UserResponse(UserBase):
     """
     Public User Profile.
