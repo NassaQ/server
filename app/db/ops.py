@@ -60,7 +60,7 @@ class UsersOps:
         if not user_id and not email:
             raise ValueError("Neither email nor id provided to get the user")
 
-        query = select(Users)
+        query = select(Users).options(selectinload(Users.role))
         if user_id:
             query = query.where(Users.user_id == user_id)
         if email:
@@ -106,8 +106,7 @@ class UsersOps:
             
         try:
             await self.db.commit()
-            await self.db.refresh(user)
-            return user
+            return await self.get_user(user_id=user.user_id)  # type: ignore[return-value]
         
         except IntegrityError:
             await self.db.rollback()
@@ -120,8 +119,7 @@ class UsersOps:
         user.is_active = True
         try:
             await self.db.commit()
-            await self.db.refresh(user)
-            return user
+            return await self.get_user(user_id=user.user_id)  # type: ignore[return-value]
         
         except IntegrityError:
             await self.db.rollback()

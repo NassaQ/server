@@ -78,10 +78,10 @@ async def get_storage() -> AsyncIterator[StorageBase]:
         await storage.__aexit__(None, None, None)
 
 def get_broker() -> BaseBroker:
-    if settings.ENVIRONMENT == "production":
-        return AzureServiceBusBroker(settings.MESSAGE_BROKER_URL)
-    else:
-        return RabbitMQBroker(settings.MESSAGE_BROKER_URL)
+    url = settings.MESSAGE_BROKER_URL or ""
+    if url.startswith(("amqp://", "amqps://")):
+        return RabbitMQBroker(url)
+    return AzureServiceBusBroker(url)
 
 def get_event_broker(request: Request) -> BaseBroker:
     return request.app.state.broker

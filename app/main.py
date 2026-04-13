@@ -1,3 +1,4 @@
+import asyncio
 from contextlib import asynccontextmanager
 from fastapi import FastAPI, status, Response
 from fastapi.middleware.cors import CORSMiddleware
@@ -8,14 +9,13 @@ from app.api.v1 import api
 from app.db.session import engine
 
 
-@asynccontextmanager
-async def lifespan(app: FastAPI):
+async def _log_rag_status() -> None:
     try:
         from app.services.rag import get_store
 
-        store = get_store()
-        doc_count = len(store.list_documents())
-        chunk_count = store.total_vectors
+        store = await asyncio.to_thread(get_store)
+        chunk_count = await asyncio.to_thread(lambda: store.total_vectors)
+        doc_count = await asyncio.to_thread(lambda: store.total_documents)
         if chunk_count > 0:
             print(
                 f"[RAG] Azure AI Search connected: {doc_count} documents, {chunk_count} chunks"
@@ -24,6 +24,11 @@ async def lifespan(app: FastAPI):
             print("[RAG] Azure AI Search index initialized (empty)")
     except Exception as e:
         print(f"[RAG] Azure AI Search init skipped: {e}")
+
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    rag_task = asyncio.create_task(_log_rag_status())
 
     broker = None
     if settings.MESSAGE_BROKER_URL:
@@ -37,6 +42,12 @@ async def lifespan(app: FastAPI):
             broker = None
 
     yield
+
+    rag_task.cancel()
+    try:
+        await rag_task
+    except (asyncio.CancelledError, Exception):
+        pass
 
     if broker:
         try:
