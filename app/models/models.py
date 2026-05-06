@@ -5,6 +5,7 @@ from sqlalchemy import (
     BigInteger,
     Boolean,
     DateTime,
+    Float,
     ForeignKeyConstraint,
     Identity,
     Index,
@@ -156,11 +157,16 @@ class Documents(Base):
     uploaded_by_user_id: Mapped[int] = mapped_column(Integer, nullable=False)
     mongo_doc_id: Mapped[str] = mapped_column(String(36, 'SQL_Latin1_General_CP1_CI_AS'), nullable=False)
     uploaded_at: Mapped[datetime.datetime] = mapped_column(DateTime, nullable=False, server_default=text('(getdate())'))
+    updated_at: Mapped[Optional[datetime.datetime]] = mapped_column(DateTime, onupdate=text('(getutcdate())'))
+    file_size: Mapped[Optional[int]] = mapped_column(BigInteger)
+    content_type: Mapped[Optional[str]] = mapped_column(String(100, 'SQL_Latin1_General_CP1_CI_AS'))
+    file_type: Mapped[Optional[str]] = mapped_column(String(10, 'SQL_Latin1_General_CP1_CI_AS'))
 
     path: Mapped['VirtualPaths'] = relationship('VirtualPaths', back_populates='Documents')
     uploaded_by_user: Mapped['Users'] = relationship('Users', back_populates='Documents')
     Processing_Status: Mapped[list['ProcessingStatus']] = relationship('ProcessingStatus', back_populates='doc')
     Rag_Ingests: Mapped[list['RagIngest']] = relationship('RagIngest', back_populates='doc')
+    Ocr_Results: Mapped[list['OcrResult']] = relationship('OcrResult', back_populates='doc')
 
 
 class IndividualPermissions(Base):
@@ -279,4 +285,30 @@ class RagIngest(Base):
 
     doc: Mapped["Documents"] = relationship(
         "Documents", back_populates="Rag_Ingests"
+    )
+
+
+class OcrResult(Base):
+    __tablename__ = "Ocr_Results"
+    __table_args__ = (
+        ForeignKeyConstraint(
+            ["doc_id"], ["Documents.doc_id"], name="FK_OcrResults_Doc"
+        ),
+        PrimaryKeyConstraint("result_id", name="PK_OcrResults"),
+    )
+
+    result_id: Mapped[int] = mapped_column(BigInteger, Identity(start=1, increment=1), primary_key=True)
+    doc_id: Mapped[int] = mapped_column(BigInteger, nullable=False)
+    page_count: Mapped[int] = mapped_column(Integer, nullable=False)
+    word_count: Mapped[int] = mapped_column(Integer, nullable=False)
+    avg_confidence: Mapped[float] = mapped_column(Float, nullable=False)
+    primary_language: Mapped[str] = mapped_column(String(10, "SQL_Latin1_General_CP1_CI_AS"), nullable=False)
+    category: Mapped[Optional[str]] = mapped_column(String(50, "SQL_Latin1_General_CP1_CI_AS"))
+    classification_confidence: Mapped[Optional[float]] = mapped_column(Float)
+    cost_usd_ocr: Mapped[float] = mapped_column(Float, nullable=False)
+    cost_usd_classification: Mapped[Optional[float]] = mapped_column(Float)
+    processed_at: Mapped[datetime.datetime] = mapped_column(DateTime, nullable=False, server_default=text("(getutcdate())"))
+
+    doc: Mapped["Documents"] = relationship(
+        "Documents", back_populates="Ocr_Results"
     )

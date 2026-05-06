@@ -10,6 +10,8 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.db.session import get_db
 from app.models.models import (
     Documents,
+    Logs,
+    OcrResult,
     ProcessingStatus,
     RagIngest,
     Users,
@@ -25,7 +27,7 @@ class UsersOps:
 
     async def get_all_users(self, skip: int, limit: int, is_active: bool | None = None) -> list[Users]:
         query = select(Users).options(selectinload(Users.role))
-        
+
         if is_active is not None:
             query = query.where(Users.is_active == is_active)
 
@@ -33,7 +35,7 @@ class UsersOps:
 
         users = (await self.db.execute(query)).scalars().all()
         return list(users)
-    
+
     async def get_conflict(self, user_id: int, username: str | None = None, email: str | None = None) -> bool:
         query = select(Users)
         if username:
@@ -41,10 +43,10 @@ class UsersOps:
 
         if email:
             query = query.where(Users.email == email.lower())
-        
+
         exist_user = (await self.db.execute(query)).scalar_one_or_none()
         return exist_user is not None and exist_user.user_id != user_id
-    
+
     async def conflict_exists(self, username: str | None = None, email: str | None = None) -> bool:
         query = select(1)
         if username:
@@ -52,7 +54,7 @@ class UsersOps:
 
         if email:
             query = query.where(Users.email == email.lower())
-        
+
         exist_user = (await self.db.execute(query)).first()
         return exist_user is not None
 
@@ -65,7 +67,7 @@ class UsersOps:
             query = query.where(Users.user_id == user_id)
         if email:
             query = query.where(func.lower(Users.email) == email.lower())
-        
+
         user = (await self.db.execute(query)).scalar_one_or_none()
         return user
 
@@ -74,7 +76,7 @@ class UsersOps:
         exists = (await self.db.execute(query)).first()
 
         return exists is not None
-    
+
     async def create_user(self, new_user: Users) -> Users:
         user_data = {
             "full_name": new_user.full_name,
@@ -95,41 +97,41 @@ class UsersOps:
             created_user = (await self.db.execute(stmt)).scalar_one()
             await self.db.commit()
             return created_user
-            
+
         except IntegrityError:
             await self.db.rollback()
             raise ValueError("Registration failed. Please try again.")
-        
+
     async def update_user(self, user: Users, update_data: dict) -> Users:
         for key, value in update_data.items():
             setattr(user, key, value)
-            
+
         try:
             await self.db.commit()
-            return await self.get_user(user_id=user.user_id)  # type: ignore[return-value]
-        
+            return await self.get_user(user_id=user.user_id) # type: ignore[return-value]
+
         except IntegrityError:
             await self.db.rollback()
             raise ValueError("Update failed. Please try again.")
-    
+
     async def activate(self, user: Users) -> Users:
         if user.is_active:
             return user
-        
+
         user.is_active = True
         try:
             await self.db.commit()
-            return await self.get_user(user_id=user.user_id)  # type: ignore[return-value]
-        
+            return await self.get_user(user_id=user.user_id) # type: ignore[return-value]
+
         except IntegrityError:
             await self.db.rollback()
             raise ValueError("Activation failed. Please try again.")
-        
+
     async def delete_user(self, user: Users) -> None:
         try:
             await self.db.delete(user)
             await self.db.commit()
-        
+
         except IntegrityError:
             await self.db.rollback()
             raise ValueError("Couldn't delete User")
@@ -240,7 +242,10 @@ class DocumentsOps:
     async def get_document(self, doc_id: int) -> Documents | None:
         query = (
             select(Documents)
-            .options(joinedload(Documents.path))
+            .options(
+                joinedload(Documents.path),
+                selectinload(Documents.Processing_Status),
+            )
             .where(Documents.doc_id == doc_id)
         )
         return (await self.db.execute(query)).scalar_one_or_none()
@@ -251,21 +256,21 @@ class DocumentsOps:
 
     async def get_document_status(
         self, doc_id: int, user_id: int | None = None
-    ) -> tuple[Documents, ProcessingStatus] | None:
-        """Return (document, ocr_status) or None."""
+    ) -> list[tuple[Documents, ProcessingStatus]]:
+        """Return list of (document, processing_status) rows for all stages."""
         query = (
             select(Documents, ProcessingStatus)
             .outerjoin(
                 ProcessingStatus,
-                (Documents.doc_id == ProcessingStatus.doc_id)
-                & (ProcessingStatus.stage_name == "OCR"),
+                Documents.doc_id == ProcessingStatus.doc_id,
             )
             .where(Documents.doc_id == doc_id)
         )
         if user_id is not None:
             query = query.where(Documents.uploaded_by_user_id == user_id)
 
-        return (await self.db.execute(query)).first()  # type: ignore[return-value]
+        rows = (await self.db.execute(query)).all()
+        return list(rows)
 
     async def get_active_status(self, doc_id: int) -> str | None:
         query = select(ProcessingStatus.status).where(
@@ -275,15 +280,16 @@ class DocumentsOps:
         return (await self.db.execute(query)).scalar_one_or_none()
 
     async def create_document(
-        self, doc: Documents, processing_status: ProcessingStatus
+        self, doc: Documents, processing_statuses: list[ProcessingStatus]
     ) -> Documents:
-        """Insert a document and its initial processing status in one transaction."""
+        """Insert a document and its initial processing statuses in one transaction."""
         try:
             self.db.add(doc)
             await self.db.flush()
 
-            processing_status.doc_id = doc.doc_id
-            self.db.add(processing_status)
+            for ps in processing_statuses:
+                ps.doc_id = doc.doc_id
+                self.db.add(ps)
             await self.db.flush()
             return doc
         except IntegrityError:
@@ -299,10 +305,13 @@ class DocumentsOps:
         await self.db.rollback()
 
     async def delete_document(self, doc: Documents) -> None:
-        """Delete a document and all its processing statuses and RAG ingest records."""
+        """Delete a document and all its processing statuses, RAG ingest records, and OCR results."""
         try:
             await self.db.execute(
                 delete(RagIngest).where(RagIngest.doc_id == doc.doc_id)
+            )
+            await self.db.execute(
+                delete(OcrResult).where(OcrResult.doc_id == doc.doc_id)
             )
             await self.db.execute(
                 delete(ProcessingStatus).where(ProcessingStatus.doc_id == doc.doc_id)
@@ -359,4 +368,45 @@ class RagIngestOps:
             delete(RagIngest).where(RagIngest.doc_id == doc_id)
         )
         await self.db.commit()
-        return result.rowcount  # type: ignore[return-value]
+        return result.rowcount # type: ignore[return-value]
+
+
+class OcrResultOps:
+    """Data-access layer for the Ocr_Results table."""
+
+    def __init__(self, db: DBSession):
+        self.db = db
+
+    async def get_by_doc_id(self, doc_id: int) -> OcrResult | None:
+        query = (
+            select(OcrResult)
+            .where(OcrResult.doc_id == doc_id)
+            .order_by(OcrResult.processed_at.desc())
+        )
+        return (await self.db.execute(query)).scalar_one_or_none()
+
+
+class LogsOps:
+    """Data-access layer for the Logs table."""
+
+    def __init__(self, db: DBSession):
+        self.db = db
+
+    async def write_log(
+        self,
+        action_type: str,
+        user_id: int | None = None,
+        entity_id: int | None = None,
+        details: str | None = None,
+    ) -> None:
+        log = Logs(
+            action_type=action_type,
+            user_id=user_id,
+            entity_id=entity_id,
+            details=details,
+        )
+        try:
+            self.db.add(log)
+            await self.db.commit()
+        except IntegrityError:
+            await self.db.rollback()

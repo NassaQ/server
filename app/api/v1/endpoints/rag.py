@@ -1,19 +1,19 @@
 """
 RAG endpoints for semantic search and retrieval-augmented generation.
 
-POST /ingest           — Chunk, embed, and store a processed document
-POST /search           — Semantic search (Azure AI Search → Cohere rerank → results)
-POST /ask              — Full RAG (search → context → gpt-4.1-mini → answer)
-GET  /documents        — List ingested documents
+POST /ingest — Chunk, embed, and store a processed document
+POST /search — Semantic search (Azure AI Search → Cohere rerank → results)
+POST /ask — Full RAG (search → context → gpt-4.1-mini → answer)
+GET /documents — List ingested documents
 DELETE /documents/{id} — Remove a document from the vector store
-GET  /stats            — Vector store statistics
+GET /stats — Vector store statistics
 """
 
 import asyncio
 
 from fastapi import APIRouter, HTTPException, status
 
-from app.api.deps import ActiveUser, DocRepo, RagIngestRepo
+from app.api.deps import ActiveUser, DocRepo, LogRepo, RagIngestRepo
 from app.schemas.rag import (
     IngestRequest,
     IngestResponse,
@@ -37,13 +37,14 @@ async def ingest_document(
     body: IngestRequest,
     doc_repo: DocRepo,
     rag_repo: RagIngestRepo,
-    user: ActiveUser = None,  # type: ignore
+    log_repo: LogRepo,
+    user: ActiveUser = None, # type: ignore
 ):
     """
     Chunk, embed, and store a processed document in the vector store.
 
     Call this after ``POST /documents/process`` to make the document
-    searchable via semantic search / RAG.  Records the ingest outcome
+    searchable via semantic search / RAG. Records the ingest outcome
     (chunks created, tokens used, status) in the ``Rag_Ingest`` table.
     """
     if not body.cleaned_text.strip():
@@ -75,18 +76,41 @@ async def ingest_document(
         except ValueError:
             pass
 
+        from app.models.models import ProcessingStatus
+        from app.db.session import get_db as get_session
+        from sqlalchemy import select
+
+        async for session in get_session():
+            query = select(ProcessingStatus).where(
+                ProcessingStatus.doc_id == doc.doc_id,
+                ProcessingStatus.stage_name == "Vectorization",
+            )
+            record = (await session.execute(query)).scalar_one_or_none()
+            if record:
+                from datetime import datetime, timezone
+                record.status = "Finished"
+                record.end_time = datetime.now(timezone.utc)
+                await session.commit()
+
+        await log_repo.write_log(
+            action_type="rag_ingest",
+            user_id=user.user_id if user else None,
+            entity_id=doc.doc_id,
+            details=f"Ingested document {body.document_id}: {result['status']}",
+        )
+
     return IngestResponse(**result)
 
 
 @router.post("/search", response_model=SearchResponse)
 def search_documents(
     body: SearchRequest,
-    user: ActiveUser = None,  # type: ignore
+    user: ActiveUser = None, # type: ignore
 ):
     """
     Two-stage semantic search:
-      Stage 1: Azure AI Search top-20 (broad recall via embedding similarity)
-      Stage 2: Cohere Rerank v4.0 Fast → top-K (precision via cross-attention)
+    Stage 1: Azure AI Search top-20 (broad recall via embedding similarity)
+    Stage 2: Cohere Rerank v4.0 Fast → top-K (precision via cross-attention)
 
     Returns ranked chunks with text, source metadata, and scores.
     """
@@ -108,7 +132,7 @@ def search_documents(
 @router.post("/ask", response_model=AskResponse)
 def ask_question(
     body: AskRequest,
-    user: ActiveUser = None,  # type: ignore
+    user: ActiveUser = None, # type: ignore
 ):
     """
     Full RAG pipeline: search → assemble context → gpt-4.1-mini → answer.
@@ -134,7 +158,7 @@ def ask_question(
 
 @router.get("/", response_model=list[DocumentInfo])
 def list_ingested_documents(
-    user: ActiveUser = None,  # type: ignore
+    user: ActiveUser = None, # type: ignore
 ):
     """List all documents currently stored in the vector store."""
     docs = rag.list_documents()
@@ -146,7 +170,8 @@ async def remove_ingested_document(
     document_id: str,
     doc_repo: DocRepo,
     rag_repo: RagIngestRepo,
-    user: ActiveUser = None,  # type: ignore
+    log_repo: LogRepo,
+    user: ActiveUser = None, # type: ignore
 ):
     """Remove a document and all its chunks from the vector store."""
     result = await asyncio.to_thread(rag.remove_document, document_id)
@@ -168,12 +193,18 @@ async def remove_ingested_document(
     except Exception:
         pass
 
+    await log_repo.write_log(
+        action_type="rag_remove",
+        user_id=user.user_id if user else None,
+        details=f"Removed document {document_id} from vector store",
+    )
+
     return RemoveResponse(**result)
 
 
 @router.get("/stats", response_model=StoreStatsResponse)
 def get_store_stats(
-    user: ActiveUser = None,  # type: ignore
+    user: ActiveUser = None, # type: ignore
 ):
     """Return vector store statistics (total vectors, total documents)."""
     stats = rag.store_stats()

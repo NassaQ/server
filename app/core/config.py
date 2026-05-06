@@ -3,6 +3,10 @@ from pydantic import computed_field
 from urllib.parse import quote_plus
 
 
+def _quote(s: str) -> str:
+    return quote_plus(s)
+
+
 class Settings(BaseSettings):
     ENVIRONMENT: str = "production"
 
@@ -11,10 +15,6 @@ class Settings(BaseSettings):
     SQL_USER: str
     SQL_PASS: str
     SQL_DRIVER: str = "ODBC Driver 18 for SQL Server"
-
-    SQL_CONNECT_TIMEOUT: int = 60
-    SQL_MAX_RETRIES: int = 3
-    SQL_RETRY_DELAY_BASE: int = 2
 
     # JWT configs
     ACCESS_TOKEN_EXPIRE_MINUTES: int
@@ -63,6 +63,13 @@ class Settings(BaseSettings):
     AZURE_SEARCH_API_KEY: str = ""
     AZURE_SEARCH_INDEX_NAME: str = "nassaq-chunks"
 
+    # Azure Cosmos DB (MongoDB API) — for OCR result cleanup
+    MONGO_USER: str = ""
+    MONGO_PASS: str = ""
+    MONGO_HOST: str = ""
+    MONGO_DB_NAME: str = "nassaq"
+    COSMOS_OCR_COLLECTION: str = "ocr_results"
+
     # RAG Pipeline
     RAG_CHUNK_SIZE: int = 400
     RAG_CHUNK_OVERLAP: int = 50
@@ -74,13 +81,24 @@ class Settings(BaseSettings):
 
     @computed_field
     def SQL_CONNECTION_STRING(self) -> str:
-        encoded_pass = quote_plus(self.SQL_PASS)
+        encoded_pass = _quote(self.SQL_PASS)
 
         return (
             f"mssql+aioodbc://{self.SQL_USER}:{encoded_pass}@"
             f"{self.SQL_SERVER}/{self.SQL_DB_NAME}"
-            f"?driver={quote_plus(self.SQL_DRIVER)}"
-            "&TrustServerCertificate=yes"
+            f"?driver={_quote(self.SQL_DRIVER)}"
+            "&TrustServerCertificate=yes&LoginTimeout=60"
+        )
+
+    @computed_field
+    def MONGO_CONNECTION_STR(self) -> str:
+        if not self.MONGO_USER or not self.MONGO_HOST:
+            return ""
+        encoded_pass = _quote(self.MONGO_PASS)
+        return (
+            f"mongodb+srv://{self.MONGO_USER}:{encoded_pass}@{self.MONGO_HOST}"
+            f"/?tls=true&authMechanism=SCRAM-SHA-256"
+            f"&retrywrites=false&maxIdleTimeMS=120000"
         )
 
 

@@ -5,7 +5,7 @@ from fastapi.concurrency import run_in_threadpool
 from app.models.models import Users
 from app.schemas.user import UserCreate, UserResponse
 from app.schemas.auth import TokenLogin, TokenRefresh
-from app.api.deps import UserRepo, gen_username, capitalize_full_name, TokenDep
+from app.api.deps import UserRepo, LogRepo, gen_username, capitalize_full_name, TokenDep
 from app.core.security import (
     hash_password,
     verify_password,
@@ -19,7 +19,7 @@ router = APIRouter()
 @router.post("/register", response_model=UserResponse,
     status_code=status.HTTP_201_CREATED, summary="Register a new user"
 )
-async def register (user_info: UserCreate, user_repo: UserRepo) -> UserResponse:
+async def register (user_info: UserCreate, user_repo: UserRepo, log_repo: LogRepo) -> UserResponse:
     isEmailExist = await user_repo.conflict_exists(email=user_info.email)
     if isEmailExist:
         raise HTTPException(
@@ -53,7 +53,13 @@ async def register (user_info: UserCreate, user_repo: UserRepo) -> UserResponse:
             status_code=status.HTTP_400_BAD_REQUEST,
             detail=str(e),
         )
-    
+
+    await log_repo.write_log(
+        action_type="user_register",
+        entity_id=created_user.user_id,
+        details=f"New user registered: {created_user.username}",
+    )
+
     return created_user
 
 

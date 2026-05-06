@@ -7,6 +7,7 @@ from app.api.deps import get_broker
 from app.core.config import settings
 from app.api.v1 import api
 from app.db.session import engine
+from app.db.cosmos import cosmos
 
 
 async def _log_rag_status() -> None:
@@ -41,6 +42,12 @@ async def lifespan(app: FastAPI):
             print(f"[Broker] Connection skipped: {e}")
             broker = None
 
+    if settings.MONGO_CONNECTION_STR:
+        try:
+            await cosmos.connect()
+        except Exception as e:
+            print(f"[Cosmos] Connection skipped: {e}")
+
     yield
 
     rag_task.cancel()
@@ -54,6 +61,11 @@ async def lifespan(app: FastAPI):
             await broker.close()
         except Exception:
             pass
+
+    try:
+        await cosmos.close()
+    except Exception:
+        pass
 
     try:
         await engine.dispose()
