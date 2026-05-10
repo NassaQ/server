@@ -23,6 +23,23 @@ class CosmosClient:
         self._collection = db[settings.COSMOS_OCR_COLLECTION]
         print(f"[Cosmos] Connected: {settings.MONGO_DB_NAME}/{settings.COSMOS_OCR_COLLECTION}")
 
+    async def find_by_doc_id(self, doc_id: int) -> dict | None:
+        """Find an OCR result document by its SQL doc_id. Returns None if not found."""
+        if self._collection is None:
+            return None
+        return await self._collection.find_one({"doc_id": doc_id})
+
+    async def upsert_ocr_result(self, doc: dict) -> bool:
+        """Insert or replace an OCR result document keyed by doc_id. Returns True if inserted."""
+        if self._collection is None:
+            return False
+        result = await self._collection.replace_one(
+            {"doc_id": doc["doc_id"]},
+            doc,
+            upsert=True,
+        )
+        return result.upserted_id is not None or result.modified_count > 0
+
     async def delete_by_doc_id(self, doc_id: int) -> bool:
         """Delete an OCR result document by its SQL doc_id. Returns True if deleted."""
         if self._collection is None:

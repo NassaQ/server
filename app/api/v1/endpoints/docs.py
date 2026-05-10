@@ -1,14 +1,20 @@
 import asyncio
 from typing import Annotated, Literal
+from urllib.parse import unquote, urlparse
 
 from fastapi import APIRouter, Query, UploadFile, status, HTTPException, File, Depends
+from sqlalchemy import select, update as sql_update
 
 from app.api.deps import ActiveUser, AdminUser, DocRepo, LogRepo, OcrResultRepo, PathRepo, get_event_broker, get_storage, doc_to_list_item
 from app.core.broker import BaseBroker
 from app.core.storage import StorageBase
 from app.db.cosmos import cosmos
-from app.models.models import Documents, ProcessingStatus
-from app.schemas.docs import DocumentDeleteResponse, DocumentStatusResponse, FileUploadResponse, FileMetadata, DocumentListResponse, StageStatus, OcrResultResponse
+from app.db.session import get_db, AsyncSessionLocal
+import logging
+from app.models.models import Documents, ProcessingStatus, OcrResult
+
+logger = logging.getLogger(__name__)
+from app.schemas.docs import DocumentDeleteResponse, DocumentStatusResponse, FileUploadResponse, FileMetadata, DocumentListResponse, StageStatus, OcrResultResponse, MoveDocumentRequest, MoveDocumentResponse
 from app.core.config import settings
 from app.services import rag
 from app.services import file_storage
@@ -239,20 +245,28 @@ async def get_doc_ocr_result(
     )
 
 
-@router.delete("/{doc_id}", response_model=DocumentDeleteResponse, summary="Delete a document (admin)",
-    description="Deletes a document's database records, blob, MongoDB document, and vector store entries. Blocked if the document is currently being processed. Admin only.")
+@router.delete("/{doc_id}", response_model=DocumentDeleteResponse, summary="Delete a document",
+    description="Deletes a document's database records, blob, MongoDB document, and vector store entries. Blocked if the document is currently being processed. Document owners and admins can delete.")
 async def delete_document(
     doc_id: int,
     doc_repo: DocRepo,
     log_repo: LogRepo,
-    current_user: AdminUser,
-    storage: StorageBase = Depends(get_storage),
+    current_user: ActiveUser,
 ) -> DocumentDeleteResponse:
     doc = await doc_repo.get_document(doc_id)
     if not doc:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail=f"Document with id {doc_id} not found.",
+        )
+
+    # Allow if user is an admin OR the document owner
+    is_admin = current_user.role_id == 99
+    is_owner = doc.uploaded_by_user_id == current_user.user_id
+    if not is_admin and not is_owner:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="You do not have permission to delete this document.",
         )
 
     active_status = await doc_repo.get_active_status(doc_id)
@@ -264,9 +278,6 @@ async def delete_document(
 
     mongo_doc_id = doc.mongo_doc_id
 
-    raw_path = doc.path.full_path.strip("/") if doc.path and doc.path.full_path else ""
-    blob_path = f"{raw_path}/{doc.filename}" if raw_path else doc.filename
-
     try:
         await doc_repo.delete_document(doc)
     except ValueError as e:
@@ -275,21 +286,17 @@ async def delete_document(
             detail=str(e),
         )
 
-    try:
-        await storage.delete(blob_path)
-    except Exception:
-        pass
-
+    # ── Delete blob from file_storage (UUID-keyed) ─────────────────
     if mongo_doc_id and mongo_doc_id != "pending":
+        try:
+            await asyncio.to_thread(file_storage.delete, mongo_doc_id)
+        except Exception:
+            pass
+
         try:
             await asyncio.to_thread(rag.remove_document, mongo_doc_id)
         except Exception:
             pass
-
-    try:
-        await asyncio.to_thread(file_storage.delete, mongo_doc_id)
-    except Exception:
-        pass
 
     if cosmos.connected:
         try:
@@ -307,4 +314,78 @@ async def delete_document(
     return DocumentDeleteResponse(
         doc_id=doc_id,
         message="Document deleted successfully.",
+    )
+
+
+@router.patch("/{doc_id}/move", response_model=MoveDocumentResponse, summary="Move a document to a different category folder",
+    description="Reorganises a document into a new category folder: updates Cosmos DB & SQL metadata.")
+async def move_document(
+    doc_id: int,
+    body: MoveDocumentRequest,
+    doc_repo: DocRepo,
+    log_repo: LogRepo,
+    current_user: ActiveUser,
+):
+    """
+    Move a document to a new classification folder.
+
+    Since files are stored keyed by UUID (not by path), no blob copy
+    is needed — we only update the category metadata in Cosmos DB and
+    the SQL Ocr_Results table.
+
+    Steps:
+      1. Look up the document in SQL.
+      2. Update ``category`` in the SQL ``Ocr_Results`` table.
+      3. Update Cosmos DB category.
+      4. Log the action.
+    """
+    # ── 1. Fetch document ──────────────────────────────────────────────
+    doc = await doc_repo.get_document(doc_id)
+    if not doc:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Document not found.")
+
+    filename = doc.filename
+    new_category = body.new_category.strip()
+
+    # ── 2. Update SQL Ocr_Results category ────────────────────────────
+    try:
+        async with AsyncSessionLocal() as session:
+            stmt = (
+                sql_update(OcrResult)
+                .where(OcrResult.doc_id == doc_id)
+                .values(category=new_category)
+            )
+            await session.execute(stmt)
+            await session.commit()
+    except Exception as exc:
+        logger.error(f"Failed to update Ocr_Results category for doc_id={doc_id}: {exc}")
+
+    # ── 3. Update Cosmos DB category ───────────────────────────────────
+    if doc.mongo_doc_id and doc.mongo_doc_id != "pending":
+        try:
+            cosmos_doc = cosmos.find_by_doc_id(doc_id)
+            if cosmos_doc:
+                if cosmos_doc.get("classification"):
+                    cosmos_doc["classification"]["category"] = new_category
+                else:
+                    cosmos_doc["classification"] = {"category": new_category}
+                await cosmos.upsert_ocr_result(cosmos_doc)
+        except Exception as exc:
+            logger.error(f"Failed to update Cosmos DB for doc_id={doc_id}: {exc}")
+
+    # ── 4. Log ────────────────────────────────────────────────────────
+    await log_repo.write_log(
+        action_type="document_move",
+        user_id=current_user.user_id,
+        entity_id=doc_id,
+        details=f"Moved {filename} to category '{new_category}'",
+    )
+
+    return MoveDocumentResponse(
+        doc_id=doc_id,
+        filename=filename,
+        old_path="",
+        new_path="",
+        new_category=new_category,
+        message=f"Document moved to {new_category}",
     )

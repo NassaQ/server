@@ -1,177 +1,154 @@
 """
-Azure AI Search vector store for the RAG pipeline.
+Pinecone vector store for the RAG pipeline.
 
-Stores chunk embeddings and metadata in an Azure AI Search index using
-HNSW vector search with cosine similarity.  All vectors MUST be
-L2-normalised before insertion so that cosine scoring is consistent
-with the embedding pipeline.
+Stores chunk embeddings and metadata in a Pinecone serverless index using
+cosine similarity.  All vectors MUST be L2-normalised before insertion
+so that cosine scoring is consistent with the embedding pipeline.
 
-Index schema (auto-created on first use):
-    id              — deterministic key ``{document_id}_{chunk_index}``
+Pinecone schema (auto-created on first use):
+    dimension  = 1536 (text-embedding-3-small)
+    metric     = cosine
+    spec       = Serverless (AWS / us-east-1)
+
+Vector metadata fields:
     document_id     — filterable string
-    chunk_index     — int32
-    page_number     — int32
-    token_count     — int32
+    chunk_index     — int
+    page_number     — int
+    token_count     — int
     section_heading — string
-    text_clean      — searchable string
+    text_clean      — string
     text_original   — string
     classification  — filterable string
     language        — filterable string
     source_file     — string
     created_at      — string (ISO-8601)
-    embedding       — Collection(Edm.Single), 1536 dims, HNSW / cosine
 """
 
 from typing import Optional
 
 import numpy as np
-from azure.core.credentials import AzureKeyCredential
-from azure.search.documents import SearchClient
-from azure.search.documents.indexes import SearchIndexClient
-from azure.search.documents.indexes.models import (
-    HnswAlgorithmConfiguration,
-    SearchableField,
-    SearchField,
-    SearchFieldDataType,
-    SearchIndex,
-    SimpleField,
-    VectorSearch,
-    VectorSearchProfile,
-)
-from azure.search.documents.models import VectorizedQuery
 
-_UPLOAD_BATCH_SIZE = 1000
+from pinecone import Pinecone, ServerlessSpec
+
+_UPSERT_BATCH_SIZE = 100
+_NEUTRAL_VEC_CACHE: Optional[list[float]] = None
 
 
-class AzureSearchVectorStore:
-    """Azure AI Search index backed vector store."""
+def _neutral_vector(dims: int) -> list[float]:
+    """Return a cached zero-vector for filter-only queries."""
+    global _NEUTRAL_VEC_CACHE
+    if _NEUTRAL_VEC_CACHE is None or len(_NEUTRAL_VEC_CACHE) != dims:
+        _NEUTRAL_VEC_CACHE = [0.0] * dims
+    return _NEUTRAL_VEC_CACHE
+
+
+class PineconeVectorStore:
+    """Pinecone serverless index backed vector store."""
 
     def __init__(
         self,
-        endpoint: str,
         api_key: str,
-        index_name: str = "nassaq-chunks",
+        index_name: str = "nassaq",
         dimensions: int = 1536,
+        cloud: str = "aws",
+        region: str = "us-east-1",
     ):
-        self._endpoint = endpoint
-        self._credential = AzureKeyCredential(api_key)
+        self._api_key = api_key
         self._index_name = index_name
         self._dims = dimensions
+        self._cloud = cloud
+        self._region = region
 
-        self._index_client = SearchIndexClient(
-            endpoint=self._endpoint,
-            credential=self._credential,
-        )
-        self._search_client = SearchClient(
-            endpoint=self._endpoint,
-            index_name=self._index_name,
-            credential=self._credential,
-        )
+        self._pc: Optional[Pinecone] = None
+        self._index = None
+        self._document_ids: set[str] = set()
+        self._synced = False
 
-        self._ensure_index()
+        if api_key:
+            self._pc = Pinecone(api_key=api_key)
+            self._ensure_index()
+            self._index = self._pc.Index(index_name)
+
+    # ── Index management ────────────────────────────────────────────────
 
     def _ensure_index(self) -> None:
-        """Create the search index if it does not already exist."""
-        fields = [
-            SimpleField(
-                name="id",
-                type=SearchFieldDataType.String,
-                key=True,
-                filterable=True,
-            ),
-            SimpleField(
-                name="document_id",
-                type=SearchFieldDataType.String,
-                filterable=True,
-            ),
-            SimpleField(
-                name="chunk_index",
-                type=SearchFieldDataType.Int32,
-                filterable=True,
-            ),
-            SimpleField(
-                name="page_number",
-                type=SearchFieldDataType.Int32,
-                filterable=True,
-            ),
-            SimpleField(
-                name="token_count",
-                type=SearchFieldDataType.Int32,
-            ),
-            SearchableField(
-                name="section_heading",
-                type=SearchFieldDataType.String,
-            ),
-            SearchableField(
-                name="text_clean",
-                type=SearchFieldDataType.String,
-            ),
-            SimpleField(
-                name="text_original",
-                type=SearchFieldDataType.String,
-            ),
-            SimpleField(
-                name="classification",
-                type=SearchFieldDataType.String,
-                filterable=True,
-            ),
-            SimpleField(
-                name="language",
-                type=SearchFieldDataType.String,
-                filterable=True,
-            ),
-            SimpleField(
-                name="source_file",
-                type=SearchFieldDataType.String,
-            ),
-            SimpleField(
-                name="created_at",
-                type=SearchFieldDataType.String,
-            ),
-            SearchField(
-                name="embedding",
-                type=SearchFieldDataType.Collection(SearchFieldDataType.Single),
-                searchable=True,
-                vector_search_dimensions=self._dims,
-                vector_search_profile_name="default-vector-profile",
-            ),
-        ]
+        """Create the Pinecone index if it does not already exist."""
+        existing = self._pc.list_indexes().names()
+        if self._index_name not in existing:
+            self._pc.create_index(
+                name=self._index_name,
+                dimension=self._dims,
+                metric="cosine",
+                spec=ServerlessSpec(cloud=self._cloud, region=self._region),
+            )
 
-        vector_search = VectorSearch(
-            algorithms=[
-                HnswAlgorithmConfiguration(name="default-hnsw"),
-            ],
-            profiles=[
-                VectorSearchProfile(
-                    name="default-vector-profile",
-                    algorithm_configuration_name="default-hnsw",
-                ),
-            ],
-        )
+    def _ready(self) -> bool:
+        """Check whether the index is available for operations."""
+        return self._index is not None
 
-        index = SearchIndex(
-            name=self._index_name,
-            fields=fields,
-            vector_search=vector_search,
-        )
+    # ── Lazy document-ID sync ───────────────────────────────────────────
 
-        self._index_client.create_or_update_index(index)
+    def _sync_docs(self) -> None:
+        """Populate the in-memory set of known document IDs from Pinecone."""
+        if self._synced or not self._ready():
+            return
+        try:
+            results = self._index.query(
+                vector=_neutral_vector(self._dims),
+                top_k=10000,
+                include_metadata=True,
+                filter={"chunk_index": 0},
+            )
+            for r in results.get("matches", []):
+                doc_id = (r.get("metadata") or {}).get("document_id")
+                if doc_id:
+                    self._document_ids.add(doc_id)
+        except Exception:
+            pass
+        self._synced = True
+
+    # ── Properties ──────────────────────────────────────────────────────
 
     @property
     def total_vectors(self) -> int:
-        """Return the total number of chunks in the index."""
-        return self._search_client.get_document_count()
+        """Return the total number of vectors (chunks) in the index."""
+        if not self._ready():
+            return 0
+        stats = self._index.describe_index_stats()
+        return int(stats.get("total_vector_count", 0))
 
     @property
     def total_documents(self) -> int:
         """Return the number of distinct documents in the index."""
-        results = self._search_client.search(
-            search_text="*",
-            filter="chunk_index eq 0",
-            top=0,
-            include_total_count=True,
-        )
-        return results.get_count() or 0
+        if not self._ready():
+            return 0
+        self._sync_docs()
+        return len(self._document_ids)
+
+    # ── Document existence check ────────────────────────────────────────
+
+    def has_document(self, document_id: str) -> bool:
+        """Check if a document has been ingested."""
+        if not self._ready():
+            return False
+        if document_id in self._document_ids:
+            return True
+        # Double-check via a lightweight query
+        try:
+            results = self._index.query(
+                vector=_neutral_vector(self._dims),
+                top_k=1,
+                include_metadata=False,
+                filter={"document_id": document_id},
+            )
+            exists = len(results.get("matches", [])) > 0
+            if exists:
+                self._document_ids.add(document_id)
+            return exists
+        except Exception:
+            return False
+
+    # ── Add / upsert vectors ────────────────────────────────────────────
 
     def add(
         self,
@@ -188,39 +165,31 @@ class AzureSearchVectorStore:
             document_id: Unique document identifier.
 
         Returns:
-            List of assigned document IDs (``{document_id}_{chunk_index}``).
+            List of assigned vector IDs (``{document_id}_{chunk_index}``).
         """
+        if not self._ready():
+            return []
+
         assert len(vectors) == len(metadatas), "vectors/metadata length mismatch"
 
-        docs = []
-        ids = []
-        for vec, meta in zip(vectors, metadatas):
-            chunk_index = meta.get("chunk_index", 0)
-            doc_id = f"{document_id}_{chunk_index}"
-            ids.append(doc_id)
-            docs.append(
-                {
-                    "id": doc_id,
-                    "document_id": document_id,
-                    "chunk_index": int(chunk_index),
-                    "page_number": int(meta.get("page_number", 1)),
-                    "token_count": int(meta.get("token_count", 0)),
-                    "section_heading": meta.get("section_heading", ""),
-                    "text_clean": meta.get("text_clean", ""),
-                    "text_original": meta.get("text_original", ""),
-                    "classification": meta.get("classification", ""),
-                    "language": meta.get("language", ""),
-                    "source_file": meta.get("source_file", ""),
-                    "created_at": meta.get("created_at", ""),
-                    "embedding": vec.tolist(),
-                }
-            )
+        ids: list[str] = []
+        pinecone_vectors: list[tuple[str, list[float], dict]] = []
 
-        for i in range(0, len(docs), _UPLOAD_BATCH_SIZE):
-            batch = docs[i : i + _UPLOAD_BATCH_SIZE]
-            self._search_client.upload_documents(documents=batch)
+        for i, (vec, meta) in enumerate(zip(vectors, metadatas)):
+            chunk_index = meta.get("chunk_index", i)
+            vec_id = f"{document_id}_{chunk_index}"
+            ids.append(vec_id)
+            pinecone_vectors.append((vec_id, vec.tolist(), dict(meta)))
 
+        # Batch upsert in chunks to avoid payload limits
+        for start in range(0, len(pinecone_vectors), _UPSERT_BATCH_SIZE):
+            batch = pinecone_vectors[start : start + _UPSERT_BATCH_SIZE]
+            self._index.upsert(vectors=batch)
+
+        self._document_ids.add(document_id)
         return ids
+
+    # ── Search ──────────────────────────────────────────────────────────
 
     def search(
         self,
@@ -238,53 +207,39 @@ class AzureSearchVectorStore:
             List of dicts, each containing the chunk metadata plus
             ``chunk_id`` and ``score`` (cosine similarity).
         """
-        vector_query = VectorizedQuery(
-            vector=query_vector[0].tolist(),
-            k_nearest_neighbors=k,
-            fields="embedding",
-        )
+        if not self._ready():
+            return []
 
-        results = self._search_client.search(
-            search_text=None,
-            vector_queries=[vector_query],
-            top=k,
-            select=[
-                "id",
-                "document_id",
-                "chunk_index",
-                "page_number",
-                "token_count",
-                "section_heading",
-                "text_clean",
-                "text_original",
-                "classification",
-                "language",
-                "source_file",
-                "created_at",
-            ],
+        results = self._index.query(
+            vector=query_vector[0].tolist(),
+            top_k=k,
+            include_metadata=True,
         )
 
         output: list[dict] = []
-        for result in results:
+        for r in results.get("matches", []):
+            meta = r.get("metadata") or {}
             output.append(
                 {
-                    "chunk_id": result["id"],
-                    "score": float(result["@search.score"]),
-                    "document_id": result.get("document_id", ""),
-                    "chunk_index": result.get("chunk_index", 0),
-                    "page_number": result.get("page_number", 1),
-                    "token_count": result.get("token_count", 0),
-                    "section_heading": result.get("section_heading", ""),
-                    "text_clean": result.get("text_clean", ""),
-                    "text_original": result.get("text_original", ""),
-                    "classification": result.get("classification", ""),
-                    "language": result.get("language", ""),
-                    "source_file": result.get("source_file", ""),
-                    "created_at": result.get("created_at", ""),
+                    "chunk_id": r.get("id", ""),
+                    "score": float(r.get("score", 0.0)),
+                    "document_id": meta.get("document_id", ""),
+                    "chunk_index": meta.get("chunk_index", 0),
+                    "page_number": meta.get("page_number", 1),
+                    "token_count": meta.get("token_count", 0),
+                    "section_heading": meta.get("section_heading", ""),
+                    "text_clean": meta.get("text_clean", ""),
+                    "text_original": meta.get("text_original", ""),
+                    "classification": meta.get("classification", ""),
+                    "language": meta.get("language", ""),
+                    "source_file": meta.get("source_file", ""),
+                    "created_at": meta.get("created_at", ""),
                 }
             )
 
         return output
+
+    # ── Remove document ─────────────────────────────────────────────────
 
     def remove_document(self, document_id: str) -> int:
         """
@@ -292,76 +247,90 @@ class AzureSearchVectorStore:
 
         Returns the number of vectors removed.
         """
-        results = self._search_client.search(
-            search_text="*",
-            filter=f"document_id eq '{document_id}'",
-            select=["id"],
-            top=10000,
-        )
-
-        docs_to_delete = [{"id": r["id"]} for r in results]
-        if not docs_to_delete:
+        if not self._ready():
             return 0
 
-        for i in range(0, len(docs_to_delete), _UPLOAD_BATCH_SIZE):
-            batch = docs_to_delete[i : i + _UPLOAD_BATCH_SIZE]
-            self._search_client.delete_documents(documents=batch)
+        # Count first
+        results = self._index.query(
+            vector=_neutral_vector(self._dims),
+            top_k=10000,
+            include_metadata=False,
+            filter={"document_id": document_id},
+        )
+        count = len(results.get("matches", []))
 
-        return len(docs_to_delete)
+        if count > 0:
+            self._index.delete(filter={"document_id": document_id})
+
+        self._document_ids.discard(document_id)
+        return count
+
+    # ── List documents ──────────────────────────────────────────────────
 
     def list_documents(self) -> list[dict]:
         """List all ingested documents with summary info."""
-        results = self._search_client.search(
-            search_text="*",
-            filter="chunk_index eq 0",
-            select=[
-                "document_id",
-                "source_file",
-                "classification",
-                "language",
-            ],
-            top=10000,
-        )
+        if not self._ready():
+            return []
+        self._sync_docs()
 
         docs: list[dict] = []
-        seen: set[str] = set()
-        for r in results:
-            doc_id = r["document_id"]
-            if doc_id in seen:
+        for doc_id in self._document_ids:
+            # Fetch one representative chunk's metadata
+            try:
+                results = self._index.query(
+                    vector=_neutral_vector(self._dims),
+                    top_k=1,
+                    include_metadata=True,
+                    filter={"document_id": doc_id, "chunk_index": 0},
+                )
+                matches = results.get("matches", [])
+                if matches:
+                    meta = matches[0].get("metadata") or {}
+                    docs.append(
+                        {
+                            "document_id": doc_id,
+                            "chunks_count": self._count_chunks(doc_id),
+                            "source_file": meta.get("source_file", ""),
+                            "classification": meta.get("classification", ""),
+                            "language": meta.get("language", ""),
+                        }
+                    )
+                else:
+                    # Fallback: query without chunk_index filter
+                    results = self._index.query(
+                        vector=_neutral_vector(self._dims),
+                        top_k=1,
+                        include_metadata=True,
+                        filter={"document_id": doc_id},
+                    )
+                    matches = results.get("matches", [])
+                    if matches:
+                        meta = matches[0].get("metadata") or {}
+                        docs.append(
+                            {
+                                "document_id": doc_id,
+                                "chunks_count": self._count_chunks(doc_id),
+                                "source_file": meta.get("source_file", ""),
+                                "classification": meta.get("classification", ""),
+                                "language": meta.get("language", ""),
+                            }
+                        )
+            except Exception:
                 continue
-            seen.add(doc_id)
-
-            chunk_count = self._count_chunks_for_document(doc_id)
-            docs.append(
-                {
-                    "document_id": doc_id,
-                    "chunks_count": chunk_count,
-                    "source_file": r.get("source_file", ""),
-                    "classification": r.get("classification", ""),
-                    "language": r.get("language", ""),
-                }
-            )
 
         return docs
 
-    def has_document(self, document_id: str) -> bool:
-        """Check if a document has been ingested."""
-        results = self._search_client.search(
-            search_text="*",
-            filter=f"document_id eq '{document_id}'",
-            select=["id"],
-            top=1,
-            include_total_count=True,
-        )
-        return (results.get_count() or 0) > 0
+    # ── Internal helpers ────────────────────────────────────────────────
 
-    def _count_chunks_for_document(self, document_id: str) -> int:
+    def _count_chunks(self, document_id: str) -> int:
         """Return the number of chunks stored for a given document."""
-        results = self._search_client.search(
-            search_text="*",
-            filter=f"document_id eq '{document_id}'",
-            select=["id"],
-            top=0,
-            include_total_count=True,
-        )
-        return results.get_count() or 0
+        try:
+            results = self._index.query(
+                vector=_neutral_vector(self._dims),
+                top_k=10000,
+                include_metadata=False,
+                filter={"document_id": document_id},
+            )
+            return len(results.get("matches", []))
+        except Exception:
+            return 0

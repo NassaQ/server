@@ -22,6 +22,10 @@ class Settings(BaseSettings):
     JWT_ALGORITHM: str
     JWT_SECRET_KEY: str
 
+    # Azure Document Intelligence (OCR)
+    AZURE_DOC_INTELLIGENCE_ENDPOINT: str = ""
+    AZURE_DOC_INTELLIGENCE_KEY: str = ""
+
     # Azure OpenAI (Classification + RAG Generation)
     AZURE_OPENAI_API_KEY: str = ""
     AZURE_OPENAI_ENDPOINT: str = ""
@@ -29,7 +33,9 @@ class Settings(BaseSettings):
     AZURE_OPENAI_API_VERSION: str = "2024-12-01-preview"
 
     # Azure OpenAI Embedding (RAG)
+    AZURE_OPENAI_EMBEDDING_ENDPOINT: str = ""
     AZURE_OPENAI_EMBEDDING_DEPLOYMENT: str = "text-embedding-3-small"
+    EMBEDDING_DIMENSIONS: int = 1536
     EMBEDDING_DIMENSIONS: int = 1536
 
     # Cohere Rerank (via Azure AI Foundry)
@@ -58,10 +64,9 @@ class Settings(BaseSettings):
     # Upload constraints
     MAX_UPLOAD_SIZE_MB: int = 50
 
-    # Azure AI Search (Vector Store)
-    AZURE_SEARCH_ENDPOINT: str = ""
-    AZURE_SEARCH_API_KEY: str = ""
-    AZURE_SEARCH_INDEX_NAME: str = "nassaq-chunks"
+    # Pinecone (Vector Store)
+    PINECONE_API_KEY: str = ""
+    PINECONE_INDEX_NAME: str = "nassaq"
 
     # Azure Cosmos DB (MongoDB API) — for OCR result cleanup
     MONGO_USER: str = ""
@@ -96,9 +101,9 @@ class Settings(BaseSettings):
             return ""
         encoded_pass = _quote(self.MONGO_PASS)
         return (
-            f"mongodb+srv://{self.MONGO_USER}:{encoded_pass}@{self.MONGO_HOST}"
-            f"/?tls=true&authMechanism=SCRAM-SHA-256"
-            f"&retrywrites=false&maxIdleTimeMS=120000"
+            f"mongodb://{self.MONGO_USER}:{encoded_pass}@{self.MONGO_HOST}:10260"
+            f"/?ssl=true&tlsInsecure=true&authMechanism=SCRAM-SHA-256"
+            f"&retrywrites=false&maxIdleTimeMS=120000&serverSelectionTimeoutMS=30000"
         )
 
 

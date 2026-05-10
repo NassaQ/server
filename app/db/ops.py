@@ -273,9 +273,14 @@ class DocumentsOps:
         return list(rows)
 
     async def get_active_status(self, doc_id: int) -> str | None:
+        """Return the first 'Processing' stage status, or None if all stages are finished.
+        
+        Only blocks deletion for actively processing documents, not ones that are
+        merely queued (e.g. Vectorization stuck on "Queued").
+        """
         query = select(ProcessingStatus.status).where(
             ProcessingStatus.doc_id == doc_id,
-            ProcessingStatus.status.in_(["Queued", "Processing"]),
+            ProcessingStatus.status == "Processing",
         )
         return (await self.db.execute(query)).scalar_one_or_none()
 
@@ -321,6 +326,9 @@ class DocumentsOps:
         except IntegrityError:
             await self.db.rollback()
             raise ValueError("Delete failed. Please try again.")
+        except Exception:
+            await self.db.rollback()
+            raise ValueError("An unexpected error occurred during deletion. Please try again.")
 
 
 class RagIngestOps:

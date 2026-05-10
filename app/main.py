@@ -1,4 +1,7 @@
 import asyncio
+import logging
+import logging.handlers
+import sys
 from contextlib import asynccontextmanager
 from fastapi import FastAPI, status, Response
 from fastapi.middleware.cors import CORSMiddleware
@@ -8,6 +11,25 @@ from app.core.config import settings
 from app.api.v1 import api
 from app.db.session import engine
 from app.db.cosmos import cosmos
+
+# ── Logging setup ─────────────────────────────────────────────────────
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)s [%(levelname)s] %(name)s: %(message)s",
+    datefmt="%Y-%m-%d %H:%M:%S",
+    handlers=[
+        logging.StreamHandler(sys.stdout),
+        logging.FileHandler("server_out.log"),
+    ],
+)
+
+# Separate error log (only ERROR and above)
+_error_handler = logging.FileHandler("server_err.log")
+_error_handler.setLevel(logging.ERROR)
+_error_handler.setFormatter(
+    logging.Formatter("%(asctime)s [%(levelname)s] %(name)s: %(message)s")
+)
+logging.getLogger().addHandler(_error_handler)
 
 
 async def _log_rag_status() -> None:
@@ -19,10 +41,10 @@ async def _log_rag_status() -> None:
         doc_count = await asyncio.to_thread(lambda: store.total_documents)
         if chunk_count > 0:
             print(
-                f"[RAG] Azure AI Search connected: {doc_count} documents, {chunk_count} chunks"
+                f"[RAG] Pinecone connected: {doc_count} documents, {chunk_count} chunks"
             )
         else:
-            print("[RAG] Azure AI Search index initialized (empty)")
+            print("[RAG] Pinecone index initialized (empty)")
     except Exception as e:
         print(f"[RAG] Azure AI Search init skipped: {e}")
 

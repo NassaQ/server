@@ -1,8 +1,8 @@
 """
 RAG engine — orchestrates ingest, search, and ask pipelines.
 
-Ingestion:   OCR result → chunk → clean → embed → Azure AI Search
-Search:      query → clean → embed → Azure AI Search top-K → Cohere rerank top-N
+Ingestion:   OCR result → chunk → clean → embed → Pinecone
+Search:      query → clean → embed → Pinecone top-K → Cohere rerank top-N
 Ask:         search → assemble context → gpt-4.1-mini → answer
 
 All three pipelines are synchronous (``def``, not ``async def``).
@@ -13,7 +13,7 @@ the event loop.
 from datetime import datetime, timezone
 from typing import Optional
 
-from openai import AzureOpenAI
+from openai import OpenAI
 
 from app.core.config import settings
 from .text_processor import (
@@ -22,35 +22,33 @@ from .text_processor import (
     clean_for_embedding,
 )
 from . import embedding_client
-from .vector_store import AzureSearchVectorStore
+from .vector_store import PineconeVectorStore
 from . import reranker as reranker_mod
 
 
-_store: Optional[AzureSearchVectorStore] = None
-_llm_client: Optional[AzureOpenAI] = None
+_store: Optional[PineconeVectorStore] = None
+_llm_client: Optional[OpenAI] = None
 
 
-def get_store() -> AzureSearchVectorStore:
-    """Return (and lazily create) the global Azure AI Search vector store."""
+def get_store() -> PineconeVectorStore:
+    """Return (and lazily create) the global Pinecone vector store."""
     global _store
     if _store is None:
-        _store = AzureSearchVectorStore(
-            endpoint=settings.AZURE_SEARCH_ENDPOINT,
-            api_key=settings.AZURE_SEARCH_API_KEY,
-            index_name=settings.AZURE_SEARCH_INDEX_NAME,
+        _store = PineconeVectorStore(
+            api_key=settings.PINECONE_API_KEY,
+            index_name=settings.PINECONE_INDEX_NAME,
             dimensions=settings.EMBEDDING_DIMENSIONS,
         )
     return _store
 
 
-def _get_llm() -> AzureOpenAI:
+def _get_llm() -> OpenAI:
     """Return (and lazily create) the Azure OpenAI client for generation."""
     global _llm_client
     if _llm_client is None:
-        _llm_client = AzureOpenAI(
+        _llm_client = OpenAI(
             api_key=settings.AZURE_OPENAI_API_KEY,
-            azure_endpoint=settings.AZURE_OPENAI_ENDPOINT,
-            api_version=settings.AZURE_OPENAI_API_VERSION,
+            base_url=settings.AZURE_OPENAI_ENDPOINT,
         )
     return _llm_client
 
@@ -102,10 +100,11 @@ def ingest(
         }
 
     texts = [c.text_clean for c in chunks]
+    embed_endpoint = settings.AZURE_OPENAI_EMBEDDING_ENDPOINT or settings.AZURE_OPENAI_ENDPOINT
     vectors = embedding_client.embed_texts(
         texts=texts,
         api_key=settings.AZURE_OPENAI_API_KEY,
-        endpoint=settings.AZURE_OPENAI_ENDPOINT,
+        endpoint=embed_endpoint,
         api_version=settings.AZURE_OPENAI_API_VERSION,
         model=settings.AZURE_OPENAI_EMBEDDING_DEPLOYMENT,
     )
@@ -170,10 +169,11 @@ def search(
     if not clean_query.strip():
         return []
 
+    embed_endpoint = settings.AZURE_OPENAI_EMBEDDING_ENDPOINT or settings.AZURE_OPENAI_ENDPOINT
     query_vec = embedding_client.embed_query(
         query=clean_query,
         api_key=settings.AZURE_OPENAI_API_KEY,
-        endpoint=settings.AZURE_OPENAI_ENDPOINT,
+        endpoint=embed_endpoint,
         api_version=settings.AZURE_OPENAI_API_VERSION,
         model=settings.AZURE_OPENAI_EMBEDDING_DEPLOYMENT,
     )
@@ -206,9 +206,13 @@ def search(
         top_n=min(top_k, len(candidates)),
     )
 
+    # ── Fallback: if reranker returned all zeros, use Pinecone scores ──
+    use_fallback = all(rr.relevance_score == 0.0 for rr in rerank_results)
+
     results: list[dict] = []
     for rr in rerank_results:
         candidate = candidates[rr.index]
+        pinecone_score = candidate.get("score", 0.0)
         results.append(
             {
                 "text": candidate["text_clean"],
@@ -219,8 +223,8 @@ def search(
                 "section_heading": candidate.get("section_heading", ""),
                 "classification": candidate.get("classification", ""),
                 "language": candidate.get("language", ""),
-                "search_score": candidate.get("score", 0.0),
-                "rerank_score": rr.relevance_score,
+                "search_score": pinecone_score,
+                "rerank_score": pinecone_score if use_fallback else rr.relevance_score,
             }
         )
 

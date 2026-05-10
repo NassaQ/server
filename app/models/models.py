@@ -233,6 +233,7 @@ class ProcessingStatus(Base):
             ["doc_id"], ["Documents.doc_id"], name="FK_ProcStatus_Doc"
         ),
         PrimaryKeyConstraint("status_id", name="PK__Processi__3683B5310CA4907C"),
+        Index("IX_ProcessingStatus_DocId_Stage", "doc_id", "stage_name"),
     )
 
     status_id: Mapped[int] = mapped_column(
@@ -295,6 +296,7 @@ class OcrResult(Base):
             ["doc_id"], ["Documents.doc_id"], name="FK_OcrResults_Doc"
         ),
         PrimaryKeyConstraint("result_id", name="PK_OcrResults"),
+        Index("IX_OcrResults_DocId", "doc_id"),
     )
 
     result_id: Mapped[int] = mapped_column(BigInteger, Identity(start=1, increment=1), primary_key=True)

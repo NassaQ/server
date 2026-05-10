@@ -75,10 +75,15 @@ async def get_storage() -> AsyncIterator[StorageBase]:
 
     storage: StorageBase
     if storage_type == "azure":
-        storage = AzureBlobStorage(
-            conn_str=settings.BLOB_CONNECTION_STR,
-            container=settings.BLOB_STORAGE_CONTAINER_NAME
-        )
+        if settings.AZURE_BLOB_CONTAINER_URL:
+            storage = AzureBlobStorage(
+                container_url=settings.AZURE_BLOB_CONTAINER_URL
+            )
+        else:
+            storage = AzureBlobStorage(
+                conn_str=settings.BLOB_CONNECTION_STR,
+                container=settings.BLOB_STORAGE_CONTAINER_NAME
+            )
     else:
         raise ValueError(
             f"Unsupported BLOB_STORAGE_TYPE: '{storage_type}'. Supported: 'azure'."

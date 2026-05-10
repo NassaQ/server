@@ -33,6 +33,17 @@ def _get_container() -> ContainerClient:
     return _container_client
 
 
+def _sanitize_meta(value: str) -> str:
+    """
+    Strip characters that can't be encoded in Latin-1 (ISO-8859-1).
+
+    Azure Blob Storage metadata values are stored as HTTP headers,
+    which must be Latin-1 encodable.  This silently drops characters
+    outside that range (e.g. Arabic, CJK, emoji).
+    """
+    return value.encode("latin-1", "ignore").decode("latin-1")
+
+
 def upload(
     document_id: str,
     file_bytes: bytes,
@@ -53,8 +64,8 @@ def upload(
         overwrite=True,
         content_settings=ContentSettings(content_type=content_type),
         metadata={
-            "original_filename": filename,
-            "content_type": content_type,
+            "original_filename": _sanitize_meta(filename),
+            "content_type": _sanitize_meta(content_type),
         },
     )
 

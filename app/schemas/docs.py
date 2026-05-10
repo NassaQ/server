@@ -96,3 +96,20 @@ class OcrResultResponse(BaseModel):
     cost_usd_ocr: float = Field(..., description="OCR processing cost in USD")
     cost_usd_classification: Optional[float] = Field(None, description="Classification cost in USD")
     processed_at: datetime = Field(..., description="Processing completion timestamp")
+
+
+class MoveDocumentRequest(BaseModel):
+    """Request body for ``PATCH /docs/{doc_id}/move``."""
+
+    new_category: str = Field(..., min_length=1, description="Target classification category (e.g., Finance, Medical)")
+
+
+class MoveDocumentResponse(BaseModel):
+    """Response from ``PATCH /docs/{doc_id}/move``."""
+
+    doc_id: int
+    filename: str
+    old_path: str
+    new_path: str
+    new_category: str
+    message: str = "Document moved successfully"
