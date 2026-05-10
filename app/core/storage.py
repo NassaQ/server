@@ -1,8 +1,8 @@
 from abc import ABC, abstractmethod
-from typing import Any, AsyncIterator
-from urllib.parse import unquote, urlparse
+from typing import Any, AsyncIterator, Optional
+from urllib.parse import unquote, urlparse, parse_qs
 from azure.core.exceptions import ResourceNotFoundError
-from azure.storage.blob.aio import BlobServiceClient
+from azure.storage.blob.aio import BlobServiceClient, ContainerClient
 
 class StorageBase(ABC):
     @abstractmethod
@@ -32,9 +32,26 @@ class StorageBase(ABC):
         pass
 
 class AzureBlobStorage(StorageBase):
-    def __init__(self, conn_str: str, container: str):
-        self.client = BlobServiceClient.from_connection_string(conn_str)
-        self.container = container
+    def __init__(self, conn_str: str = "", container: str = "", container_url: str = ""):
+        if container_url:
+            # Parse SAS URL to extract account URL, SAS token, and container name
+            parsed = urlparse(container_url)
+            account_url = f"{parsed.scheme}://{parsed.netloc}"
+            qs = parse_qs(parsed.query)
+            # Reconstruct the SAS token from query params
+            sas_parts = []
+            for key, values in qs.items():
+                for val in values:
+                    sas_parts.append(f"{key}={val}")
+            sas_token = "&".join(sas_parts)
+            # Extract container name from path
+            path_parts = parsed.path.strip("/").split("/")
+            container_name = path_parts[0] if path_parts else container
+            self.client = BlobServiceClient(account_url=account_url, credential=sas_token)
+            self.container = container_name
+        else:
+            self.client = BlobServiceClient.from_connection_string(conn_str)
+            self.container = container
 
     async def __aexit__(self, *args):
         await self.client.close()

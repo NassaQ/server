@@ -9,7 +9,7 @@ from app.core.security import decode_token
 from app.core.storage import AzureBlobStorage, StorageBase
 from app.core.config import settings
 
-from app.db.ops import UsersOps
+from app.db.ops import DocumentsOps, LogsOps, OcrResultOps, RagIngestOps, UsersOps, VirtualPathsOps
 from app.db.session import get_db
 from app.models.models import Documents, Users
 from app.schemas.docs import DocumentListItem
@@ -18,6 +18,11 @@ oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/api/v1/auth/login")
 
 DBSession = Annotated[AsyncSession, Depends(get_db)]
 UserRepo = Annotated[UsersOps, Depends()]
+PathRepo = Annotated[VirtualPathsOps, Depends()]
+DocRepo = Annotated[DocumentsOps, Depends()]
+RagIngestRepo = Annotated[RagIngestOps, Depends()]
+OcrResultRepo = Annotated[OcrResultOps, Depends()]
+LogRepo = Annotated[LogsOps, Depends()]
 
 TokenDep = Annotated[str, Depends(oauth2_scheme)]
 
@@ -33,10 +38,18 @@ def capitalize_full_name(name: str) -> str:
     return full_name
 
 def doc_to_list_item(doc: Documents) -> DocumentListItem:
-    """Extract OCR status from a Documents object loaded with Processing_Status + path."""
+    """Extract all processing statuses from a Documents object loaded with Processing_Status + path."""
 
     ocr_status = next(
         (ps for ps in doc.Processing_Status if ps.stage_name == "OCR"),
+        None,
+    )
+    classification_status = next(
+        (ps for ps in doc.Processing_Status if ps.stage_name == "Classification"),
+        None,
+    )
+    vectorization_status = next(
+        (ps for ps in doc.Processing_Status if ps.stage_name == "Vectorization"),
         None,
     )
 
@@ -46,25 +59,35 @@ def doc_to_list_item(doc: Documents) -> DocumentListItem:
         path=doc.path.full_path if doc.path else "/",
         uploaded_by_user_id=doc.uploaded_by_user_id,
         uploaded_at=doc.uploaded_at,
-        status=ocr_status.status if ocr_status else None,
-        error_message=ocr_status.error_message if ocr_status else None,
+        file_size=doc.file_size,
+        content_type=doc.content_type,
+        file_type=doc.file_type,
+        ocr_status=ocr_status.status if ocr_status else None,
+        ocr_error_message=ocr_status.error_message if ocr_status else None,
+        classification_status=classification_status.status if classification_status else None,
+        classification_error_message=classification_status.error_message if classification_status else None,
+        vectorization_status=vectorization_status.status if vectorization_status else None,
+        vectorization_error_message=vectorization_status.error_message if vectorization_status else None,
     )
 
 async def get_storage() -> AsyncIterator[StorageBase]:
-    """
-    Dependency that yields the correct storage backend based on config.
-    Handles the lifecycle (opening/closing connections) automatically.
-    """
     storage_type = settings.BLOB_STORAGE_TYPE
 
     storage: StorageBase
     if storage_type == "azure":
-        storage = AzureBlobStorage(
-            conn_str=settings.BLOB_CONNECTION_STR, 
-            container=settings.BLOB_STORAGE_CONTAINER_NAME
-        )
+        if settings.AZURE_BLOB_CONTAINER_URL:
+            storage = AzureBlobStorage(
+                container_url=settings.AZURE_BLOB_CONTAINER_URL
+            )
+        else:
+            storage = AzureBlobStorage(
+                conn_str=settings.BLOB_CONNECTION_STR,
+                container=settings.BLOB_STORAGE_CONTAINER_NAME
+            )
     else:
-        pass
+        raise ValueError(
+            f"Unsupported BLOB_STORAGE_TYPE: '{storage_type}'. Supported: 'azure'."
+        )
 
     await storage.__aenter__()
     try:
@@ -73,19 +96,15 @@ async def get_storage() -> AsyncIterator[StorageBase]:
         await storage.__aexit__(None, None, None)
 
 def get_broker() -> BaseBroker:
-    if settings.ENVIRONMENT == "production":
-        return AzureServiceBusBroker(settings.MESSAGE_BROKER_URL)
-    else:
-        return RabbitMQBroker(settings.MESSAGE_BROKER_URL)
+    url = settings.MESSAGE_BROKER_URL or ""
+    if url.startswith(("amqp://", "amqps://")):
+        return RabbitMQBroker(url)
+    return AzureServiceBusBroker(url)
 
 def get_event_broker(request: Request) -> BaseBroker:
     return request.app.state.broker
 
 async def get_current_user(token: TokenDep, user_repo: UserRepo) -> Users:
-    """
-    Validate JWT token and return the current user.
-    """
-
     credException = HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,
         detail="Could not validate credentials",
@@ -95,16 +114,16 @@ async def get_current_user(token: TokenDep, user_repo: UserRepo) -> Users:
     payload = decode_token(token)
     if not payload or payload.get("type") != "access":
         raise credException
-    
+
     subject = payload.get("sub")
     if not subject:
         raise credException
-    
+
     try:
         user_id = int(subject)
     except ValueError:
         raise credException
-    
+
     user = await user_repo.get_user(user_id)
 
     if not user:
@@ -115,10 +134,6 @@ async def get_current_user(token: TokenDep, user_repo: UserRepo) -> Users:
 CurrentUser = Annotated[Users, Depends(get_current_user)]
 
 async def get_current_active_user(current_user: CurrentUser) -> Users:
-    """
-    Ensure the current user is active.
-    """
-
     if current_user.is_active is False:
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,

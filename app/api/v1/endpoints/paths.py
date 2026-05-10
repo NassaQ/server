@@ -1,18 +1,17 @@
 from typing import Annotated
 from fastapi import APIRouter, HTTPException, Query, status
-from sqlalchemy import select
-from sqlalchemy.exc import IntegrityError
 
-from app.api.deps import ActiveUser, AdminUser, DBSession
+from app.api.deps import ActiveUser, AdminUser, PathRepo, LogRepo
 from app.models.models import VirtualPaths
 from app.schemas.paths import PathCreate, PathResponse, PathUpdate
 
 router = APIRouter()
 
+
 @router.get("/", response_model=list[PathResponse], summary="Return all paths in blob storage",
-            description="Get all paths in blob storage to view and return them in a tree hierarchy")
+    description="Get all paths in blob storage to view and return them in a tree hierarchy")
 async def get_paths(
-    db: DBSession,
+    path_repo: PathRepo,
     current_user: ActiveUser,
     minDepth: Annotated[int, Query(ge=0, le=10, description="Min depth of the paths")] = 0,
     maxDepth: Annotated[int, Query(ge=1, le=30, description="Max depth of the paths")] = 5,
@@ -27,19 +26,16 @@ async def get_paths(
 
     Requires an active user.
     """
-
-    query = select(VirtualPaths).where(
-        VirtualPaths.depth >= minDepth,
-        VirtualPaths.depth <= maxDepth,
-        VirtualPaths.full_path.startswith(prefix)
+    return await path_repo.get_all_paths(
+        min_depth=minDepth, max_depth=maxDepth, prefix=prefix
     )
-    result = (await db.execute(query)).scalars().all()
-    return result
+
 
 @router.post("/", response_model=PathResponse, status_code=status.HTTP_201_CREATED, summary="Create new path if not exist",
-             description="Create a new path if not exist, raises an exception if exists")
+    description="Create a new path if not exist, raises an exception if exists")
 async def create_path(
-    db: DBSession,
+    path_repo: PathRepo,
+    log_repo: LogRepo,
     current_user: AdminUser,
     path_info: PathCreate,
 ) -> PathResponse:
@@ -48,43 +44,42 @@ async def create_path(
 
     Requires an Admin user.
     """
-
-    query = select(VirtualPaths).where(VirtualPaths.full_path == path_info.full_path)
-    exists = (await db.execute(query)).scalar_one_or_none()
-
+    exists = await path_repo.get_path_by_full_path(path_info.full_path)
     if exists:
         raise HTTPException(
             status_code=status.HTTP_409_CONFLICT,
             detail=f"Path '{path_info.full_path}' already exists."
         )
-    
+
     depth = len([d for d in path_info.full_path.split("/") if d])
 
     new_path = VirtualPaths(
         full_path=path_info.full_path,
         description=path_info.description,
-        depth=depth
+        depth=depth,
     )
 
     try:
-        db.add(new_path)
-        await db.commit()
-        await db.refresh(new_path)
-        
-    except IntegrityError:
-        await db.rollback()
-        raise HTTPException(
-            status.HTTP_400_BAD_REQUEST, 
-            detail="Creating path failed. Please try again."
-        )
+        created_path = await path_repo.create_path(new_path)
+    except ValueError as e:
+        raise HTTPException(status.HTTP_400_BAD_REQUEST, detail=str(e))
 
-    return new_path
+    await log_repo.write_log(
+        action_type="path_create",
+        user_id=current_user.user_id,
+        entity_id=created_path.path_id,
+        details=f"Created path: {path_info.full_path}",
+    )
+
+    return created_path
+
 
 @router.patch("/{path_id}", response_model=PathResponse, summary="Update a path info",
-             description="Update an existing path, raises an exception if not exist")
+    description="Update an existing path, raises an exception if not exist")
 async def update_path(
     path_id: int,
-    db: DBSession,
+    path_repo: PathRepo,
+    log_repo: LogRepo,
     current_user: AdminUser,
     path_info: PathUpdate,
 ) -> PathResponse:
@@ -93,10 +88,7 @@ async def update_path(
 
     Requires an Admin user.
     """
-
-    query = select(VirtualPaths).where(VirtualPaths.path_id == path_id)
-    path = (await db.execute(query)).scalar_one_or_none()
-
+    path = await path_repo.get_path(path_id)
     if not path:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
@@ -105,37 +97,35 @@ async def update_path(
 
     update_data = path_info.model_dump(exclude_unset=True)
 
-    if not update_data['full_path']:
-        query = select(VirtualPaths).where(VirtualPaths.full_path == path_info.full_path)
-        conflict = (await db.execute(query)).scalar_one_or_none()
-        
-        if conflict:
+    if update_data.get("full_path"):
+        conflict = await path_repo.get_path_by_full_path(update_data["full_path"])
+        if conflict and conflict.path_id != path_id:
             raise HTTPException(
                 status_code=status.HTTP_409_CONFLICT,
                 detail=f"Path '{update_data['full_path']}' already exists."
             )
 
-    setattr(path, "full_path", update_data["full_path"])
-    setattr(path, "description", update_data["description"])
-
     try:
-        await db.commit()
-        await db.refresh(path)
-        
-    except IntegrityError:
-        await db.rollback()
-        raise HTTPException(
-            status.HTTP_400_BAD_REQUEST, 
-            detail="Creating path failed. Please try again."
-        )
+        updated_path = await path_repo.update_path(path, update_data)
+    except ValueError as e:
+        raise HTTPException(status.HTTP_400_BAD_REQUEST, detail=str(e))
 
-    return path
+    await log_repo.write_log(
+        action_type="path_update",
+        user_id=current_user.user_id,
+        entity_id=path_id,
+        details=f"Updated path fields: {', '.join(update_data.keys())}",
+    )
+
+    return updated_path
+
 
 @router.delete("/{path_id}", status_code=status.HTTP_204_NO_CONTENT, summary="Delete a path",
-             description="Delete one path if exist, raises an exception if doesn't exist")
+    description="Delete one path if exist, raises an exception if doesn't exist")
 async def delete_path(
     path_id: int,
-    db: DBSession,
+    path_repo: PathRepo,
+    log_repo: LogRepo,
     current_user: AdminUser,
 ):
     """
@@ -143,23 +133,21 @@ async def delete_path(
 
     Requires an Admin user.
     """
-
-    query = select(VirtualPaths).where(VirtualPaths.path_id == path_id)
-    path = (await db.execute(query)).scalar_one_or_none()
-
+    path = await path_repo.get_path(path_id)
     if not path:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail=f"Path with {path_id} doesn't exist"
         )
-    
+
     try:
-        await db.delete(path)
-        await db.commit()
-    
-    except IntegrityError:
-        await db.rollback()
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Cannot delete user. Please try again."
-        )
+        await path_repo.delete_path(path)
+    except ValueError as e:
+        raise HTTPException(status.HTTP_400_BAD_REQUEST, detail=str(e))
+
+    await log_repo.write_log(
+        action_type="path_delete",
+        user_id=current_user.user_id,
+        entity_id=path_id,
+        details=f"Deleted path: {path.full_path}",
+    )

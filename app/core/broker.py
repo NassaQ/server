@@ -1,10 +1,8 @@
 from abc import ABC, abstractmethod
+from typing import Callable, Awaitable
 import json
-from typing import Awaitable, Callable
 import aio_pika
-from azure.servicebus import ServiceBusMessage
-from azure.servicebus.aio import ServiceBusClient
-
+from azure.servicebus import ServiceBusClient, ServiceBusMessage
 
 class BaseBroker(ABC):
     @abstractmethod
@@ -21,7 +19,10 @@ class BaseBroker(ABC):
     async def consume(
         self, queue_name: str, callback: Callable[[dict], Awaitable[None]]
     ):
-        """Consume messages from a queue"""
+        """
+        Start consuming messages from a queue.
+        callback receives the parsed message dict and must be an async function.
+        """
         pass
 
     @abstractmethod
@@ -41,9 +42,6 @@ class RabbitMQBroker(BaseBroker):
         self.channel = await self.connection.channel()
 
     async def publish(self, queue_name: str, message: dict):
-        if not self.channel:
-            raise RuntimeError("RabbitMQ channel is not connected")
-
         await self.channel.declare_queue(queue_name, durable=True)
 
         await self.channel.default_exchange.publish(
@@ -57,9 +55,11 @@ class RabbitMQBroker(BaseBroker):
     async def consume(
         self, queue_name: str, callback: Callable[[dict], Awaitable[None]]
     ):
-        if not self.channel:
-            raise RuntimeError("RabbitMQ channel is not connected")
-
+        """
+        Start consuming messages from a queue.
+        Messages are acknowledged after the callback completes successfully.
+        On callback failure, the message is negatively acknowledged and requeued.
+        """
         await self.channel.set_qos(prefetch_count=1)
         queue = await self.channel.declare_queue(queue_name, durable=True)
 
@@ -73,7 +73,6 @@ class RabbitMQBroker(BaseBroker):
     async def close(self):
         if self.connection:
             await self.connection.close()
-
 
 class AzureServiceBusBroker(BaseBroker):
     def __init__(self, conn_str: str):
