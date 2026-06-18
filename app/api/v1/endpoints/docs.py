@@ -237,6 +237,7 @@ async def get_doc_ocr_result(
         word_count=ocr_result.word_count,
         avg_confidence=ocr_result.avg_confidence,
         primary_language=ocr_result.primary_language,
+        domain=ocr_result.domain,
         category=ocr_result.category,
         classification_confidence=ocr_result.classification_confidence,
         cost_usd_ocr=ocr_result.cost_usd_ocr,
@@ -330,13 +331,13 @@ async def move_document(
     Move a document to a new classification folder.
 
     Since files are stored keyed by UUID (not by path), no blob copy
-    is needed — we only update the category metadata in Cosmos DB and
+    is needed — we only update the domain and category metadata in Cosmos DB and
     the SQL Ocr_Results table.
 
     Steps:
       1. Look up the document in SQL.
-      2. Update ``category`` in the SQL ``Ocr_Results`` table.
-      3. Update Cosmos DB category.
+      2. Update ``domain`` and ``category`` in the SQL ``Ocr_Results`` table.
+      3. Update Cosmos DB domain and category.
       4. Log the action.
     """
     # ── 1. Fetch document ──────────────────────────────────────────────
@@ -345,30 +346,32 @@ async def move_document(
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Document not found.")
 
     filename = doc.filename
+    new_domain = body.new_domain.strip()
     new_category = body.new_category.strip()
 
-    # ── 2. Update SQL Ocr_Results category ────────────────────────────
+    # ── 2. Update SQL Ocr_Results domain & category ───────────────────
     try:
         async with AsyncSessionLocal() as session:
             stmt = (
                 sql_update(OcrResult)
                 .where(OcrResult.doc_id == doc_id)
-                .values(category=new_category)
+                .values(domain=new_domain, category=new_category)
             )
             await session.execute(stmt)
             await session.commit()
     except Exception as exc:
-        logger.error(f"Failed to update Ocr_Results category for doc_id={doc_id}: {exc}")
+        logger.error(f"Failed to update Ocr_Results for doc_id={doc_id}: {exc}")
 
-    # ── 3. Update Cosmos DB category ───────────────────────────────────
+    # ── 3. Update Cosmos DB domain & category ──────────────────────────
     if doc.mongo_doc_id and doc.mongo_doc_id != "pending":
         try:
             cosmos_doc = cosmos.find_by_doc_id(doc_id)
             if cosmos_doc:
                 if cosmos_doc.get("classification"):
+                    cosmos_doc["classification"]["domain"] = new_domain
                     cosmos_doc["classification"]["category"] = new_category
                 else:
-                    cosmos_doc["classification"] = {"category": new_category}
+                    cosmos_doc["classification"] = {"domain": new_domain, "category": new_category}
                 await cosmos.upsert_ocr_result(cosmos_doc)
         except Exception as exc:
             logger.error(f"Failed to update Cosmos DB for doc_id={doc_id}: {exc}")
@@ -378,7 +381,7 @@ async def move_document(
         action_type="document_move",
         user_id=current_user.user_id,
         entity_id=doc_id,
-        details=f"Moved {filename} to category '{new_category}'",
+        details=f"Moved {filename} to domain '{new_domain}' category '{new_category}'",
     )
 
     return MoveDocumentResponse(
@@ -386,6 +389,7 @@ async def move_document(
         filename=filename,
         old_path="",
         new_path="",
+        new_domain=new_domain,
         new_category=new_category,
-        message=f"Document moved to {new_category}",
+        message=f"Document moved to {new_domain} > {new_category}",
     )

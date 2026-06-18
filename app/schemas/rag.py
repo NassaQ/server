@@ -19,6 +19,7 @@ class IngestRequest(BaseModel):
         default=[], description="Table markdown strings from OCR"
     )
     classification: str = Field(default="", description="Classification category label")
+    domain: str = Field(default="", description="Classification domain label")
     language: str = Field(
         default="unknown", description="Detected language: ar / en / mixed"
     )
@@ -48,6 +49,9 @@ class SearchRequest(BaseModel):
     filter_classification: Optional[str] = Field(
         default=None, description="Filter by category"
     )
+    filter_domain: Optional[str] = Field(
+        default=None, description="Filter by domain"
+    )
     filter_language: Optional[str] = Field(
         default=None, description="Filter by language"
     )
@@ -66,6 +70,7 @@ class SearchResultItem(BaseModel):
     page_number: int = 1
     section_heading: str = ""
     classification: str = ""
+    domain: str = ""
     language: str = ""
     search_score: float = 0.0
     rerank_score: float = 0.0
@@ -86,6 +91,9 @@ class AskRequest(BaseModel):
     top_k: int = Field(default=5, ge=1, le=20, description="Number of context chunks")
     filter_classification: Optional[str] = Field(
         default=None, description="Filter by category"
+    )
+    filter_domain: Optional[str] = Field(
+        default=None, description="Filter by domain"
     )
     filter_language: Optional[str] = Field(
         default=None, description="Filter by language"
@@ -109,6 +117,7 @@ class DocumentInfo(BaseModel):
     document_id: str
     chunks_count: int = 0
     source_file: str = ""
+    domain: str = ""
     classification: str = ""
     language: str = ""
 

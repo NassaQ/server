@@ -60,6 +60,7 @@ async def ingest_document(
         document_id=body.document_id,
         cleaned_text=body.cleaned_text,
         tables_markdown=body.tables_markdown or [],
+        domain=body.domain,
         classification=body.classification,
         language=body.language,
         source_file=body.source_file,
@@ -117,6 +118,7 @@ def search_documents(
     results = rag.search(
         query=body.query,
         top_k=body.top_k,
+        filter_domain=body.filter_domain,
         filter_classification=body.filter_classification,
         filter_language=body.filter_language,
         filter_document_id=body.filter_document_id,
@@ -143,6 +145,7 @@ def ask_question(
     result = rag.ask(
         query=body.query,
         top_k=body.top_k,
+        filter_domain=body.filter_domain,
         filter_classification=body.filter_classification,
         filter_language=body.filter_language,
         filter_document_id=body.filter_document_id,

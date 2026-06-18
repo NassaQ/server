@@ -9,23 +9,24 @@ in the Azure AI Search vector index.
 from typing import Optional
 
 import numpy as np
-from openai import OpenAI
+from openai import AzureOpenAI
 
 # ── Module-level singleton ────────────────────────────────────────────────
-_client: Optional[OpenAI] = None
+_client: Optional[AzureOpenAI] = None
 
 
 def _get_client(
     api_key: str,
     endpoint: str,
     api_version: str,
-) -> OpenAI:
-    """Lazily create a single OpenAI client per process."""
+) -> AzureOpenAI:
+    """Lazily create a single AzureOpenAI client per process."""
     global _client
     if _client is None:
-        _client = OpenAI(
+        _client = AzureOpenAI(
             api_key=api_key,
-            base_url=endpoint,
+            azure_endpoint=endpoint,
+            api_version=api_version,
         )
     return _client
 

@@ -91,6 +91,7 @@ class OcrResultResponse(BaseModel):
     word_count: int = Field(..., description="Total words extracted")
     avg_confidence: float = Field(..., description="Average OCR confidence score")
     primary_language: str = Field(..., description="Detected language (ar, en, mixed)")
+    domain: Optional[str] = Field(None, description="Classification domain")
     category: Optional[str] = Field(None, description="Classification category")
     classification_confidence: Optional[float] = Field(None, description="Classification confidence score")
     cost_usd_ocr: float = Field(..., description="OCR processing cost in USD")
@@ -101,7 +102,8 @@ class OcrResultResponse(BaseModel):
 class MoveDocumentRequest(BaseModel):
     """Request body for ``PATCH /docs/{doc_id}/move``."""
 
-    new_category: str = Field(..., min_length=1, description="Target classification category (e.g., Finance, Medical)")
+    new_domain: str = Field(..., min_length=1, description="Target classification domain (e.g., Law)")
+    new_category: str = Field(..., min_length=1, description="Target classification category (e.g., Contracts)")
 
 
 class MoveDocumentResponse(BaseModel):
@@ -111,5 +113,6 @@ class MoveDocumentResponse(BaseModel):
     filename: str
     old_path: str
     new_path: str
+    new_domain: str
     new_category: str
     message: str = "Document moved successfully"

@@ -291,6 +291,7 @@ class PineconeVectorStore:
                             "document_id": doc_id,
                             "chunks_count": self._count_chunks(doc_id),
                             "source_file": meta.get("source_file", ""),
+                            "domain": meta.get("domain", ""),
                             "classification": meta.get("classification", ""),
                             "language": meta.get("language", ""),
                         }
@@ -311,6 +312,7 @@ class PineconeVectorStore:
                                 "document_id": doc_id,
                                 "chunks_count": self._count_chunks(doc_id),
                                 "source_file": meta.get("source_file", ""),
+                                "domain": meta.get("domain", ""),
                                 "classification": meta.get("classification", ""),
                                 "language": meta.get("language", ""),
                             }

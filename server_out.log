@@ -1,0 +1,2050 @@
+2026-06-09 22:25:21 [INFO] pymongo.client: You appear to be connected to a CosmosDB cluster. For more information regarding feature compatibility and support please visit https://www.mongodb.com/supportability/cosmosdb
+2026-06-09 22:25:22 [INFO] pinecone.client.indexes: Listing indexes
+2026-06-09 22:25:23 [INFO] httpx: HTTP Request: GET https://api.pinecone.io/indexes "HTTP/1.1 200 OK"
+2026-06-09 22:25:23 [INFO] pinecone.client.indexes: Describing index 'nassaq'
+2026-06-09 22:25:23 [INFO] httpx: HTTP Request: GET https://api.pinecone.io/indexes/nassaq "HTTP/1.1 200 OK"
+2026-06-09 22:25:23 [INFO] pinecone.index: Index client created for host https://nassaq-uujm500.svc.aped-4627-b74a.pinecone.io
+2026-06-09 22:25:23 [INFO] pinecone.index: Describing index stats
+2026-06-09 22:25:24 [INFO] pinecone.index: Querying index with top_k=10000
+2026-06-09 22:27:54 [INFO] pymongo.client: You appear to be connected to a CosmosDB cluster. For more information regarding feature compatibility and support please visit https://www.mongodb.com/supportability/cosmosdb
+2026-06-09 22:27:54 [INFO] pinecone.client.indexes: Listing indexes
+2026-06-09 22:27:55 [INFO] httpx: HTTP Request: GET https://api.pinecone.io/indexes "HTTP/1.1 200 OK"
+2026-06-09 22:27:55 [INFO] pinecone.client.indexes: Describing index 'nassaq'
+2026-06-09 22:27:56 [INFO] httpx: HTTP Request: GET https://api.pinecone.io/indexes/nassaq "HTTP/1.1 200 OK"
+2026-06-09 22:27:56 [INFO] pinecone.index: Index client created for host https://nassaq-uujm500.svc.aped-4627-b74a.pinecone.io
+2026-06-09 22:27:56 [INFO] pinecone.index: Describing index stats
+2026-06-09 22:27:57 [INFO] pinecone.index: Querying index with top_k=10000
+2026-06-09 22:29:31 [INFO] azure.core.pipeline.policies.http_logging_policy: Request URL: 'https://nassaq.blob.core.windows.net/testing-yousef/147cb966-a936-47eb-901c-4dc966abea5f?sp=REDACTED&st=REDACTED&se=REDACTED&spr=REDACTED&sv=REDACTED&sr=REDACTED&sig=REDACTED'
+Request method: 'PUT'
+Request headers:
+    'Content-Length': '7989'
+    'x-ms-meta-original_filename': 'REDACTED'
+    'x-ms-meta-content_type': 'REDACTED'
+    'x-ms-blob-type': 'REDACTED'
+    'x-ms-blob-content-type': 'REDACTED'
+    'x-ms-version': 'REDACTED'
+    'Content-Type': 'application/octet-stream'
+    'Accept': 'application/xml'
+    'User-Agent': 'azsdk-python-storage-blob/12.28.0 Python/3.11.14 (Windows-10-10.0.26200-SP0)'
+    'x-ms-date': 'REDACTED'
+    'x-ms-client-request-id': '89e560c8-6439-11f1-bb76-e00af66009f2'
+A body is sent with the request
+2026-06-09 22:29:32 [INFO] azure.core.pipeline.policies.http_logging_policy: Response status: 403
+Response headers:
+    'Content-Length': '279'
+    'Content-Type': 'application/xml'
+    'Server': 'Windows-Azure-Blob/1.0 Microsoft-HTTPAPI/2.0'
+    'x-ms-request-id': 'd1ec6c52-701e-00ad-6c46-f87c58000000'
+    'x-ms-client-request-id': '89e560c8-6439-11f1-bb76-e00af66009f2'
+    'x-ms-version': 'REDACTED'
+    'x-ms-error-code': 'AuthorizationPermissionMismatch'
+    'Date': 'Tue, 09 Jun 2026 19:29:28 GMT'
+2026-06-09 22:29:32 [WARNING] app.api.v1.endpoints.process: Failed to upload original file to blob storage: This request is not authorized to perform this operation using this permission.
+RequestId:d1ec6c52-701e-00ad-6c46-f87c58000000
+Time:2026-06-09T19:29:28.4786814Z
+ErrorCode:AuthorizationPermissionMismatch
+Content: <?xml version="1.0" encoding="utf-8"?><Error><Code>AuthorizationPermissionMismatch</Code><Message>This request is not authorized to perform this operation using this permission.
+RequestId:d1ec6c52-701e-00ad-6c46-f87c58000000
+Time:2026-06-09T19:29:28.4786814Z</Message></Error>
+2026-06-09 22:29:32 [INFO] azure.core.pipeline.policies.http_logging_policy: Request URL: 'https://ocr-nassaq-model.cognitiveservices.azure.com//documentintelligence/documentModels/prebuilt-layout:analyze?api-version=2024-11-30&features=REDACTED&outputContentFormat=REDACTED'
+Request method: 'POST'
+Request headers:
+    'content-type': 'application/octet-stream'
+    'Accept': 'application/json'
+    'x-ms-client-request-id': '8a423c22-6439-11f1-bc77-e00af66009f2'
+    'User-Agent': 'azsdk-python-ai-documentintelligence/1.0.2 Python/3.11.14 (Windows-10-10.0.26200-SP0)'
+    'Ocp-Apim-Subscription-Key': 'REDACTED'
+A body is sent with the request
+2026-06-09 22:29:32 [INFO] azure.core.pipeline.policies.http_logging_policy: Response status: 401
+Response headers:
+    'Content-Length': '224'
+    'Content-Type': 'application/json'
+    'apim-request-id': 'REDACTED'
+    'Date': 'Tue, 09 Jun 2026 19:29:28 GMT'
+2026-06-15 20:38:20 [INFO] pinecone.client.indexes: Listing indexes
+2026-06-15 20:38:21 [INFO] httpx: HTTP Request: GET https://api.pinecone.io/indexes "HTTP/1.1 200 OK"
+2026-06-15 20:38:21 [INFO] pinecone.client.indexes: Creating index 'nassaq'
+2026-06-15 20:38:23 [INFO] pinecone.client.indexes: Describing index 'nassaq'
+2026-06-15 20:38:24 [INFO] httpx: HTTP Request: GET https://api.pinecone.io/indexes/nassaq "HTTP/1.1 200 OK"
+2026-06-15 20:38:24 [ERROR] aiormq.connection: error when creating transport: <AMQPConnectionError: ("Multiple exceptions: [Errno 10061] Connect call failed ('::1', 5672, 0, 0), [Errno 10061] Connect call failed ('127.0.0.1', 5672)",)>
+2026-06-15 20:38:24 [INFO] aio_pika.robust_connection: Connection to amqp://guest:******@localhost:5672/ closed. Reconnecting after 5 seconds.
+2026-06-15 20:38:24 [INFO] pymongo.client: You appear to be connected to a CosmosDB cluster. For more information regarding feature compatibility and support please visit https://www.mongodb.com/supportability/cosmosdb
+2026-06-15 20:38:29 [INFO] pinecone.client.indexes: Describing index 'nassaq'
+2026-06-15 20:38:29 [INFO] httpx: HTTP Request: GET https://api.pinecone.io/indexes/nassaq "HTTP/1.1 200 OK"
+2026-06-15 20:38:29 [INFO] pinecone.index: Index client created for host https://nassaq-uujm500.svc.aped-4627-b74a.pinecone.io
+2026-06-15 20:38:29 [INFO] pinecone.index: Describing index stats
+2026-06-15 20:38:30 [INFO] pinecone.index: Querying index with top_k=10000
+2026-06-15 20:40:38 [INFO] pinecone.client.indexes: Listing indexes
+2026-06-15 20:40:39 [INFO] httpx: HTTP Request: GET https://api.pinecone.io/indexes "HTTP/1.1 200 OK"
+2026-06-15 20:40:39 [INFO] pinecone.client.indexes: Describing index 'nassaq'
+2026-06-15 20:40:39 [INFO] httpx: HTTP Request: GET https://api.pinecone.io/indexes/nassaq "HTTP/1.1 200 OK"
+2026-06-15 20:40:39 [INFO] pinecone.index: Index client created for host https://nassaq-uujm500.svc.aped-4627-b74a.pinecone.io
+2026-06-15 20:40:39 [INFO] pinecone.index: Describing index stats
+2026-06-15 20:40:40 [INFO] pinecone.index: Querying index with top_k=10000
+2026-06-15 20:40:42 [ERROR] aiormq.connection: error when creating transport: <AMQPConnectionError: ("Multiple exceptions: [Errno 10061] Connect call failed ('::1', 5672, 0, 0), [Errno 10061] Connect call failed ('127.0.0.1', 5672)",)>
+2026-06-15 20:40:42 [INFO] aio_pika.robust_connection: Connection to amqp://guest:******@localhost:5672/ closed. Reconnecting after 5 seconds.
+2026-06-15 20:40:42 [INFO] pymongo.client: You appear to be connected to a CosmosDB cluster. For more information regarding feature compatibility and support please visit https://www.mongodb.com/supportability/cosmosdb
+2026-06-15 20:45:25 [INFO] pymongo.client: You appear to be connected to a CosmosDB cluster. For more information regarding feature compatibility and support please visit https://www.mongodb.com/supportability/cosmosdb
+2026-06-15 20:45:25 [INFO] pinecone.client.indexes: Listing indexes
+2026-06-15 20:45:26 [INFO] httpx: HTTP Request: GET https://api.pinecone.io/indexes "HTTP/1.1 200 OK"
+2026-06-15 20:45:26 [INFO] pinecone.client.indexes: Describing index 'nassaq'
+2026-06-15 20:45:27 [INFO] httpx: HTTP Request: GET https://api.pinecone.io/indexes/nassaq "HTTP/1.1 200 OK"
+2026-06-15 20:45:27 [INFO] pinecone.index: Index client created for host https://nassaq-uujm500.svc.aped-4627-b74a.pinecone.io
+2026-06-15 20:45:27 [INFO] pinecone.index: Describing index stats
+2026-06-15 20:45:28 [INFO] pinecone.index: Querying index with top_k=10000
+2026-06-15 20:50:15 [INFO] pymongo.client: You appear to be connected to a CosmosDB cluster. For more information regarding feature compatibility and support please visit https://www.mongodb.com/supportability/cosmosdb
+2026-06-15 20:50:16 [INFO] pinecone.client.indexes: Listing indexes
+2026-06-15 20:50:17 [INFO] httpx: HTTP Request: GET https://api.pinecone.io/indexes "HTTP/1.1 200 OK"
+2026-06-15 20:50:17 [INFO] pinecone.client.indexes: Describing index 'nassaq'
+2026-06-15 20:50:17 [INFO] httpx: HTTP Request: GET https://api.pinecone.io/indexes/nassaq "HTTP/1.1 200 OK"
+2026-06-15 20:50:17 [INFO] pinecone.index: Index client created for host https://nassaq-uujm500.svc.aped-4627-b74a.pinecone.io
+2026-06-15 20:50:17 [INFO] pinecone.index: Describing index stats
+2026-06-15 20:50:17 [INFO] pinecone.index: Querying index with top_k=10000
+2026-06-15 20:53:01 [INFO] pymongo.client: You appear to be connected to a CosmosDB cluster. For more information regarding feature compatibility and support please visit https://www.mongodb.com/supportability/cosmosdb
+2026-06-15 20:53:01 [INFO] pinecone.client.indexes: Listing indexes
+2026-06-15 20:53:02 [INFO] httpx: HTTP Request: GET https://api.pinecone.io/indexes "HTTP/1.1 200 OK"
+2026-06-15 20:53:02 [INFO] pinecone.client.indexes: Describing index 'nassaq'
+2026-06-15 20:53:03 [INFO] httpx: HTTP Request: GET https://api.pinecone.io/indexes/nassaq "HTTP/1.1 200 OK"
+2026-06-15 20:53:03 [INFO] pinecone.index: Index client created for host https://nassaq-uujm500.svc.aped-4627-b74a.pinecone.io
+2026-06-15 20:53:03 [INFO] pinecone.index: Describing index stats
+2026-06-15 20:53:03 [INFO] pinecone.index: Querying index with top_k=10000
+2026-06-15 21:56:03 [INFO] pymongo.client: You appear to be connected to a CosmosDB cluster. For more information regarding feature compatibility and support please visit https://www.mongodb.com/supportability/cosmosdb
+2026-06-15 21:56:03 [INFO] pinecone.client.indexes: Listing indexes
+2026-06-15 21:56:04 [INFO] httpx: HTTP Request: GET https://api.pinecone.io/indexes "HTTP/1.1 200 OK"
+2026-06-15 21:56:05 [INFO] pinecone.client.indexes: Describing index 'nassaq'
+2026-06-15 21:56:05 [INFO] httpx: HTTP Request: GET https://api.pinecone.io/indexes/nassaq "HTTP/1.1 200 OK"
+2026-06-15 21:56:05 [INFO] pinecone.index: Index client created for host https://nassaq-uujm500.svc.aped-4627-b74a.pinecone.io
+2026-06-15 21:56:05 [INFO] pinecone.index: Describing index stats
+2026-06-15 21:56:06 [INFO] pinecone.index: Querying index with top_k=10000
+2026-06-15 21:57:08 [INFO] pymongo.client: You appear to be connected to a CosmosDB cluster. For more information regarding feature compatibility and support please visit https://www.mongodb.com/supportability/cosmosdb
+2026-06-15 21:57:08 [INFO] pinecone.client.indexes: Listing indexes
+2026-06-16 21:33:51 [INFO] pymongo.client: You appear to be connected to a CosmosDB cluster. For more information regarding feature compatibility and support please visit https://www.mongodb.com/supportability/cosmosdb
+2026-06-16 21:33:52 [INFO] pinecone.client.indexes: Listing indexes
+2026-06-16 21:33:53 [INFO] httpx: HTTP Request: GET https://api.pinecone.io/indexes "HTTP/1.1 200 OK"
+2026-06-16 21:33:53 [INFO] pinecone.client.indexes: Describing index 'nassaq'
+2026-06-16 21:33:53 [INFO] httpx: HTTP Request: GET https://api.pinecone.io/indexes/nassaq "HTTP/1.1 200 OK"
+2026-06-16 21:33:53 [INFO] pinecone.index: Index client created for host https://nassaq-uujm500.svc.aped-4627-b74a.pinecone.io
+2026-06-16 21:33:53 [INFO] pinecone.index: Describing index stats
+2026-06-16 21:33:54 [INFO] pinecone.index: Querying index with top_k=10000
+2026-06-16 21:38:17 [INFO] pymongo.client: You appear to be connected to a CosmosDB cluster. For more information regarding feature compatibility and support please visit https://www.mongodb.com/supportability/cosmosdb
+2026-06-16 21:38:17 [INFO] pinecone.client.indexes: Listing indexes
+2026-06-16 21:38:18 [INFO] httpx: HTTP Request: GET https://api.pinecone.io/indexes "HTTP/1.1 200 OK"
+2026-06-16 21:38:18 [INFO] pinecone.client.indexes: Describing index 'nassaq'
+2026-06-16 21:38:19 [INFO] httpx: HTTP Request: GET https://api.pinecone.io/indexes/nassaq "HTTP/1.1 200 OK"
+2026-06-16 21:38:19 [INFO] pinecone.index: Index client created for host https://nassaq-uujm500.svc.aped-4627-b74a.pinecone.io
+2026-06-16 21:38:19 [INFO] pinecone.index: Describing index stats
+2026-06-16 21:38:19 [INFO] pinecone.index: Querying index with top_k=10000
+2026-06-18 13:18:10 [INFO] pymongo.client: You appear to be connected to a CosmosDB cluster. For more information regarding feature compatibility and support please visit https://www.mongodb.com/supportability/cosmosdb
+2026-06-18 13:18:10 [INFO] pinecone.client.indexes: Listing indexes
+2026-06-18 13:18:11 [INFO] httpx: HTTP Request: GET https://api.pinecone.io/indexes "HTTP/1.1 200 OK"
+2026-06-18 13:18:11 [INFO] pinecone.client.indexes: Describing index 'nassaq'
+2026-06-18 13:18:12 [INFO] httpx: HTTP Request: GET https://api.pinecone.io/indexes/nassaq "HTTP/1.1 200 OK"
+2026-06-18 13:18:12 [INFO] pinecone.index: Index client created for host https://nassaq-uujm500.svc.aped-4627-b74a.pinecone.io
+2026-06-18 13:18:12 [INFO] pinecone.index: Describing index stats
+2026-06-18 13:18:12 [INFO] pinecone.index: Querying index with top_k=10000
+2026-06-18 13:22:08 [INFO] azure.core.pipeline.policies.http_logging_policy: Request URL: 'https://nassaqq.blob.core.windows.net/demo/bee33d12-1307-45be-866d-c0ef28ffb288?sp=REDACTED&st=REDACTED&se=REDACTED&spr=REDACTED&sv=REDACTED&sr=REDACTED&sig=REDACTED'
+Request method: 'DELETE'
+Request headers:
+    'x-ms-version': 'REDACTED'
+    'Accept': 'application/xml'
+    'User-Agent': 'azsdk-python-storage-blob/12.28.0 Python/3.11.14 (Windows-10-10.0.26200-SP0)'
+    'x-ms-date': 'REDACTED'
+    'x-ms-client-request-id': '8fcc94c4-6aff-11f1-bfa5-e00af66009f2'
+No body was attached to the request
+2026-06-18 13:22:09 [INFO] azure.core.pipeline.policies.http_logging_policy: Response status: 404
+Response headers:
+    'Content-Length': '215'
+    'Content-Type': 'application/xml'
+    'Server': 'Windows-Azure-Blob/1.0 Microsoft-HTTPAPI/2.0'
+    'x-ms-request-id': 'e4033760-501e-0014-040c-ff68ac000000'
+    'x-ms-client-request-id': '8fcc94c4-6aff-11f1-bfa5-e00af66009f2'
+    'x-ms-version': 'REDACTED'
+    'x-ms-error-code': 'BlobNotFound'
+    'Date': 'Thu, 18 Jun 2026 10:22:09 GMT'
+2026-06-18 13:22:09 [INFO] pinecone.index: Querying index with top_k=1
+2026-06-18 13:22:22 [INFO] azure.core.pipeline.policies.http_logging_policy: Request URL: 'https://nassaqq.blob.core.windows.net/demo/4a4e1f7d-c84b-4681-a30c-a70cf5195f72?sp=REDACTED&st=REDACTED&se=REDACTED&spr=REDACTED&sv=REDACTED&sr=REDACTED&sig=REDACTED'
+Request method: 'DELETE'
+Request headers:
+    'x-ms-version': 'REDACTED'
+    'Accept': 'application/xml'
+    'User-Agent': 'azsdk-python-storage-blob/12.28.0 Python/3.11.14 (Windows-10-10.0.26200-SP0)'
+    'x-ms-date': 'REDACTED'
+    'x-ms-client-request-id': '983f85f5-6aff-11f1-8688-e00af66009f2'
+No body was attached to the request
+2026-06-18 13:22:23 [INFO] azure.core.pipeline.policies.http_logging_policy: Response status: 404
+Response headers:
+    'Content-Length': '215'
+    'Content-Type': 'application/xml'
+    'Server': 'Windows-Azure-Blob/1.0 Microsoft-HTTPAPI/2.0'
+    'x-ms-request-id': 'e40355dc-501e-0014-040c-ff68ac000000'
+    'x-ms-client-request-id': '983f85f5-6aff-11f1-8688-e00af66009f2'
+    'x-ms-version': 'REDACTED'
+    'x-ms-error-code': 'BlobNotFound'
+    'Date': 'Thu, 18 Jun 2026 10:22:23 GMT'
+2026-06-18 13:22:23 [INFO] pinecone.index: Querying index with top_k=1
+2026-06-18 13:22:35 [INFO] azure.core.pipeline.policies.http_logging_policy: Request URL: 'https://nassaqq.blob.core.windows.net/demo/48e6c7a9-5f11-429e-857c-895a63bded3e?sp=REDACTED&st=REDACTED&se=REDACTED&spr=REDACTED&sv=REDACTED&sr=REDACTED&sig=REDACTED'
+Request method: 'DELETE'
+Request headers:
+    'x-ms-version': 'REDACTED'
+    'Accept': 'application/xml'
+    'User-Agent': 'azsdk-python-storage-blob/12.28.0 Python/3.11.14 (Windows-10-10.0.26200-SP0)'
+    'x-ms-date': 'REDACTED'
+    'x-ms-client-request-id': '9fd3a982-6aff-11f1-9c15-e00af66009f2'
+No body was attached to the request
+2026-06-18 13:22:35 [INFO] azure.core.pipeline.policies.http_logging_policy: Response status: 404
+Response headers:
+    'Content-Length': '215'
+    'Content-Type': 'application/xml'
+    'Server': 'Windows-Azure-Blob/1.0 Microsoft-HTTPAPI/2.0'
+    'x-ms-request-id': 'e4037463-501e-0014-600c-ff68ac000000'
+    'x-ms-client-request-id': '9fd3a982-6aff-11f1-9c15-e00af66009f2'
+    'x-ms-version': 'REDACTED'
+    'x-ms-error-code': 'BlobNotFound'
+    'Date': 'Thu, 18 Jun 2026 10:22:35 GMT'
+2026-06-18 13:22:35 [INFO] pinecone.index: Querying index with top_k=1
+2026-06-18 13:22:39 [INFO] pinecone.index: Describing index stats
+2026-06-18 13:23:16 [INFO] pinecone.index: Describing index stats
+2026-06-18 14:08:33 [INFO] pymongo.client: You appear to be connected to a CosmosDB cluster. For more information regarding feature compatibility and support please visit https://www.mongodb.com/supportability/cosmosdb
+2026-06-18 14:08:34 [INFO] pinecone.client.indexes: Listing indexes
+2026-06-18 14:08:35 [INFO] httpx: HTTP Request: GET https://api.pinecone.io/indexes "HTTP/1.1 200 OK"
+2026-06-18 14:08:35 [INFO] pinecone.client.indexes: Describing index 'nassaq'
+2026-06-18 14:08:35 [INFO] httpx: HTTP Request: GET https://api.pinecone.io/indexes/nassaq "HTTP/1.1 200 OK"
+2026-06-18 14:08:35 [INFO] pinecone.index: Index client created for host https://nassaq-uujm500.svc.aped-4627-b74a.pinecone.io
+2026-06-18 14:08:35 [INFO] pinecone.index: Describing index stats
+2026-06-18 14:08:36 [INFO] pinecone.index: Querying index with top_k=10000
+2026-06-18 15:07:29 [INFO] azure.core.pipeline.policies.http_logging_policy: Request URL: 'https://nassaqq.blob.core.windows.net/demo/4bf3ce2a-fed9-4d11-8ce7-13ddad166e16?sp=REDACTED&st=REDACTED&se=REDACTED&spr=REDACTED&sv=REDACTED&sr=REDACTED&sig=REDACTED'
+Request method: 'PUT'
+Request headers:
+    'Content-Length': '77503'
+    'x-ms-meta-original_filename': 'REDACTED'
+    'x-ms-meta-content_type': 'REDACTED'
+    'x-ms-blob-type': 'REDACTED'
+    'x-ms-blob-content-type': 'REDACTED'
+    'x-ms-version': 'REDACTED'
+    'Content-Type': 'application/octet-stream'
+    'Accept': 'application/xml'
+    'User-Agent': 'azsdk-python-storage-blob/12.28.0 Python/3.11.14 (Windows-10-10.0.26200-SP0)'
+    'x-ms-date': 'REDACTED'
+    'x-ms-client-request-id': '47399a5d-6b0e-11f1-9241-e00af66009f2'
+A body is sent with the request
+2026-06-18 15:07:30 [INFO] azure.core.pipeline.policies.http_logging_policy: Response status: 201
+Response headers:
+    'Content-Length': '0'
+    'Content-MD5': 'REDACTED'
+    'Last-Modified': 'Thu, 18 Jun 2026 12:07:30 GMT'
+    'ETag': '"0x8DECD322BF37F80"'
+    'Server': 'Windows-Azure-Blob/1.0 Microsoft-HTTPAPI/2.0'
+    'x-ms-request-id': 'a9f43311-801e-0017-301b-ff89c8000000'
+    'x-ms-client-request-id': '47399a5d-6b0e-11f1-9241-e00af66009f2'
+    'x-ms-version': 'REDACTED'
+    'x-ms-content-crc64': 'REDACTED'
+    'x-ms-request-server-encrypted': 'REDACTED'
+    'Date': 'Thu, 18 Jun 2026 12:07:29 GMT'
+2026-06-18 15:07:30 [INFO] azure.core.pipeline.policies.http_logging_policy: Request URL: 'https://ocr-nassaqq-model.cognitiveservices.azure.com//documentintelligence/documentModels/prebuilt-layout:analyze?api-version=2024-11-30&features=REDACTED&outputContentFormat=REDACTED'
+Request method: 'POST'
+Request headers:
+    'content-type': 'application/octet-stream'
+    'Accept': 'application/json'
+    'x-ms-client-request-id': '47ae1935-6b0e-11f1-af93-e00af66009f2'
+    'User-Agent': 'azsdk-python-ai-documentintelligence/1.0.2 Python/3.11.14 (Windows-10-10.0.26200-SP0)'
+    'Ocp-Apim-Subscription-Key': 'REDACTED'
+A body is sent with the request
+2026-06-18 15:13:30 [INFO] pymongo.client: You appear to be connected to a CosmosDB cluster. For more information regarding feature compatibility and support please visit https://www.mongodb.com/supportability/cosmosdb
+2026-06-18 15:13:30 [INFO] pinecone.client.indexes: Listing indexes
+2026-06-18 15:13:31 [INFO] httpx: HTTP Request: GET https://api.pinecone.io/indexes "HTTP/1.1 200 OK"
+2026-06-18 15:13:31 [INFO] pinecone.client.indexes: Describing index 'nassaq'
+2026-06-18 15:13:32 [INFO] httpx: HTTP Request: GET https://api.pinecone.io/indexes/nassaq "HTTP/1.1 200 OK"
+2026-06-18 15:13:32 [INFO] pinecone.index: Index client created for host https://nassaq-uujm500.svc.aped-4627-b74a.pinecone.io
+2026-06-18 15:13:32 [INFO] pinecone.index: Describing index stats
+2026-06-18 15:13:32 [INFO] pinecone.index: Querying index with top_k=10000
+2026-06-18 15:14:23 [INFO] azure.core.pipeline.policies.http_logging_policy: Request URL: 'https://nassaqq.blob.core.windows.net/demo/642945fd-75e8-4222-88ef-242feefd764c?sp=REDACTED&st=REDACTED&se=REDACTED&spr=REDACTED&sv=REDACTED&sr=REDACTED&sig=REDACTED'
+Request method: 'PUT'
+Request headers:
+    'Content-Length': '77503'
+    'x-ms-meta-original_filename': 'REDACTED'
+    'x-ms-meta-content_type': 'REDACTED'
+    'x-ms-blob-type': 'REDACTED'
+    'x-ms-blob-content-type': 'REDACTED'
+    'x-ms-version': 'REDACTED'
+    'Content-Type': 'application/octet-stream'
+    'Accept': 'application/xml'
+    'User-Agent': 'azsdk-python-storage-blob/12.28.0 Python/3.11.14 (Windows-10-10.0.26200-SP0)'
+    'x-ms-date': 'REDACTED'
+    'x-ms-client-request-id': '3e11bfbf-6b0f-11f1-8ad3-e00af66009f2'
+A body is sent with the request
+2026-06-18 15:14:24 [INFO] azure.core.pipeline.policies.http_logging_policy: Response status: 201
+Response headers:
+    'Content-Length': '0'
+    'Content-MD5': 'REDACTED'
+    'Last-Modified': 'Thu, 18 Jun 2026 12:14:24 GMT'
+    'ETag': '"0x8DECD3322B9B06E"'
+    'Server': 'Windows-Azure-Blob/1.0 Microsoft-HTTPAPI/2.0'
+    'x-ms-request-id': '7c43c2bf-d01e-0068-6a1c-ff4653000000'
+    'x-ms-client-request-id': '3e11bfbf-6b0f-11f1-8ad3-e00af66009f2'
+    'x-ms-version': 'REDACTED'
+    'x-ms-content-crc64': 'REDACTED'
+    'x-ms-request-server-encrypted': 'REDACTED'
+    'Date': 'Thu, 18 Jun 2026 12:14:23 GMT'
+2026-06-18 15:14:24 [INFO] azure.core.pipeline.policies.http_logging_policy: Request URL: 'https://nassaqq-ocr.cognitiveservices.azure.com//documentintelligence/documentModels/prebuilt-layout:analyze?api-version=2024-11-30&features=REDACTED&outputContentFormat=REDACTED'
+Request method: 'POST'
+Request headers:
+    'content-type': 'application/octet-stream'
+    'Accept': 'application/json'
+    'x-ms-client-request-id': '3e700aa2-6b0f-11f1-ba7e-e00af66009f2'
+    'User-Agent': 'azsdk-python-ai-documentintelligence/1.0.2 Python/3.11.14 (Windows-10-10.0.26200-SP0)'
+    'Ocp-Apim-Subscription-Key': 'REDACTED'
+A body is sent with the request
+2026-06-18 15:14:24 [INFO] azure.core.pipeline.policies.http_logging_policy: Response status: 202
+Response headers:
+    'Content-Length': '0'
+    'Operation-Location': 'REDACTED'
+    'x-envoy-upstream-service-time': 'REDACTED'
+    'apim-request-id': 'REDACTED'
+    'Strict-Transport-Security': 'REDACTED'
+    'x-content-type-options': 'REDACTED'
+    'x-ms-region': 'REDACTED'
+    'Date': 'Thu, 18 Jun 2026 12:14:24 GMT'
+2026-06-18 15:14:24 [INFO] azure.core.pipeline.policies.http_logging_policy: Request URL: 'https://nassaqq-ocr.cognitiveservices.azure.com/documentintelligence/documentModels/prebuilt-layout/analyzeResults/84a6c845-37f1-461e-9732-5e9dd124a448?api-version=2024-11-30'
+Request method: 'GET'
+Request headers:
+    'x-ms-client-request-id': '3e700aa2-6b0f-11f1-ba7e-e00af66009f2'
+    'User-Agent': 'azsdk-python-ai-documentintelligence/1.0.2 Python/3.11.14 (Windows-10-10.0.26200-SP0)'
+    'Ocp-Apim-Subscription-Key': 'REDACTED'
+No body was attached to the request
+2026-06-18 15:14:24 [INFO] azure.core.pipeline.policies.http_logging_policy: Response status: 200
+Response headers:
+    'Content-Length': '106'
+    'Content-Type': 'application/json; charset=utf-8'
+    'retry-after': '5'
+    'x-envoy-upstream-service-time': 'REDACTED'
+    'apim-request-id': 'REDACTED'
+    'Strict-Transport-Security': 'REDACTED'
+    'x-content-type-options': 'REDACTED'
+    'x-ms-region': 'REDACTED'
+    'Date': 'Thu, 18 Jun 2026 12:14:24 GMT'
+2026-06-18 15:14:29 [INFO] azure.core.pipeline.policies.http_logging_policy: Request URL: 'https://nassaqq-ocr.cognitiveservices.azure.com/documentintelligence/documentModels/prebuilt-layout/analyzeResults/84a6c845-37f1-461e-9732-5e9dd124a448?api-version=2024-11-30'
+Request method: 'GET'
+Request headers:
+    'x-ms-client-request-id': '3e700aa2-6b0f-11f1-ba7e-e00af66009f2'
+    'User-Agent': 'azsdk-python-ai-documentintelligence/1.0.2 Python/3.11.14 (Windows-10-10.0.26200-SP0)'
+    'Ocp-Apim-Subscription-Key': 'REDACTED'
+No body was attached to the request
+2026-06-18 15:14:29 [INFO] azure.core.pipeline.policies.http_logging_policy: Response status: 200
+Response headers:
+    'Content-Length': '106'
+    'Content-Type': 'application/json; charset=utf-8'
+    'retry-after': '1'
+    'x-envoy-upstream-service-time': 'REDACTED'
+    'apim-request-id': 'REDACTED'
+    'Strict-Transport-Security': 'REDACTED'
+    'x-content-type-options': 'REDACTED'
+    'x-ms-region': 'REDACTED'
+    'Date': 'Thu, 18 Jun 2026 12:14:30 GMT'
+2026-06-18 15:14:30 [INFO] azure.core.pipeline.policies.http_logging_policy: Request URL: 'https://nassaqq-ocr.cognitiveservices.azure.com/documentintelligence/documentModels/prebuilt-layout/analyzeResults/84a6c845-37f1-461e-9732-5e9dd124a448?api-version=2024-11-30'
+Request method: 'GET'
+Request headers:
+    'x-ms-client-request-id': '3e700aa2-6b0f-11f1-ba7e-e00af66009f2'
+    'User-Agent': 'azsdk-python-ai-documentintelligence/1.0.2 Python/3.11.14 (Windows-10-10.0.26200-SP0)'
+    'Ocp-Apim-Subscription-Key': 'REDACTED'
+No body was attached to the request
+2026-06-18 15:14:31 [INFO] azure.core.pipeline.policies.http_logging_policy: Response status: 200
+Response headers:
+    'Content-Length': '106'
+    'Content-Type': 'application/json; charset=utf-8'
+    'retry-after': '1'
+    'x-envoy-upstream-service-time': 'REDACTED'
+    'apim-request-id': 'REDACTED'
+    'Strict-Transport-Security': 'REDACTED'
+    'x-content-type-options': 'REDACTED'
+    'x-ms-region': 'REDACTED'
+    'Date': 'Thu, 18 Jun 2026 12:14:31 GMT'
+2026-06-18 15:14:32 [INFO] azure.core.pipeline.policies.http_logging_policy: Request URL: 'https://nassaqq-ocr.cognitiveservices.azure.com/documentintelligence/documentModels/prebuilt-layout/analyzeResults/84a6c845-37f1-461e-9732-5e9dd124a448?api-version=2024-11-30'
+Request method: 'GET'
+Request headers:
+    'x-ms-client-request-id': '3e700aa2-6b0f-11f1-ba7e-e00af66009f2'
+    'User-Agent': 'azsdk-python-ai-documentintelligence/1.0.2 Python/3.11.14 (Windows-10-10.0.26200-SP0)'
+    'Ocp-Apim-Subscription-Key': 'REDACTED'
+No body was attached to the request
+2026-06-18 15:14:32 [INFO] azure.core.pipeline.policies.http_logging_policy: Response status: 200
+Response headers:
+    'Content-Length': '238713'
+    'Content-Type': 'application/json; charset=utf-8'
+    'x-envoy-upstream-service-time': 'REDACTED'
+    'apim-request-id': 'REDACTED'
+    'Strict-Transport-Security': 'REDACTED'
+    'x-content-type-options': 'REDACTED'
+    'x-ms-region': 'REDACTED'
+    'Date': 'Thu, 18 Jun 2026 12:14:32 GMT'
+2026-06-18 15:14:34 [INFO] openai._base_client: Retrying request to /chat/completions in 0.449011 seconds
+2026-06-18 15:14:35 [INFO] openai._base_client: Retrying request to /chat/completions in 0.759736 seconds
+2026-06-18 15:15:02 [INFO] pinecone.index: Querying index with top_k=1
+2026-06-18 15:15:03 [INFO] openai._base_client: Retrying request to /embeddings in 0.450783 seconds
+2026-06-18 15:15:04 [INFO] openai._base_client: Retrying request to /embeddings in 0.928194 seconds
+2026-06-18 15:16:37 [INFO] pymongo.client: You appear to be connected to a CosmosDB cluster. For more information regarding feature compatibility and support please visit https://www.mongodb.com/supportability/cosmosdb
+2026-06-18 15:16:37 [INFO] pinecone.client.indexes: Listing indexes
+2026-06-18 15:16:38 [INFO] httpx: HTTP Request: GET https://api.pinecone.io/indexes "HTTP/1.1 200 OK"
+2026-06-18 15:16:38 [INFO] pinecone.client.indexes: Describing index 'nassaq'
+2026-06-18 15:16:39 [INFO] httpx: HTTP Request: GET https://api.pinecone.io/indexes/nassaq "HTTP/1.1 200 OK"
+2026-06-18 15:16:39 [INFO] pinecone.index: Index client created for host https://nassaq-uujm500.svc.aped-4627-b74a.pinecone.io
+2026-06-18 15:16:39 [INFO] pinecone.index: Describing index stats
+2026-06-18 15:16:40 [INFO] pinecone.index: Querying index with top_k=10000
+2026-06-18 15:18:31 [INFO] pymongo.client: You appear to be connected to a CosmosDB cluster. For more information regarding feature compatibility and support please visit https://www.mongodb.com/supportability/cosmosdb
+2026-06-18 15:18:32 [INFO] pinecone.client.indexes: Listing indexes
+2026-06-18 15:18:32 [INFO] httpx: HTTP Request: GET https://api.pinecone.io/indexes "HTTP/1.1 200 OK"
+2026-06-18 15:18:32 [INFO] pinecone.client.indexes: Describing index 'nassaq'
+2026-06-18 15:18:33 [INFO] httpx: HTTP Request: GET https://api.pinecone.io/indexes/nassaq "HTTP/1.1 200 OK"
+2026-06-18 15:18:33 [INFO] pinecone.index: Index client created for host https://nassaq-uujm500.svc.aped-4627-b74a.pinecone.io
+2026-06-18 15:18:33 [INFO] pinecone.index: Describing index stats
+2026-06-18 15:18:33 [INFO] pinecone.index: Querying index with top_k=10000
+2026-06-18 15:18:57 [INFO] pinecone.index: Describing index stats
+2026-06-18 15:19:02 [INFO] pinecone.index: Describing index stats
+2026-06-18 15:19:31 [INFO] azure.core.pipeline.policies.http_logging_policy: Request URL: 'https://nassaqq.blob.core.windows.net/demo/7856be7a-c145-4f5d-9427-6f3bac800a44?sp=REDACTED&st=REDACTED&se=REDACTED&spr=REDACTED&sv=REDACTED&sr=REDACTED&sig=REDACTED'
+Request method: 'PUT'
+Request headers:
+    'Content-Length': '77503'
+    'x-ms-meta-original_filename': 'REDACTED'
+    'x-ms-meta-content_type': 'REDACTED'
+    'x-ms-blob-type': 'REDACTED'
+    'x-ms-blob-content-type': 'REDACTED'
+    'x-ms-version': 'REDACTED'
+    'Content-Type': 'application/octet-stream'
+    'Accept': 'application/xml'
+    'User-Agent': 'azsdk-python-storage-blob/12.28.0 Python/3.11.14 (Windows-10-10.0.26200-SP0)'
+    'x-ms-date': 'REDACTED'
+    'x-ms-client-request-id': 'f5c1341e-6b0f-11f1-8be4-e00af66009f2'
+A body is sent with the request
+2026-06-18 15:19:32 [INFO] azure.core.pipeline.policies.http_logging_policy: Response status: 201
+Response headers:
+    'Content-Length': '0'
+    'Content-MD5': 'REDACTED'
+    'Last-Modified': 'Thu, 18 Jun 2026 12:19:32 GMT'
+    'ETag': '"0x8DECD33DA60C535"'
+    'Server': 'Windows-Azure-Blob/1.0 Microsoft-HTTPAPI/2.0'
+    'x-ms-request-id': '6286cd6b-201e-0031-011c-ffc1d0000000'
+    'x-ms-client-request-id': 'f5c1341e-6b0f-11f1-8be4-e00af66009f2'
+    'x-ms-version': 'REDACTED'
+    'x-ms-content-crc64': 'REDACTED'
+    'x-ms-request-server-encrypted': 'REDACTED'
+    'Date': 'Thu, 18 Jun 2026 12:19:31 GMT'
+2026-06-18 15:19:32 [INFO] azure.core.pipeline.policies.http_logging_policy: Request URL: 'https://nassaqq-ocr.cognitiveservices.azure.com//documentintelligence/documentModels/prebuilt-layout:analyze?api-version=2024-11-30&features=REDACTED&outputContentFormat=REDACTED'
+Request method: 'POST'
+Request headers:
+    'content-type': 'application/octet-stream'
+    'Accept': 'application/json'
+    'x-ms-client-request-id': 'f617232d-6b0f-11f1-a21d-e00af66009f2'
+    'User-Agent': 'azsdk-python-ai-documentintelligence/1.0.2 Python/3.11.14 (Windows-10-10.0.26200-SP0)'
+    'Ocp-Apim-Subscription-Key': 'REDACTED'
+A body is sent with the request
+2026-06-18 15:19:32 [INFO] azure.core.pipeline.policies.http_logging_policy: Response status: 202
+Response headers:
+    'Content-Length': '0'
+    'Operation-Location': 'REDACTED'
+    'x-envoy-upstream-service-time': 'REDACTED'
+    'apim-request-id': 'REDACTED'
+    'Strict-Transport-Security': 'REDACTED'
+    'x-content-type-options': 'REDACTED'
+    'x-ms-region': 'REDACTED'
+    'Date': 'Thu, 18 Jun 2026 12:19:32 GMT'
+2026-06-18 15:19:32 [INFO] azure.core.pipeline.policies.http_logging_policy: Request URL: 'https://nassaqq-ocr.cognitiveservices.azure.com/documentintelligence/documentModels/prebuilt-layout/analyzeResults/bf86811f-32a0-4e92-87dc-da1bf1bfc3e6?api-version=2024-11-30'
+Request method: 'GET'
+Request headers:
+    'x-ms-client-request-id': 'f617232d-6b0f-11f1-a21d-e00af66009f2'
+    'User-Agent': 'azsdk-python-ai-documentintelligence/1.0.2 Python/3.11.14 (Windows-10-10.0.26200-SP0)'
+    'Ocp-Apim-Subscription-Key': 'REDACTED'
+No body was attached to the request
+2026-06-18 15:19:32 [INFO] azure.core.pipeline.policies.http_logging_policy: Response status: 200
+Response headers:
+    'Content-Length': '106'
+    'Content-Type': 'application/json; charset=utf-8'
+    'retry-after': '5'
+    'x-envoy-upstream-service-time': 'REDACTED'
+    'apim-request-id': 'REDACTED'
+    'Strict-Transport-Security': 'REDACTED'
+    'x-content-type-options': 'REDACTED'
+    'x-ms-region': 'REDACTED'
+    'Date': 'Thu, 18 Jun 2026 12:19:32 GMT'
+2026-06-18 15:19:37 [INFO] azure.core.pipeline.policies.http_logging_policy: Request URL: 'https://nassaqq-ocr.cognitiveservices.azure.com/documentintelligence/documentModels/prebuilt-layout/analyzeResults/bf86811f-32a0-4e92-87dc-da1bf1bfc3e6?api-version=2024-11-30'
+Request method: 'GET'
+Request headers:
+    'x-ms-client-request-id': 'f617232d-6b0f-11f1-a21d-e00af66009f2'
+    'User-Agent': 'azsdk-python-ai-documentintelligence/1.0.2 Python/3.11.14 (Windows-10-10.0.26200-SP0)'
+    'Ocp-Apim-Subscription-Key': 'REDACTED'
+No body was attached to the request
+2026-06-18 15:19:38 [INFO] azure.core.pipeline.policies.http_logging_policy: Response status: 200
+Response headers:
+    'Content-Length': '106'
+    'Content-Type': 'application/json; charset=utf-8'
+    'retry-after': '1'
+    'x-envoy-upstream-service-time': 'REDACTED'
+    'apim-request-id': 'REDACTED'
+    'Strict-Transport-Security': 'REDACTED'
+    'x-content-type-options': 'REDACTED'
+    'x-ms-region': 'REDACTED'
+    'Date': 'Thu, 18 Jun 2026 12:19:37 GMT'
+2026-06-18 15:19:39 [INFO] azure.core.pipeline.policies.http_logging_policy: Request URL: 'https://nassaqq-ocr.cognitiveservices.azure.com/documentintelligence/documentModels/prebuilt-layout/analyzeResults/bf86811f-32a0-4e92-87dc-da1bf1bfc3e6?api-version=2024-11-30'
+Request method: 'GET'
+Request headers:
+    'x-ms-client-request-id': 'f617232d-6b0f-11f1-a21d-e00af66009f2'
+    'User-Agent': 'azsdk-python-ai-documentintelligence/1.0.2 Python/3.11.14 (Windows-10-10.0.26200-SP0)'
+    'Ocp-Apim-Subscription-Key': 'REDACTED'
+No body was attached to the request
+2026-06-18 15:19:39 [INFO] azure.core.pipeline.policies.http_logging_policy: Response status: 200
+Response headers:
+    'Content-Length': '238713'
+    'Content-Type': 'application/json; charset=utf-8'
+    'x-envoy-upstream-service-time': 'REDACTED'
+    'apim-request-id': 'REDACTED'
+    'Strict-Transport-Security': 'REDACTED'
+    'x-content-type-options': 'REDACTED'
+    'x-ms-region': 'REDACTED'
+    'Date': 'Thu, 18 Jun 2026 12:19:38 GMT'
+2026-06-18 15:19:40 [INFO] httpx: HTTP Request: POST https://nassaqq.services.ai.azure.com/openai/v1/responses/chat/completions "HTTP/1.1 404 Resource Not Found"
+2026-06-18 15:19:46 [INFO] pinecone.index: Querying index with top_k=1
+2026-06-18 15:19:47 [INFO] httpx: HTTP Request: POST https://nassaqq.services.ai.azure.com/embeddings "HTTP/1.1 404 Resource Not Found"
+2026-06-18 15:22:36 [INFO] pymongo.client: You appear to be connected to a CosmosDB cluster. For more information regarding feature compatibility and support please visit https://www.mongodb.com/supportability/cosmosdb
+2026-06-18 15:22:36 [INFO] pinecone.client.indexes: Listing indexes
+2026-06-18 15:22:37 [INFO] httpx: HTTP Request: GET https://api.pinecone.io/indexes "HTTP/1.1 200 OK"
+2026-06-18 15:22:37 [INFO] pinecone.client.indexes: Describing index 'nassaq'
+2026-06-18 15:22:38 [INFO] httpx: HTTP Request: GET https://api.pinecone.io/indexes/nassaq "HTTP/1.1 200 OK"
+2026-06-18 15:22:38 [INFO] pinecone.index: Index client created for host https://nassaq-uujm500.svc.aped-4627-b74a.pinecone.io
+2026-06-18 15:22:38 [INFO] pinecone.index: Describing index stats
+2026-06-18 15:22:38 [INFO] pinecone.index: Querying index with top_k=10000
+2026-06-18 15:23:05 [INFO] azure.core.pipeline.policies.http_logging_policy: Request URL: 'https://nassaqq.blob.core.windows.net/demo/f1161299-6171-4ba3-994d-a31a3a9b1b51?sp=REDACTED&st=REDACTED&se=REDACTED&spr=REDACTED&sv=REDACTED&sr=REDACTED&sig=REDACTED'
+Request method: 'PUT'
+Request headers:
+    'Content-Length': '77503'
+    'x-ms-meta-original_filename': 'REDACTED'
+    'x-ms-meta-content_type': 'REDACTED'
+    'x-ms-blob-type': 'REDACTED'
+    'x-ms-blob-content-type': 'REDACTED'
+    'x-ms-version': 'REDACTED'
+    'Content-Type': 'application/octet-stream'
+    'Accept': 'application/xml'
+    'User-Agent': 'azsdk-python-storage-blob/12.28.0 Python/3.11.14 (Windows-10-10.0.26200-SP0)'
+    'x-ms-date': 'REDACTED'
+    'x-ms-client-request-id': '7549e489-6b10-11f1-b8b4-e00af66009f2'
+A body is sent with the request
+2026-06-18 15:23:06 [INFO] azure.core.pipeline.policies.http_logging_policy: Response status: 201
+Response headers:
+    'Content-Length': '0'
+    'Content-MD5': 'REDACTED'
+    'Last-Modified': 'Thu, 18 Jun 2026 12:23:06 GMT'
+    'ETag': '"0x8DECD3459E91535"'
+    'Server': 'Windows-Azure-Blob/1.0 Microsoft-HTTPAPI/2.0'
+    'x-ms-request-id': '32200505-701e-0003-181d-ffc1a7000000'
+    'x-ms-client-request-id': '7549e489-6b10-11f1-b8b4-e00af66009f2'
+    'x-ms-version': 'REDACTED'
+    'x-ms-content-crc64': 'REDACTED'
+    'x-ms-request-server-encrypted': 'REDACTED'
+    'Date': 'Thu, 18 Jun 2026 12:23:06 GMT'
+2026-06-18 15:23:06 [INFO] azure.core.pipeline.policies.http_logging_policy: Request URL: 'https://nassaqq-ocr.cognitiveservices.azure.com//documentintelligence/documentModels/prebuilt-layout:analyze?api-version=2024-11-30&features=REDACTED&outputContentFormat=REDACTED'
+Request method: 'POST'
+Request headers:
+    'content-type': 'application/octet-stream'
+    'Accept': 'application/json'
+    'x-ms-client-request-id': '75a02109-6b10-11f1-b945-e00af66009f2'
+    'User-Agent': 'azsdk-python-ai-documentintelligence/1.0.2 Python/3.11.14 (Windows-10-10.0.26200-SP0)'
+    'Ocp-Apim-Subscription-Key': 'REDACTED'
+A body is sent with the request
+2026-06-18 15:23:06 [INFO] azure.core.pipeline.policies.http_logging_policy: Response status: 202
+Response headers:
+    'Content-Length': '0'
+    'Operation-Location': 'REDACTED'
+    'x-envoy-upstream-service-time': 'REDACTED'
+    'apim-request-id': 'REDACTED'
+    'Strict-Transport-Security': 'REDACTED'
+    'x-content-type-options': 'REDACTED'
+    'x-ms-region': 'REDACTED'
+    'Date': 'Thu, 18 Jun 2026 12:23:06 GMT'
+2026-06-18 15:23:06 [INFO] azure.core.pipeline.policies.http_logging_policy: Request URL: 'https://nassaqq-ocr.cognitiveservices.azure.com/documentintelligence/documentModels/prebuilt-layout/analyzeResults/46b111f2-5f88-4bfb-909a-5fd5fed4b8c1?api-version=2024-11-30'
+Request method: 'GET'
+Request headers:
+    'x-ms-client-request-id': '75a02109-6b10-11f1-b945-e00af66009f2'
+    'User-Agent': 'azsdk-python-ai-documentintelligence/1.0.2 Python/3.11.14 (Windows-10-10.0.26200-SP0)'
+    'Ocp-Apim-Subscription-Key': 'REDACTED'
+No body was attached to the request
+2026-06-18 15:23:06 [INFO] azure.core.pipeline.policies.http_logging_policy: Response status: 200
+Response headers:
+    'Content-Length': '106'
+    'Content-Type': 'application/json; charset=utf-8'
+    'retry-after': '5'
+    'x-envoy-upstream-service-time': 'REDACTED'
+    'apim-request-id': 'REDACTED'
+    'Strict-Transport-Security': 'REDACTED'
+    'x-content-type-options': 'REDACTED'
+    'x-ms-region': 'REDACTED'
+    'Date': 'Thu, 18 Jun 2026 12:23:06 GMT'
+2026-06-18 15:23:11 [INFO] azure.core.pipeline.policies.http_logging_policy: Request URL: 'https://nassaqq-ocr.cognitiveservices.azure.com/documentintelligence/documentModels/prebuilt-layout/analyzeResults/46b111f2-5f88-4bfb-909a-5fd5fed4b8c1?api-version=2024-11-30'
+Request method: 'GET'
+Request headers:
+    'x-ms-client-request-id': '75a02109-6b10-11f1-b945-e00af66009f2'
+    'User-Agent': 'azsdk-python-ai-documentintelligence/1.0.2 Python/3.11.14 (Windows-10-10.0.26200-SP0)'
+    'Ocp-Apim-Subscription-Key': 'REDACTED'
+No body was attached to the request
+2026-06-18 15:23:12 [INFO] azure.core.pipeline.policies.http_logging_policy: Response status: 200
+Response headers:
+    'Content-Length': '238713'
+    'Content-Type': 'application/json; charset=utf-8'
+    'x-envoy-upstream-service-time': 'REDACTED'
+    'apim-request-id': 'REDACTED'
+    'Strict-Transport-Security': 'REDACTED'
+    'x-content-type-options': 'REDACTED'
+    'x-ms-region': 'REDACTED'
+    'Date': 'Thu, 18 Jun 2026 12:23:11 GMT'
+2026-06-18 15:23:13 [INFO] httpx: HTTP Request: POST https://nassaqq.services.ai.azure.com/openai/v1/responses/chat/completions "HTTP/1.1 404 Resource Not Found"
+2026-06-18 15:23:16 [INFO] pinecone.index: Querying index with top_k=1
+2026-06-18 15:23:17 [INFO] httpx: HTTP Request: POST https://nassaqq.services.ai.azure.com/openai/embeddings "HTTP/1.1 404 Resource Not Found"
+2026-06-18 15:27:33 [INFO] pymongo.client: You appear to be connected to a CosmosDB cluster. For more information regarding feature compatibility and support please visit https://www.mongodb.com/supportability/cosmosdb
+2026-06-18 15:27:33 [INFO] pinecone.client.indexes: Listing indexes
+2026-06-18 15:27:34 [INFO] httpx: HTTP Request: GET https://api.pinecone.io/indexes "HTTP/1.1 200 OK"
+2026-06-18 15:27:34 [INFO] pinecone.client.indexes: Describing index 'nassaq'
+2026-06-18 15:27:35 [INFO] httpx: HTTP Request: GET https://api.pinecone.io/indexes/nassaq "HTTP/1.1 200 OK"
+2026-06-18 15:27:35 [INFO] pinecone.index: Index client created for host https://nassaq-uujm500.svc.aped-4627-b74a.pinecone.io
+2026-06-18 15:27:35 [INFO] pinecone.index: Describing index stats
+2026-06-18 15:27:36 [INFO] pinecone.index: Querying index with top_k=10000
+2026-06-18 15:28:09 [INFO] azure.core.pipeline.policies.http_logging_policy: Request URL: 'https://nassaqq.blob.core.windows.net/demo/58903fd8-f864-40f1-97bf-fc3170513a38?sp=REDACTED&st=REDACTED&se=REDACTED&spr=REDACTED&sv=REDACTED&sr=REDACTED&sig=REDACTED'
+Request method: 'PUT'
+Request headers:
+    'Content-Length': '77503'
+    'x-ms-meta-original_filename': 'REDACTED'
+    'x-ms-meta-content_type': 'REDACTED'
+    'x-ms-blob-type': 'REDACTED'
+    'x-ms-blob-content-type': 'REDACTED'
+    'x-ms-version': 'REDACTED'
+    'Content-Type': 'application/octet-stream'
+    'Accept': 'application/xml'
+    'User-Agent': 'azsdk-python-storage-blob/12.28.0 Python/3.11.14 (Windows-10-10.0.26200-SP0)'
+    'x-ms-date': 'REDACTED'
+    'x-ms-client-request-id': '2a6c563c-6b11-11f1-a2c9-e00af66009f2'
+A body is sent with the request
+2026-06-18 15:28:10 [INFO] azure.core.pipeline.policies.http_logging_policy: Response status: 201
+Response headers:
+    'Content-Length': '0'
+    'Content-MD5': 'REDACTED'
+    'Last-Modified': 'Thu, 18 Jun 2026 12:28:10 GMT'
+    'ETag': '"0x8DECD350F087B57"'
+    'Server': 'Windows-Azure-Blob/1.0 Microsoft-HTTPAPI/2.0'
+    'x-ms-request-id': '82978fdf-701e-0061-311d-ff0380000000'
+    'x-ms-client-request-id': '2a6c563c-6b11-11f1-a2c9-e00af66009f2'
+    'x-ms-version': 'REDACTED'
+    'x-ms-content-crc64': 'REDACTED'
+    'x-ms-request-server-encrypted': 'REDACTED'
+    'Date': 'Thu, 18 Jun 2026 12:28:09 GMT'
+2026-06-18 15:28:10 [INFO] azure.core.pipeline.policies.http_logging_policy: Request URL: 'https://nassaqq-ocr.cognitiveservices.azure.com//documentintelligence/documentModels/prebuilt-layout:analyze?api-version=2024-11-30&features=REDACTED&outputContentFormat=REDACTED'
+Request method: 'POST'
+Request headers:
+    'content-type': 'application/octet-stream'
+    'Accept': 'application/json'
+    'x-ms-client-request-id': '2abf3fa6-6b11-11f1-86ad-e00af66009f2'
+    'User-Agent': 'azsdk-python-ai-documentintelligence/1.0.2 Python/3.11.14 (Windows-10-10.0.26200-SP0)'
+    'Ocp-Apim-Subscription-Key': 'REDACTED'
+A body is sent with the request
+2026-06-18 15:28:10 [INFO] azure.core.pipeline.policies.http_logging_policy: Response status: 202
+Response headers:
+    'Content-Length': '0'
+    'Operation-Location': 'REDACTED'
+    'x-envoy-upstream-service-time': 'REDACTED'
+    'apim-request-id': 'REDACTED'
+    'Strict-Transport-Security': 'REDACTED'
+    'x-content-type-options': 'REDACTED'
+    'x-ms-region': 'REDACTED'
+    'Date': 'Thu, 18 Jun 2026 12:28:10 GMT'
+2026-06-18 15:28:10 [INFO] azure.core.pipeline.policies.http_logging_policy: Request URL: 'https://nassaqq-ocr.cognitiveservices.azure.com/documentintelligence/documentModels/prebuilt-layout/analyzeResults/a62b3163-2e0c-4974-ac2c-73229f5d1b72?api-version=2024-11-30'
+Request method: 'GET'
+Request headers:
+    'x-ms-client-request-id': '2abf3fa6-6b11-11f1-86ad-e00af66009f2'
+    'User-Agent': 'azsdk-python-ai-documentintelligence/1.0.2 Python/3.11.14 (Windows-10-10.0.26200-SP0)'
+    'Ocp-Apim-Subscription-Key': 'REDACTED'
+No body was attached to the request
+2026-06-18 15:28:10 [INFO] azure.core.pipeline.policies.http_logging_policy: Response status: 200
+Response headers:
+    'Content-Length': '106'
+    'Content-Type': 'application/json; charset=utf-8'
+    'retry-after': '5'
+    'x-envoy-upstream-service-time': 'REDACTED'
+    'apim-request-id': 'REDACTED'
+    'Strict-Transport-Security': 'REDACTED'
+    'x-content-type-options': 'REDACTED'
+    'x-ms-region': 'REDACTED'
+    'Date': 'Thu, 18 Jun 2026 12:28:10 GMT'
+2026-06-18 15:28:15 [INFO] azure.core.pipeline.policies.http_logging_policy: Request URL: 'https://nassaqq-ocr.cognitiveservices.azure.com/documentintelligence/documentModels/prebuilt-layout/analyzeResults/a62b3163-2e0c-4974-ac2c-73229f5d1b72?api-version=2024-11-30'
+Request method: 'GET'
+Request headers:
+    'x-ms-client-request-id': '2abf3fa6-6b11-11f1-86ad-e00af66009f2'
+    'User-Agent': 'azsdk-python-ai-documentintelligence/1.0.2 Python/3.11.14 (Windows-10-10.0.26200-SP0)'
+    'Ocp-Apim-Subscription-Key': 'REDACTED'
+No body was attached to the request
+2026-06-18 15:28:15 [INFO] azure.core.pipeline.policies.http_logging_policy: Response status: 200
+Response headers:
+    'Content-Length': '106'
+    'Content-Type': 'application/json; charset=utf-8'
+    'retry-after': '1'
+    'x-envoy-upstream-service-time': 'REDACTED'
+    'apim-request-id': 'REDACTED'
+    'Strict-Transport-Security': 'REDACTED'
+    'x-content-type-options': 'REDACTED'
+    'x-ms-region': 'REDACTED'
+    'Date': 'Thu, 18 Jun 2026 12:28:15 GMT'
+2026-06-18 15:28:16 [INFO] azure.core.pipeline.policies.http_logging_policy: Request URL: 'https://nassaqq-ocr.cognitiveservices.azure.com/documentintelligence/documentModels/prebuilt-layout/analyzeResults/a62b3163-2e0c-4974-ac2c-73229f5d1b72?api-version=2024-11-30'
+Request method: 'GET'
+Request headers:
+    'x-ms-client-request-id': '2abf3fa6-6b11-11f1-86ad-e00af66009f2'
+    'User-Agent': 'azsdk-python-ai-documentintelligence/1.0.2 Python/3.11.14 (Windows-10-10.0.26200-SP0)'
+    'Ocp-Apim-Subscription-Key': 'REDACTED'
+No body was attached to the request
+2026-06-18 15:28:16 [INFO] azure.core.pipeline.policies.http_logging_policy: Response status: 200
+Response headers:
+    'Content-Length': '106'
+    'Content-Type': 'application/json; charset=utf-8'
+    'retry-after': '1'
+    'x-envoy-upstream-service-time': 'REDACTED'
+    'apim-request-id': 'REDACTED'
+    'Strict-Transport-Security': 'REDACTED'
+    'x-content-type-options': 'REDACTED'
+    'x-ms-region': 'REDACTED'
+    'Date': 'Thu, 18 Jun 2026 12:28:16 GMT'
+2026-06-18 15:28:17 [INFO] azure.core.pipeline.policies.http_logging_policy: Request URL: 'https://nassaqq-ocr.cognitiveservices.azure.com/documentintelligence/documentModels/prebuilt-layout/analyzeResults/a62b3163-2e0c-4974-ac2c-73229f5d1b72?api-version=2024-11-30'
+Request method: 'GET'
+Request headers:
+    'x-ms-client-request-id': '2abf3fa6-6b11-11f1-86ad-e00af66009f2'
+    'User-Agent': 'azsdk-python-ai-documentintelligence/1.0.2 Python/3.11.14 (Windows-10-10.0.26200-SP0)'
+    'Ocp-Apim-Subscription-Key': 'REDACTED'
+No body was attached to the request
+2026-06-18 15:28:18 [INFO] azure.core.pipeline.policies.http_logging_policy: Response status: 200
+Response headers:
+    'Content-Length': '238713'
+    'Content-Type': 'application/json; charset=utf-8'
+    'x-envoy-upstream-service-time': 'REDACTED'
+    'apim-request-id': 'REDACTED'
+    'Strict-Transport-Security': 'REDACTED'
+    'x-content-type-options': 'REDACTED'
+    'x-ms-region': 'REDACTED'
+    'Date': 'Thu, 18 Jun 2026 12:28:17 GMT'
+2026-06-18 15:28:19 [INFO] httpx: HTTP Request: POST https://nassaqq.cognitiveservices.azure.com/openai/deployments/gpt-4.1-mini/chat/completions?api-version=2025-01-01-preview/chat/completions "HTTP/1.1 404 Resource Not Found"
+2026-06-18 15:28:22 [INFO] pinecone.index: Querying index with top_k=1
+2026-06-18 15:28:23 [INFO] httpx: HTTP Request: POST https://nassaqq.cognitiveservices.azure.com/openai/deployments/text-embedding-3-small/embeddings?api-version=2023-05-15/embeddings "HTTP/1.1 404 Resource Not Found"
+2026-06-18 15:29:32 [INFO] pymongo.client: You appear to be connected to a CosmosDB cluster. For more information regarding feature compatibility and support please visit https://www.mongodb.com/supportability/cosmosdb
+2026-06-18 15:29:32 [INFO] pinecone.client.indexes: Listing indexes
+2026-06-18 15:29:33 [INFO] httpx: HTTP Request: GET https://api.pinecone.io/indexes "HTTP/1.1 200 OK"
+2026-06-18 15:29:33 [INFO] pinecone.client.indexes: Describing index 'nassaq'
+2026-06-18 15:29:34 [INFO] httpx: HTTP Request: GET https://api.pinecone.io/indexes/nassaq "HTTP/1.1 200 OK"
+2026-06-18 15:29:34 [INFO] pinecone.index: Index client created for host https://nassaq-uujm500.svc.aped-4627-b74a.pinecone.io
+2026-06-18 15:29:34 [INFO] pinecone.index: Describing index stats
+2026-06-18 15:29:34 [INFO] pinecone.index: Querying index with top_k=10000
+2026-06-18 15:29:58 [INFO] azure.core.pipeline.policies.http_logging_policy: Request URL: 'https://nassaqq.blob.core.windows.net/demo/7f6b01d0-a724-4d8f-abfc-19b5bb4cab6b?sp=REDACTED&st=REDACTED&se=REDACTED&spr=REDACTED&sv=REDACTED&sr=REDACTED&sig=REDACTED'
+Request method: 'PUT'
+Request headers:
+    'Content-Length': '77503'
+    'x-ms-meta-original_filename': 'REDACTED'
+    'x-ms-meta-content_type': 'REDACTED'
+    'x-ms-blob-type': 'REDACTED'
+    'x-ms-blob-content-type': 'REDACTED'
+    'x-ms-version': 'REDACTED'
+    'Content-Type': 'application/octet-stream'
+    'Accept': 'application/xml'
+    'User-Agent': 'azsdk-python-storage-blob/12.28.0 Python/3.11.14 (Windows-10-10.0.26200-SP0)'
+    'x-ms-date': 'REDACTED'
+    'x-ms-client-request-id': '6b6a7c5f-6b11-11f1-ba10-e00af66009f2'
+A body is sent with the request
+2026-06-18 15:29:59 [INFO] azure.core.pipeline.policies.http_logging_policy: Response status: 201
+Response headers:
+    'Content-Length': '0'
+    'Content-MD5': 'REDACTED'
+    'Last-Modified': 'Thu, 18 Jun 2026 12:29:59 GMT'
+    'ETag': '"0x8DECD35500425FA"'
+    'Server': 'Windows-Azure-Blob/1.0 Microsoft-HTTPAPI/2.0'
+    'x-ms-request-id': '20edc640-f01e-006f-6a1e-ff2a30000000'
+    'x-ms-client-request-id': '6b6a7c5f-6b11-11f1-ba10-e00af66009f2'
+    'x-ms-version': 'REDACTED'
+    'x-ms-content-crc64': 'REDACTED'
+    'x-ms-request-server-encrypted': 'REDACTED'
+    'Date': 'Thu, 18 Jun 2026 12:29:58 GMT'
+2026-06-18 15:29:59 [INFO] azure.core.pipeline.policies.http_logging_policy: Request URL: 'https://nassaqq-ocr.cognitiveservices.azure.com//documentintelligence/documentModels/prebuilt-layout:analyze?api-version=2024-11-30&features=REDACTED&outputContentFormat=REDACTED'
+Request method: 'POST'
+Request headers:
+    'content-type': 'application/octet-stream'
+    'Accept': 'application/json'
+    'x-ms-client-request-id': '6bbb1d36-6b11-11f1-a884-e00af66009f2'
+    'User-Agent': 'azsdk-python-ai-documentintelligence/1.0.2 Python/3.11.14 (Windows-10-10.0.26200-SP0)'
+    'Ocp-Apim-Subscription-Key': 'REDACTED'
+A body is sent with the request
+2026-06-18 15:29:59 [INFO] azure.core.pipeline.policies.http_logging_policy: Response status: 202
+Response headers:
+    'Content-Length': '0'
+    'Operation-Location': 'REDACTED'
+    'x-envoy-upstream-service-time': 'REDACTED'
+    'apim-request-id': 'REDACTED'
+    'Strict-Transport-Security': 'REDACTED'
+    'x-content-type-options': 'REDACTED'
+    'x-ms-region': 'REDACTED'
+    'Date': 'Thu, 18 Jun 2026 12:29:58 GMT'
+2026-06-18 15:29:59 [INFO] azure.core.pipeline.policies.http_logging_policy: Request URL: 'https://nassaqq-ocr.cognitiveservices.azure.com/documentintelligence/documentModels/prebuilt-layout/analyzeResults/3712fd09-29fb-48a5-a80a-d3b7400ca0b2?api-version=2024-11-30'
+Request method: 'GET'
+Request headers:
+    'x-ms-client-request-id': '6bbb1d36-6b11-11f1-a884-e00af66009f2'
+    'User-Agent': 'azsdk-python-ai-documentintelligence/1.0.2 Python/3.11.14 (Windows-10-10.0.26200-SP0)'
+    'Ocp-Apim-Subscription-Key': 'REDACTED'
+No body was attached to the request
+2026-06-18 15:29:59 [INFO] azure.core.pipeline.policies.http_logging_policy: Response status: 200
+Response headers:
+    'Content-Length': '106'
+    'Content-Type': 'application/json; charset=utf-8'
+    'retry-after': '5'
+    'x-envoy-upstream-service-time': 'REDACTED'
+    'apim-request-id': 'REDACTED'
+    'Strict-Transport-Security': 'REDACTED'
+    'x-content-type-options': 'REDACTED'
+    'x-ms-region': 'REDACTED'
+    'Date': 'Thu, 18 Jun 2026 12:29:59 GMT'
+2026-06-18 15:30:04 [INFO] azure.core.pipeline.policies.http_logging_policy: Request URL: 'https://nassaqq-ocr.cognitiveservices.azure.com/documentintelligence/documentModels/prebuilt-layout/analyzeResults/3712fd09-29fb-48a5-a80a-d3b7400ca0b2?api-version=2024-11-30'
+Request method: 'GET'
+Request headers:
+    'x-ms-client-request-id': '6bbb1d36-6b11-11f1-a884-e00af66009f2'
+    'User-Agent': 'azsdk-python-ai-documentintelligence/1.0.2 Python/3.11.14 (Windows-10-10.0.26200-SP0)'
+    'Ocp-Apim-Subscription-Key': 'REDACTED'
+No body was attached to the request
+2026-06-18 15:30:04 [INFO] azure.core.pipeline.policies.http_logging_policy: Response status: 200
+Response headers:
+    'Content-Length': '106'
+    'Content-Type': 'application/json; charset=utf-8'
+    'retry-after': '1'
+    'x-envoy-upstream-service-time': 'REDACTED'
+    'apim-request-id': 'REDACTED'
+    'Strict-Transport-Security': 'REDACTED'
+    'x-content-type-options': 'REDACTED'
+    'x-ms-region': 'REDACTED'
+    'Date': 'Thu, 18 Jun 2026 12:30:04 GMT'
+2026-06-18 15:30:05 [INFO] azure.core.pipeline.policies.http_logging_policy: Request URL: 'https://nassaqq-ocr.cognitiveservices.azure.com/documentintelligence/documentModels/prebuilt-layout/analyzeResults/3712fd09-29fb-48a5-a80a-d3b7400ca0b2?api-version=2024-11-30'
+Request method: 'GET'
+Request headers:
+    'x-ms-client-request-id': '6bbb1d36-6b11-11f1-a884-e00af66009f2'
+    'User-Agent': 'azsdk-python-ai-documentintelligence/1.0.2 Python/3.11.14 (Windows-10-10.0.26200-SP0)'
+    'Ocp-Apim-Subscription-Key': 'REDACTED'
+No body was attached to the request
+2026-06-18 15:30:06 [INFO] azure.core.pipeline.policies.http_logging_policy: Response status: 200
+Response headers:
+    'Content-Length': '238713'
+    'Content-Type': 'application/json; charset=utf-8'
+    'x-envoy-upstream-service-time': 'REDACTED'
+    'apim-request-id': 'REDACTED'
+    'Strict-Transport-Security': 'REDACTED'
+    'x-content-type-options': 'REDACTED'
+    'x-ms-region': 'REDACTED'
+    'Date': 'Thu, 18 Jun 2026 12:30:05 GMT'
+2026-06-18 15:30:07 [INFO] httpx: HTTP Request: POST https://nassaqq.cognitiveservices.azure.com/openai/deployments/gpt-4.1-mini/chat/completions?api-version=2025-01-01-preview/chat/completions "HTTP/1.1 404 Resource Not Found"
+2026-06-18 15:30:15 [INFO] pinecone.index: Querying index with top_k=1
+2026-06-18 15:30:16 [INFO] httpx: HTTP Request: POST https://nassaqq.cognitiveservices.azure.com/openai/deployments/text-embedding-3-small/embeddings?api-version=2023-05-15/embeddings "HTTP/1.1 404 Resource Not Found"
+2026-06-18 15:33:47 [INFO] pymongo.client: You appear to be connected to a CosmosDB cluster. For more information regarding feature compatibility and support please visit https://www.mongodb.com/supportability/cosmosdb
+2026-06-18 15:33:47 [INFO] pinecone.client.indexes: Listing indexes
+2026-06-18 15:33:48 [INFO] httpx: HTTP Request: GET https://api.pinecone.io/indexes "HTTP/1.1 200 OK"
+2026-06-18 15:33:48 [INFO] pinecone.client.indexes: Describing index 'nassaq'
+2026-06-18 15:33:49 [INFO] httpx: HTTP Request: GET https://api.pinecone.io/indexes/nassaq "HTTP/1.1 200 OK"
+2026-06-18 15:33:49 [INFO] pinecone.index: Index client created for host https://nassaq-uujm500.svc.aped-4627-b74a.pinecone.io
+2026-06-18 15:33:49 [INFO] pinecone.index: Describing index stats
+2026-06-18 15:33:50 [INFO] pinecone.index: Querying index with top_k=10000
+2026-06-18 15:35:16 [INFO] pymongo.client: You appear to be connected to a CosmosDB cluster. For more information regarding feature compatibility and support please visit https://www.mongodb.com/supportability/cosmosdb
+2026-06-18 15:35:17 [INFO] pinecone.client.indexes: Listing indexes
+2026-06-18 15:35:18 [INFO] httpx: HTTP Request: GET https://api.pinecone.io/indexes "HTTP/1.1 200 OK"
+2026-06-18 15:35:18 [INFO] pinecone.client.indexes: Describing index 'nassaq'
+2026-06-18 15:35:18 [INFO] httpx: HTTP Request: GET https://api.pinecone.io/indexes/nassaq "HTTP/1.1 200 OK"
+2026-06-18 15:35:18 [INFO] pinecone.index: Index client created for host https://nassaq-uujm500.svc.aped-4627-b74a.pinecone.io
+2026-06-18 15:35:18 [INFO] pinecone.index: Describing index stats
+2026-06-18 15:35:19 [INFO] pinecone.index: Querying index with top_k=10000
+2026-06-18 15:44:55 [INFO] pymongo.client: You appear to be connected to a CosmosDB cluster. For more information regarding feature compatibility and support please visit https://www.mongodb.com/supportability/cosmosdb
+2026-06-18 15:44:55 [INFO] pinecone.client.indexes: Listing indexes
+2026-06-18 15:44:56 [INFO] httpx: HTTP Request: GET https://api.pinecone.io/indexes "HTTP/1.1 200 OK"
+2026-06-18 15:44:56 [INFO] pinecone.client.indexes: Describing index 'nassaq'
+2026-06-18 15:44:56 [INFO] httpx: HTTP Request: GET https://api.pinecone.io/indexes/nassaq "HTTP/1.1 200 OK"
+2026-06-18 15:44:57 [INFO] pinecone.index: Index client created for host https://nassaq-uujm500.svc.aped-4627-b74a.pinecone.io
+2026-06-18 15:44:57 [INFO] pinecone.index: Describing index stats
+2026-06-18 15:44:57 [INFO] pinecone.index: Querying index with top_k=10000
+2026-06-18 15:45:46 [INFO] pymongo.client: You appear to be connected to a CosmosDB cluster. For more information regarding feature compatibility and support please visit https://www.mongodb.com/supportability/cosmosdb
+2026-06-18 15:45:46 [INFO] pinecone.client.indexes: Listing indexes
+2026-06-18 15:45:47 [INFO] httpx: HTTP Request: GET https://api.pinecone.io/indexes "HTTP/1.1 200 OK"
+2026-06-18 15:45:47 [INFO] pinecone.client.indexes: Describing index 'nassaq'
+2026-06-18 15:45:47 [INFO] httpx: HTTP Request: GET https://api.pinecone.io/indexes/nassaq "HTTP/1.1 200 OK"
+2026-06-18 15:45:47 [INFO] pinecone.index: Index client created for host https://nassaq-uujm500.svc.aped-4627-b74a.pinecone.io
+2026-06-18 15:45:47 [INFO] pinecone.index: Describing index stats
+2026-06-18 15:45:48 [INFO] pinecone.index: Querying index with top_k=10000
+2026-06-18 17:17:37 [INFO] azure.core.pipeline.policies.http_logging_policy: Request URL: 'https://nassaqq.blob.core.windows.net/demo/8576c43d-e6a6-45af-aee4-ae5cc62dee30?sp=REDACTED&st=REDACTED&se=REDACTED&spr=REDACTED&sv=REDACTED&sr=REDACTED&sig=REDACTED'
+Request method: 'PUT'
+Request headers:
+    'Content-Length': '77503'
+    'x-ms-meta-original_filename': 'REDACTED'
+    'x-ms-meta-content_type': 'REDACTED'
+    'x-ms-blob-type': 'REDACTED'
+    'x-ms-blob-content-type': 'REDACTED'
+    'x-ms-version': 'REDACTED'
+    'Content-Type': 'application/octet-stream'
+    'Accept': 'application/xml'
+    'User-Agent': 'azsdk-python-storage-blob/12.28.0 Python/3.11.14 (Windows-10-10.0.26200-SP0)'
+    'x-ms-date': 'REDACTED'
+    'x-ms-client-request-id': '757fda06-6b20-11f1-80c8-e00af66009f2'
+A body is sent with the request
+2026-06-18 17:17:38 [INFO] azure.core.pipeline.policies.http_logging_policy: Response status: 201
+Response headers:
+    'Content-Length': '0'
+    'Content-MD5': 'REDACTED'
+    'Last-Modified': 'Thu, 18 Jun 2026 14:17:38 GMT'
+    'ETag': '"0x8DECD445A243018"'
+    'Server': 'Windows-Azure-Blob/1.0 Microsoft-HTTPAPI/2.0'
+    'x-ms-request-id': '08bc116b-301e-003d-612d-ff56d8000000'
+    'x-ms-client-request-id': '757fda06-6b20-11f1-80c8-e00af66009f2'
+    'x-ms-version': 'REDACTED'
+    'x-ms-content-crc64': 'REDACTED'
+    'x-ms-request-server-encrypted': 'REDACTED'
+    'Date': 'Thu, 18 Jun 2026 14:17:37 GMT'
+2026-06-18 17:17:38 [INFO] azure.core.pipeline.policies.http_logging_policy: Request URL: 'https://nassaqq-ocr.cognitiveservices.azure.com//documentintelligence/documentModels/prebuilt-layout:analyze?api-version=2024-11-30&features=REDACTED&outputContentFormat=REDACTED'
+Request method: 'POST'
+Request headers:
+    'content-type': 'application/octet-stream'
+    'Accept': 'application/json'
+    'x-ms-client-request-id': '75e7d03b-6b20-11f1-bd69-e00af66009f2'
+    'User-Agent': 'azsdk-python-ai-documentintelligence/1.0.2 Python/3.11.14 (Windows-10-10.0.26200-SP0)'
+    'Ocp-Apim-Subscription-Key': 'REDACTED'
+A body is sent with the request
+2026-06-18 17:17:39 [INFO] azure.core.pipeline.policies.http_logging_policy: Response status: 202
+Response headers:
+    'Content-Length': '0'
+    'Operation-Location': 'REDACTED'
+    'x-envoy-upstream-service-time': 'REDACTED'
+    'apim-request-id': 'REDACTED'
+    'Strict-Transport-Security': 'REDACTED'
+    'x-content-type-options': 'REDACTED'
+    'x-ms-region': 'REDACTED'
+    'Date': 'Thu, 18 Jun 2026 14:17:39 GMT'
+2026-06-18 17:17:39 [INFO] azure.core.pipeline.policies.http_logging_policy: Request URL: 'https://nassaqq-ocr.cognitiveservices.azure.com/documentintelligence/documentModels/prebuilt-layout/analyzeResults/de515afd-d29e-46d9-93e0-23ea9201dabd?api-version=2024-11-30'
+Request method: 'GET'
+Request headers:
+    'x-ms-client-request-id': '75e7d03b-6b20-11f1-bd69-e00af66009f2'
+    'User-Agent': 'azsdk-python-ai-documentintelligence/1.0.2 Python/3.11.14 (Windows-10-10.0.26200-SP0)'
+    'Ocp-Apim-Subscription-Key': 'REDACTED'
+No body was attached to the request
+2026-06-18 17:17:39 [INFO] azure.core.pipeline.policies.http_logging_policy: Response status: 200
+Response headers:
+    'Content-Length': '106'
+    'Content-Type': 'application/json; charset=utf-8'
+    'retry-after': '5'
+    'x-envoy-upstream-service-time': 'REDACTED'
+    'apim-request-id': 'REDACTED'
+    'Strict-Transport-Security': 'REDACTED'
+    'x-content-type-options': 'REDACTED'
+    'x-ms-region': 'REDACTED'
+    'Date': 'Thu, 18 Jun 2026 14:17:39 GMT'
+2026-06-18 17:17:44 [INFO] azure.core.pipeline.policies.http_logging_policy: Request URL: 'https://nassaqq-ocr.cognitiveservices.azure.com/documentintelligence/documentModels/prebuilt-layout/analyzeResults/de515afd-d29e-46d9-93e0-23ea9201dabd?api-version=2024-11-30'
+Request method: 'GET'
+Request headers:
+    'x-ms-client-request-id': '75e7d03b-6b20-11f1-bd69-e00af66009f2'
+    'User-Agent': 'azsdk-python-ai-documentintelligence/1.0.2 Python/3.11.14 (Windows-10-10.0.26200-SP0)'
+    'Ocp-Apim-Subscription-Key': 'REDACTED'
+No body was attached to the request
+2026-06-18 17:17:44 [INFO] azure.core.pipeline.policies.http_logging_policy: Response status: 200
+Response headers:
+    'Content-Length': '106'
+    'Content-Type': 'application/json; charset=utf-8'
+    'retry-after': '1'
+    'x-envoy-upstream-service-time': 'REDACTED'
+    'apim-request-id': 'REDACTED'
+    'Strict-Transport-Security': 'REDACTED'
+    'x-content-type-options': 'REDACTED'
+    'x-ms-region': 'REDACTED'
+    'Date': 'Thu, 18 Jun 2026 14:17:44 GMT'
+2026-06-18 17:17:45 [INFO] azure.core.pipeline.policies.http_logging_policy: Request URL: 'https://nassaqq-ocr.cognitiveservices.azure.com/documentintelligence/documentModels/prebuilt-layout/analyzeResults/de515afd-d29e-46d9-93e0-23ea9201dabd?api-version=2024-11-30'
+Request method: 'GET'
+Request headers:
+    'x-ms-client-request-id': '75e7d03b-6b20-11f1-bd69-e00af66009f2'
+    'User-Agent': 'azsdk-python-ai-documentintelligence/1.0.2 Python/3.11.14 (Windows-10-10.0.26200-SP0)'
+    'Ocp-Apim-Subscription-Key': 'REDACTED'
+No body was attached to the request
+2026-06-18 17:17:45 [INFO] azure.core.pipeline.policies.http_logging_policy: Response status: 200
+Response headers:
+    'Content-Length': '106'
+    'Content-Type': 'application/json; charset=utf-8'
+    'retry-after': '1'
+    'x-envoy-upstream-service-time': 'REDACTED'
+    'apim-request-id': 'REDACTED'
+    'Strict-Transport-Security': 'REDACTED'
+    'x-content-type-options': 'REDACTED'
+    'x-ms-region': 'REDACTED'
+    'Date': 'Thu, 18 Jun 2026 14:17:45 GMT'
+2026-06-18 17:17:46 [INFO] azure.core.pipeline.policies.http_logging_policy: Request URL: 'https://nassaqq-ocr.cognitiveservices.azure.com/documentintelligence/documentModels/prebuilt-layout/analyzeResults/de515afd-d29e-46d9-93e0-23ea9201dabd?api-version=2024-11-30'
+Request method: 'GET'
+Request headers:
+    'x-ms-client-request-id': '75e7d03b-6b20-11f1-bd69-e00af66009f2'
+    'User-Agent': 'azsdk-python-ai-documentintelligence/1.0.2 Python/3.11.14 (Windows-10-10.0.26200-SP0)'
+    'Ocp-Apim-Subscription-Key': 'REDACTED'
+No body was attached to the request
+2026-06-18 17:17:46 [INFO] azure.core.pipeline.policies.http_logging_policy: Response status: 200
+Response headers:
+    'Content-Length': '106'
+    'Content-Type': 'application/json; charset=utf-8'
+    'retry-after': '1'
+    'x-envoy-upstream-service-time': 'REDACTED'
+    'apim-request-id': 'REDACTED'
+    'Strict-Transport-Security': 'REDACTED'
+    'x-content-type-options': 'REDACTED'
+    'x-ms-region': 'REDACTED'
+    'Date': 'Thu, 18 Jun 2026 14:17:46 GMT'
+2026-06-18 17:17:47 [INFO] azure.core.pipeline.policies.http_logging_policy: Request URL: 'https://nassaqq-ocr.cognitiveservices.azure.com/documentintelligence/documentModels/prebuilt-layout/analyzeResults/de515afd-d29e-46d9-93e0-23ea9201dabd?api-version=2024-11-30'
+Request method: 'GET'
+Request headers:
+    'x-ms-client-request-id': '75e7d03b-6b20-11f1-bd69-e00af66009f2'
+    'User-Agent': 'azsdk-python-ai-documentintelligence/1.0.2 Python/3.11.14 (Windows-10-10.0.26200-SP0)'
+    'Ocp-Apim-Subscription-Key': 'REDACTED'
+No body was attached to the request
+2026-06-18 17:17:47 [INFO] azure.core.pipeline.policies.http_logging_policy: Response status: 200
+Response headers:
+    'Content-Length': '238713'
+    'Content-Type': 'application/json; charset=utf-8'
+    'x-envoy-upstream-service-time': 'REDACTED'
+    'apim-request-id': 'REDACTED'
+    'Strict-Transport-Security': 'REDACTED'
+    'x-content-type-options': 'REDACTED'
+    'x-ms-region': 'REDACTED'
+    'Date': 'Thu, 18 Jun 2026 14:17:47 GMT'
+2026-06-18 17:17:51 [INFO] httpx: HTTP Request: POST https://nassaqq.cognitiveservices.azure.com/openai/deployments/gpt-4.1-mini/chat/completions?api-version=2024-12-01-preview "HTTP/1.1 200 OK"
+2026-06-18 17:18:20 [INFO] pinecone.index: Querying index with top_k=1
+2026-06-18 17:18:21 [INFO] httpx: HTTP Request: POST https://nassaqq.cognitiveservices.azure.com/openai/deployments/text-embedding-3-small/embeddings?api-version=2024-12-01-preview "HTTP/1.1 200 OK"
+2026-06-18 17:18:21 [INFO] pinecone.index: Upserting 7 vectors into namespace ''
+2026-06-18 17:18:49 [INFO] azure.core.pipeline.policies.http_logging_policy: Request URL: 'https://nassaqq.blob.core.windows.net/demo/b0558e91-c37c-4446-8abb-a56bbedad89a?sp=REDACTED&st=REDACTED&se=REDACTED&spr=REDACTED&sv=REDACTED&sr=REDACTED&sig=REDACTED'
+Request method: 'PUT'
+Request headers:
+    'Content-Length': '34881'
+    'x-ms-meta-original_filename': 'REDACTED'
+    'x-ms-meta-content_type': 'REDACTED'
+    'x-ms-blob-type': 'REDACTED'
+    'x-ms-blob-content-type': 'REDACTED'
+    'x-ms-version': 'REDACTED'
+    'Content-Type': 'application/octet-stream'
+    'Accept': 'application/xml'
+    'User-Agent': 'azsdk-python-storage-blob/12.28.0 Python/3.11.14 (Windows-10-10.0.26200-SP0)'
+    'x-ms-date': 'REDACTED'
+    'x-ms-client-request-id': '9ff42e09-6b20-11f1-ac6e-e00af66009f2'
+A body is sent with the request
+2026-06-18 17:18:49 [INFO] azure.core.pipeline.policies.http_logging_policy: Response status: 201
+Response headers:
+    'Content-Length': '0'
+    'Content-MD5': 'REDACTED'
+    'Last-Modified': 'Thu, 18 Jun 2026 14:18:49 GMT'
+    'ETag': '"0x8DECD448442A97E"'
+    'Server': 'Windows-Azure-Blob/1.0 Microsoft-HTTPAPI/2.0'
+    'x-ms-request-id': '08bcbd4c-301e-003d-4d2d-ff56d8000000'
+    'x-ms-client-request-id': '9ff42e09-6b20-11f1-ac6e-e00af66009f2'
+    'x-ms-version': 'REDACTED'
+    'x-ms-content-crc64': 'REDACTED'
+    'x-ms-request-server-encrypted': 'REDACTED'
+    'Date': 'Thu, 18 Jun 2026 14:18:49 GMT'
+2026-06-18 17:18:49 [INFO] azure.core.pipeline.policies.http_logging_policy: Request URL: 'https://nassaqq-ocr.cognitiveservices.azure.com//documentintelligence/documentModels/prebuilt-layout:analyze?api-version=2024-11-30&features=REDACTED&outputContentFormat=REDACTED'
+Request method: 'POST'
+Request headers:
+    'content-type': 'application/octet-stream'
+    'Accept': 'application/json'
+    'x-ms-client-request-id': 'a003655b-6b20-11f1-8340-e00af66009f2'
+    'User-Agent': 'azsdk-python-ai-documentintelligence/1.0.2 Python/3.11.14 (Windows-10-10.0.26200-SP0)'
+    'Ocp-Apim-Subscription-Key': 'REDACTED'
+A body is sent with the request
+2026-06-18 17:18:49 [INFO] azure.core.pipeline.policies.http_logging_policy: Response status: 202
+Response headers:
+    'Content-Length': '0'
+    'Operation-Location': 'REDACTED'
+    'x-envoy-upstream-service-time': 'REDACTED'
+    'apim-request-id': 'REDACTED'
+    'Strict-Transport-Security': 'REDACTED'
+    'x-content-type-options': 'REDACTED'
+    'x-ms-region': 'REDACTED'
+    'Date': 'Thu, 18 Jun 2026 14:18:49 GMT'
+2026-06-18 17:18:49 [INFO] azure.core.pipeline.policies.http_logging_policy: Request URL: 'https://nassaqq-ocr.cognitiveservices.azure.com/documentintelligence/documentModels/prebuilt-layout/analyzeResults/351793cf-9543-44a4-95f8-17e8e06ee110?api-version=2024-11-30'
+Request method: 'GET'
+Request headers:
+    'x-ms-client-request-id': 'a003655b-6b20-11f1-8340-e00af66009f2'
+    'User-Agent': 'azsdk-python-ai-documentintelligence/1.0.2 Python/3.11.14 (Windows-10-10.0.26200-SP0)'
+    'Ocp-Apim-Subscription-Key': 'REDACTED'
+No body was attached to the request
+2026-06-18 17:18:49 [INFO] azure.core.pipeline.policies.http_logging_policy: Response status: 200
+Response headers:
+    'Content-Length': '106'
+    'Content-Type': 'application/json; charset=utf-8'
+    'retry-after': '4'
+    'x-envoy-upstream-service-time': 'REDACTED'
+    'apim-request-id': 'REDACTED'
+    'Strict-Transport-Security': 'REDACTED'
+    'x-content-type-options': 'REDACTED'
+    'x-ms-region': 'REDACTED'
+    'Date': 'Thu, 18 Jun 2026 14:18:49 GMT'
+2026-06-18 17:18:53 [INFO] azure.core.pipeline.policies.http_logging_policy: Request URL: 'https://nassaqq-ocr.cognitiveservices.azure.com/documentintelligence/documentModels/prebuilt-layout/analyzeResults/351793cf-9543-44a4-95f8-17e8e06ee110?api-version=2024-11-30'
+Request method: 'GET'
+Request headers:
+    'x-ms-client-request-id': 'a003655b-6b20-11f1-8340-e00af66009f2'
+    'User-Agent': 'azsdk-python-ai-documentintelligence/1.0.2 Python/3.11.14 (Windows-10-10.0.26200-SP0)'
+    'Ocp-Apim-Subscription-Key': 'REDACTED'
+No body was attached to the request
+2026-06-18 17:18:53 [INFO] azure.core.pipeline.policies.http_logging_policy: Response status: 200
+Response headers:
+    'Content-Length': '106'
+    'Content-Type': 'application/json; charset=utf-8'
+    'retry-after': '1'
+    'x-envoy-upstream-service-time': 'REDACTED'
+    'apim-request-id': 'REDACTED'
+    'Strict-Transport-Security': 'REDACTED'
+    'x-content-type-options': 'REDACTED'
+    'x-ms-region': 'REDACTED'
+    'Date': 'Thu, 18 Jun 2026 14:18:53 GMT'
+2026-06-18 17:18:54 [INFO] azure.core.pipeline.policies.http_logging_policy: Request URL: 'https://nassaqq-ocr.cognitiveservices.azure.com/documentintelligence/documentModels/prebuilt-layout/analyzeResults/351793cf-9543-44a4-95f8-17e8e06ee110?api-version=2024-11-30'
+Request method: 'GET'
+Request headers:
+    'x-ms-client-request-id': 'a003655b-6b20-11f1-8340-e00af66009f2'
+    'User-Agent': 'azsdk-python-ai-documentintelligence/1.0.2 Python/3.11.14 (Windows-10-10.0.26200-SP0)'
+    'Ocp-Apim-Subscription-Key': 'REDACTED'
+No body was attached to the request
+2026-06-18 17:18:54 [INFO] azure.core.pipeline.policies.http_logging_policy: Response status: 200
+Response headers:
+    'Content-Length': '47574'
+    'Content-Type': 'application/json; charset=utf-8'
+    'x-envoy-upstream-service-time': 'REDACTED'
+    'apim-request-id': 'REDACTED'
+    'Strict-Transport-Security': 'REDACTED'
+    'x-content-type-options': 'REDACTED'
+    'x-ms-region': 'REDACTED'
+    'Date': 'Thu, 18 Jun 2026 14:18:54 GMT'
+2026-06-18 17:18:57 [INFO] httpx: HTTP Request: POST https://nassaqq.cognitiveservices.azure.com/openai/deployments/gpt-4.1-mini/chat/completions?api-version=2024-12-01-preview "HTTP/1.1 200 OK"
+2026-06-18 17:21:37 [INFO] pinecone.index: Querying index with top_k=1
+2026-06-18 17:21:38 [INFO] httpx: HTTP Request: POST https://nassaqq.cognitiveservices.azure.com/openai/deployments/text-embedding-3-small/embeddings?api-version=2024-12-01-preview "HTTP/1.1 200 OK"
+2026-06-18 17:21:38 [INFO] pinecone.index: Upserting 4 vectors into namespace ''
+2026-06-18 17:21:50 [INFO] azure.core.pipeline.policies.http_logging_policy: Request URL: 'https://nassaqq.blob.core.windows.net/demo/a75584e4-715d-4941-967c-18c59f01703f?sp=REDACTED&st=REDACTED&se=REDACTED&spr=REDACTED&sv=REDACTED&sr=REDACTED&sig=REDACTED'
+Request method: 'PUT'
+Request headers:
+    'Content-Length': '25413'
+    'x-ms-meta-original_filename': 'REDACTED'
+    'x-ms-meta-content_type': 'REDACTED'
+    'x-ms-blob-type': 'REDACTED'
+    'x-ms-blob-content-type': 'REDACTED'
+    'x-ms-version': 'REDACTED'
+    'Content-Type': 'application/octet-stream'
+    'Accept': 'application/xml'
+    'User-Agent': 'azsdk-python-storage-blob/12.28.0 Python/3.11.14 (Windows-10-10.0.26200-SP0)'
+    'x-ms-date': 'REDACTED'
+    'x-ms-client-request-id': '0bc8460b-6b21-11f1-89c8-e00af66009f2'
+A body is sent with the request
+2026-06-18 17:21:50 [INFO] azure.core.pipeline.policies.http_logging_policy: Response status: 201
+Response headers:
+    'Content-Length': '0'
+    'Content-MD5': 'REDACTED'
+    'Last-Modified': 'Thu, 18 Jun 2026 14:21:50 GMT'
+    'ETag': '"0x8DECD44F0155CD9"'
+    'Server': 'Windows-Azure-Blob/1.0 Microsoft-HTTPAPI/2.0'
+    'x-ms-request-id': '08be9142-301e-003d-422d-ff56d8000000'
+    'x-ms-client-request-id': '0bc8460b-6b21-11f1-89c8-e00af66009f2'
+    'x-ms-version': 'REDACTED'
+    'x-ms-content-crc64': 'REDACTED'
+    'x-ms-request-server-encrypted': 'REDACTED'
+    'Date': 'Thu, 18 Jun 2026 14:21:50 GMT'
+2026-06-18 17:21:50 [INFO] azure.core.pipeline.policies.http_logging_policy: Request URL: 'https://nassaqq-ocr.cognitiveservices.azure.com//documentintelligence/documentModels/prebuilt-layout:analyze?api-version=2024-11-30&features=REDACTED&outputContentFormat=REDACTED'
+Request method: 'POST'
+Request headers:
+    'content-type': 'application/octet-stream'
+    'Accept': 'application/json'
+    'x-ms-client-request-id': '0bd60d98-6b21-11f1-8144-e00af66009f2'
+    'User-Agent': 'azsdk-python-ai-documentintelligence/1.0.2 Python/3.11.14 (Windows-10-10.0.26200-SP0)'
+    'Ocp-Apim-Subscription-Key': 'REDACTED'
+A body is sent with the request
+2026-06-18 17:21:50 [INFO] azure.core.pipeline.policies.http_logging_policy: Response status: 202
+Response headers:
+    'Content-Length': '0'
+    'Operation-Location': 'REDACTED'
+    'x-envoy-upstream-service-time': 'REDACTED'
+    'apim-request-id': 'REDACTED'
+    'Strict-Transport-Security': 'REDACTED'
+    'x-content-type-options': 'REDACTED'
+    'x-ms-region': 'REDACTED'
+    'Date': 'Thu, 18 Jun 2026 14:21:50 GMT'
+2026-06-18 17:21:50 [INFO] azure.core.pipeline.policies.http_logging_policy: Request URL: 'https://nassaqq-ocr.cognitiveservices.azure.com/documentintelligence/documentModels/prebuilt-layout/analyzeResults/892c3c54-ca59-4c96-864b-17aa38d05c01?api-version=2024-11-30'
+Request method: 'GET'
+Request headers:
+    'x-ms-client-request-id': '0bd60d98-6b21-11f1-8144-e00af66009f2'
+    'User-Agent': 'azsdk-python-ai-documentintelligence/1.0.2 Python/3.11.14 (Windows-10-10.0.26200-SP0)'
+    'Ocp-Apim-Subscription-Key': 'REDACTED'
+No body was attached to the request
+2026-06-18 17:21:50 [INFO] azure.core.pipeline.policies.http_logging_policy: Response status: 200
+Response headers:
+    'Content-Length': '106'
+    'Content-Type': 'application/json; charset=utf-8'
+    'retry-after': '4'
+    'x-envoy-upstream-service-time': 'REDACTED'
+    'apim-request-id': 'REDACTED'
+    'Strict-Transport-Security': 'REDACTED'
+    'x-content-type-options': 'REDACTED'
+    'x-ms-region': 'REDACTED'
+    'Date': 'Thu, 18 Jun 2026 14:21:50 GMT'
+2026-06-18 17:21:54 [INFO] azure.core.pipeline.policies.http_logging_policy: Request URL: 'https://nassaqq-ocr.cognitiveservices.azure.com/documentintelligence/documentModels/prebuilt-layout/analyzeResults/892c3c54-ca59-4c96-864b-17aa38d05c01?api-version=2024-11-30'
+Request method: 'GET'
+Request headers:
+    'x-ms-client-request-id': '0bd60d98-6b21-11f1-8144-e00af66009f2'
+    'User-Agent': 'azsdk-python-ai-documentintelligence/1.0.2 Python/3.11.14 (Windows-10-10.0.26200-SP0)'
+    'Ocp-Apim-Subscription-Key': 'REDACTED'
+No body was attached to the request
+2026-06-18 17:21:54 [INFO] azure.core.pipeline.policies.http_logging_policy: Response status: 200
+Response headers:
+    'Content-Length': '106'
+    'Content-Type': 'application/json; charset=utf-8'
+    'retry-after': '1'
+    'x-envoy-upstream-service-time': 'REDACTED'
+    'apim-request-id': 'REDACTED'
+    'Strict-Transport-Security': 'REDACTED'
+    'x-content-type-options': 'REDACTED'
+    'x-ms-region': 'REDACTED'
+    'Date': 'Thu, 18 Jun 2026 14:21:54 GMT'
+2026-06-18 17:21:55 [INFO] azure.core.pipeline.policies.http_logging_policy: Request URL: 'https://nassaqq-ocr.cognitiveservices.azure.com/documentintelligence/documentModels/prebuilt-layout/analyzeResults/892c3c54-ca59-4c96-864b-17aa38d05c01?api-version=2024-11-30'
+Request method: 'GET'
+Request headers:
+    'x-ms-client-request-id': '0bd60d98-6b21-11f1-8144-e00af66009f2'
+    'User-Agent': 'azsdk-python-ai-documentintelligence/1.0.2 Python/3.11.14 (Windows-10-10.0.26200-SP0)'
+    'Ocp-Apim-Subscription-Key': 'REDACTED'
+No body was attached to the request
+2026-06-18 17:21:56 [INFO] azure.core.pipeline.policies.http_logging_policy: Response status: 200
+Response headers:
+    'Content-Length': '7822'
+    'Content-Type': 'application/json; charset=utf-8'
+    'x-envoy-upstream-service-time': 'REDACTED'
+    'apim-request-id': 'REDACTED'
+    'Strict-Transport-Security': 'REDACTED'
+    'x-content-type-options': 'REDACTED'
+    'x-ms-region': 'REDACTED'
+    'Date': 'Thu, 18 Jun 2026 14:21:56 GMT'
+2026-06-18 17:21:57 [INFO] httpx: HTTP Request: POST https://nassaqq.cognitiveservices.azure.com/openai/deployments/gpt-4.1-mini/chat/completions?api-version=2024-12-01-preview "HTTP/1.1 200 OK"
+2026-06-18 17:22:07 [INFO] pinecone.index: Querying index with top_k=1
+2026-06-18 17:22:09 [INFO] httpx: HTTP Request: POST https://nassaqq.cognitiveservices.azure.com/openai/deployments/text-embedding-3-small/embeddings?api-version=2024-12-01-preview "HTTP/1.1 200 OK"
+2026-06-18 17:22:09 [INFO] pinecone.index: Upserting 1 vectors into namespace ''
+2026-06-18 17:22:16 [INFO] azure.core.pipeline.policies.http_logging_policy: Request URL: 'https://nassaqq.blob.core.windows.net/demo/ea2ad5a8-b55e-40a3-b8e0-ea4ae9e8f42d?sp=REDACTED&st=REDACTED&se=REDACTED&spr=REDACTED&sv=REDACTED&sr=REDACTED&sig=REDACTED'
+Request method: 'PUT'
+Request headers:
+    'Content-Length': '43426'
+    'x-ms-meta-original_filename': 'REDACTED'
+    'x-ms-meta-content_type': 'REDACTED'
+    'x-ms-blob-type': 'REDACTED'
+    'x-ms-blob-content-type': 'REDACTED'
+    'x-ms-version': 'REDACTED'
+    'Content-Type': 'application/octet-stream'
+    'Accept': 'application/xml'
+    'User-Agent': 'azsdk-python-storage-blob/12.28.0 Python/3.11.14 (Windows-10-10.0.26200-SP0)'
+    'x-ms-date': 'REDACTED'
+    'x-ms-client-request-id': '1b7758a5-6b21-11f1-b58a-e00af66009f2'
+A body is sent with the request
+2026-06-18 17:22:16 [INFO] azure.core.pipeline.policies.http_logging_policy: Response status: 201
+Response headers:
+    'Content-Length': '0'
+    'Content-MD5': 'REDACTED'
+    'Last-Modified': 'Thu, 18 Jun 2026 14:22:16 GMT'
+    'ETag': '"0x8DECD44FFC6D5C2"'
+    'Server': 'Windows-Azure-Blob/1.0 Microsoft-HTTPAPI/2.0'
+    'x-ms-request-id': '08bedaa3-301e-003d-0b2d-ff56d8000000'
+    'x-ms-client-request-id': '1b7758a5-6b21-11f1-b58a-e00af66009f2'
+    'x-ms-version': 'REDACTED'
+    'x-ms-content-crc64': 'REDACTED'
+    'x-ms-request-server-encrypted': 'REDACTED'
+    'Date': 'Thu, 18 Jun 2026 14:22:16 GMT'
+2026-06-18 17:22:16 [INFO] azure.core.pipeline.policies.http_logging_policy: Request URL: 'https://nassaqq-ocr.cognitiveservices.azure.com//documentintelligence/documentModels/prebuilt-layout:analyze?api-version=2024-11-30&features=REDACTED&outputContentFormat=REDACTED'
+Request method: 'POST'
+Request headers:
+    'content-type': 'application/octet-stream'
+    'Accept': 'application/json'
+    'x-ms-client-request-id': '1b90995c-6b21-11f1-8c15-e00af66009f2'
+    'User-Agent': 'azsdk-python-ai-documentintelligence/1.0.2 Python/3.11.14 (Windows-10-10.0.26200-SP0)'
+    'Ocp-Apim-Subscription-Key': 'REDACTED'
+A body is sent with the request
+2026-06-18 17:22:16 [INFO] azure.core.pipeline.policies.http_logging_policy: Response status: 202
+Response headers:
+    'Content-Length': '0'
+    'Operation-Location': 'REDACTED'
+    'x-envoy-upstream-service-time': 'REDACTED'
+    'apim-request-id': 'REDACTED'
+    'Strict-Transport-Security': 'REDACTED'
+    'x-content-type-options': 'REDACTED'
+    'x-ms-region': 'REDACTED'
+    'Date': 'Thu, 18 Jun 2026 14:22:16 GMT'
+2026-06-18 17:22:16 [INFO] azure.core.pipeline.policies.http_logging_policy: Request URL: 'https://nassaqq-ocr.cognitiveservices.azure.com/documentintelligence/documentModels/prebuilt-layout/analyzeResults/05fb9f5a-26d4-4b00-a6e0-4b9a4c33f3cc?api-version=2024-11-30'
+Request method: 'GET'
+Request headers:
+    'x-ms-client-request-id': '1b90995c-6b21-11f1-8c15-e00af66009f2'
+    'User-Agent': 'azsdk-python-ai-documentintelligence/1.0.2 Python/3.11.14 (Windows-10-10.0.26200-SP0)'
+    'Ocp-Apim-Subscription-Key': 'REDACTED'
+No body was attached to the request
+2026-06-18 17:22:17 [INFO] azure.core.pipeline.policies.http_logging_policy: Response status: 200
+Response headers:
+    'Content-Length': '106'
+    'Content-Type': 'application/json; charset=utf-8'
+    'retry-after': '4'
+    'x-envoy-upstream-service-time': 'REDACTED'
+    'apim-request-id': 'REDACTED'
+    'Strict-Transport-Security': 'REDACTED'
+    'x-content-type-options': 'REDACTED'
+    'x-ms-region': 'REDACTED'
+    'Date': 'Thu, 18 Jun 2026 14:22:16 GMT'
+2026-06-18 17:22:21 [INFO] azure.core.pipeline.policies.http_logging_policy: Request URL: 'https://nassaqq-ocr.cognitiveservices.azure.com/documentintelligence/documentModels/prebuilt-layout/analyzeResults/05fb9f5a-26d4-4b00-a6e0-4b9a4c33f3cc?api-version=2024-11-30'
+Request method: 'GET'
+Request headers:
+    'x-ms-client-request-id': '1b90995c-6b21-11f1-8c15-e00af66009f2'
+    'User-Agent': 'azsdk-python-ai-documentintelligence/1.0.2 Python/3.11.14 (Windows-10-10.0.26200-SP0)'
+    'Ocp-Apim-Subscription-Key': 'REDACTED'
+No body was attached to the request
+2026-06-18 17:22:21 [INFO] azure.core.pipeline.policies.http_logging_policy: Response status: 200
+Response headers:
+    'Content-Length': '106'
+    'Content-Type': 'application/json; charset=utf-8'
+    'retry-after': '1'
+    'x-envoy-upstream-service-time': 'REDACTED'
+    'apim-request-id': 'REDACTED'
+    'Strict-Transport-Security': 'REDACTED'
+    'x-content-type-options': 'REDACTED'
+    'x-ms-region': 'REDACTED'
+    'Date': 'Thu, 18 Jun 2026 14:22:20 GMT'
+2026-06-18 17:22:22 [INFO] azure.core.pipeline.policies.http_logging_policy: Request URL: 'https://nassaqq-ocr.cognitiveservices.azure.com/documentintelligence/documentModels/prebuilt-layout/analyzeResults/05fb9f5a-26d4-4b00-a6e0-4b9a4c33f3cc?api-version=2024-11-30'
+Request method: 'GET'
+Request headers:
+    'x-ms-client-request-id': '1b90995c-6b21-11f1-8c15-e00af66009f2'
+    'User-Agent': 'azsdk-python-ai-documentintelligence/1.0.2 Python/3.11.14 (Windows-10-10.0.26200-SP0)'
+    'Ocp-Apim-Subscription-Key': 'REDACTED'
+No body was attached to the request
+2026-06-18 17:22:22 [INFO] azure.core.pipeline.policies.http_logging_policy: Response status: 200
+Response headers:
+    'Content-Length': '76455'
+    'Content-Type': 'application/json; charset=utf-8'
+    'x-envoy-upstream-service-time': 'REDACTED'
+    'apim-request-id': 'REDACTED'
+    'Strict-Transport-Security': 'REDACTED'
+    'x-content-type-options': 'REDACTED'
+    'x-ms-region': 'REDACTED'
+    'Date': 'Thu, 18 Jun 2026 14:22:22 GMT'
+2026-06-18 17:22:25 [INFO] httpx: HTTP Request: POST https://nassaqq.cognitiveservices.azure.com/openai/deployments/gpt-4.1-mini/chat/completions?api-version=2024-12-01-preview "HTTP/1.1 200 OK"
+2026-06-18 17:22:38 [INFO] azure.core.pipeline.policies.http_logging_policy: Request URL: 'https://nassaqq.blob.core.windows.net/demo/e589c35e-5077-4903-ae6c-068d9ae734de?sp=REDACTED&st=REDACTED&se=REDACTED&spr=REDACTED&sv=REDACTED&sr=REDACTED&sig=REDACTED'
+Request method: 'PUT'
+Request headers:
+    'Content-Length': '95702'
+    'x-ms-meta-original_filename': 'REDACTED'
+    'x-ms-meta-content_type': 'REDACTED'
+    'x-ms-blob-type': 'REDACTED'
+    'x-ms-blob-content-type': 'REDACTED'
+    'x-ms-version': 'REDACTED'
+    'Content-Type': 'application/octet-stream'
+    'Accept': 'application/xml'
+    'User-Agent': 'azsdk-python-storage-blob/12.28.0 Python/3.11.14 (Windows-10-10.0.26200-SP0)'
+    'x-ms-date': 'REDACTED'
+    'x-ms-client-request-id': '288755e0-6b21-11f1-9fc1-e00af66009f2'
+A body is sent with the request
+2026-06-18 17:22:38 [INFO] azure.core.pipeline.policies.http_logging_policy: Response status: 201
+Response headers:
+    'Content-Length': '0'
+    'Content-MD5': 'REDACTED'
+    'Last-Modified': 'Thu, 18 Jun 2026 14:22:38 GMT'
+    'ETag': '"0x8DECD450CDD718D"'
+    'Server': 'Windows-Azure-Blob/1.0 Microsoft-HTTPAPI/2.0'
+    'x-ms-request-id': '08bf1670-301e-003d-5b2d-ff56d8000000'
+    'x-ms-client-request-id': '288755e0-6b21-11f1-9fc1-e00af66009f2'
+    'x-ms-version': 'REDACTED'
+    'x-ms-content-crc64': 'REDACTED'
+    'x-ms-request-server-encrypted': 'REDACTED'
+    'Date': 'Thu, 18 Jun 2026 14:22:38 GMT'
+2026-06-18 17:22:38 [INFO] azure.core.pipeline.policies.http_logging_policy: Request URL: 'https://nassaqq-ocr.cognitiveservices.azure.com//documentintelligence/documentModels/prebuilt-layout:analyze?api-version=2024-11-30&features=REDACTED&outputContentFormat=REDACTED'
+Request method: 'POST'
+Request headers:
+    'content-type': 'application/octet-stream'
+    'Accept': 'application/json'
+    'x-ms-client-request-id': '289e82af-6b21-11f1-bd6c-e00af66009f2'
+    'User-Agent': 'azsdk-python-ai-documentintelligence/1.0.2 Python/3.11.14 (Windows-10-10.0.26200-SP0)'
+    'Ocp-Apim-Subscription-Key': 'REDACTED'
+A body is sent with the request
+2026-06-18 17:22:38 [INFO] azure.core.pipeline.policies.http_logging_policy: Response status: 202
+Response headers:
+    'Content-Length': '0'
+    'Operation-Location': 'REDACTED'
+    'x-envoy-upstream-service-time': 'REDACTED'
+    'apim-request-id': 'REDACTED'
+    'Strict-Transport-Security': 'REDACTED'
+    'x-content-type-options': 'REDACTED'
+    'x-ms-region': 'REDACTED'
+    'Date': 'Thu, 18 Jun 2026 14:22:38 GMT'
+2026-06-18 17:22:38 [INFO] azure.core.pipeline.policies.http_logging_policy: Request URL: 'https://nassaqq-ocr.cognitiveservices.azure.com/documentintelligence/documentModels/prebuilt-layout/analyzeResults/01aaf3d6-ccfd-432a-85a8-f9da6f4cb53a?api-version=2024-11-30'
+Request method: 'GET'
+Request headers:
+    'x-ms-client-request-id': '289e82af-6b21-11f1-bd6c-e00af66009f2'
+    'User-Agent': 'azsdk-python-ai-documentintelligence/1.0.2 Python/3.11.14 (Windows-10-10.0.26200-SP0)'
+    'Ocp-Apim-Subscription-Key': 'REDACTED'
+No body was attached to the request
+2026-06-18 17:22:38 [INFO] azure.core.pipeline.policies.http_logging_policy: Response status: 200
+Response headers:
+    'Content-Length': '106'
+    'Content-Type': 'application/json; charset=utf-8'
+    'retry-after': '4'
+    'x-envoy-upstream-service-time': 'REDACTED'
+    'apim-request-id': 'REDACTED'
+    'Strict-Transport-Security': 'REDACTED'
+    'x-content-type-options': 'REDACTED'
+    'x-ms-region': 'REDACTED'
+    'Date': 'Thu, 18 Jun 2026 14:22:38 GMT'
+2026-06-18 17:22:42 [INFO] azure.core.pipeline.policies.http_logging_policy: Request URL: 'https://nassaqq-ocr.cognitiveservices.azure.com/documentintelligence/documentModels/prebuilt-layout/analyzeResults/01aaf3d6-ccfd-432a-85a8-f9da6f4cb53a?api-version=2024-11-30'
+Request method: 'GET'
+Request headers:
+    'x-ms-client-request-id': '289e82af-6b21-11f1-bd6c-e00af66009f2'
+    'User-Agent': 'azsdk-python-ai-documentintelligence/1.0.2 Python/3.11.14 (Windows-10-10.0.26200-SP0)'
+    'Ocp-Apim-Subscription-Key': 'REDACTED'
+No body was attached to the request
+2026-06-18 17:22:42 [INFO] azure.core.pipeline.policies.http_logging_policy: Response status: 200
+Response headers:
+    'Content-Length': '35065'
+    'Content-Type': 'application/json; charset=utf-8'
+    'x-envoy-upstream-service-time': 'REDACTED'
+    'apim-request-id': 'REDACTED'
+    'Strict-Transport-Security': 'REDACTED'
+    'x-content-type-options': 'REDACTED'
+    'x-ms-region': 'REDACTED'
+    'Date': 'Thu, 18 Jun 2026 14:22:42 GMT'
+2026-06-18 17:22:44 [INFO] httpx: HTTP Request: POST https://nassaqq.cognitiveservices.azure.com/openai/deployments/gpt-4.1-mini/chat/completions?api-version=2024-12-01-preview "HTTP/1.1 200 OK"
+2026-06-18 17:23:29 [INFO] pinecone.index: Describing index stats
+2026-06-18 17:24:43 [INFO] pinecone.index: Describing index stats
+2026-06-18 17:24:44 [INFO] pinecone.index: Describing index stats
+2026-06-18 17:24:44 [INFO] pinecone.index: Describing index stats
+2026-06-18 17:24:44 [INFO] httpx: HTTP Request: POST https://nassaqq.cognitiveservices.azure.com/openai/deployments/text-embedding-3-small/embeddings?api-version=2024-12-01-preview "HTTP/1.1 200 OK"
+2026-06-18 17:24:44 [INFO] pinecone.index: Querying index with top_k=20
+2026-06-18 17:24:44 [INFO] httpx: HTTP Request: POST https://nassaqq.cognitiveservices.azure.com/openai/deployments/text-embedding-3-small/embeddings?api-version=2024-12-01-preview "HTTP/1.1 200 OK"
+2026-06-18 17:24:44 [INFO] pinecone.index: Querying index with top_k=20
+2026-06-18 17:24:45 [INFO] httpx: HTTP Request: POST https://nassaqq.cognitiveservices.azure.com/openai/deployments/text-embedding-3-small/embeddings?api-version=2024-12-01-preview "HTTP/1.1 200 OK"
+2026-06-18 17:24:45 [INFO] pinecone.index: Querying index with top_k=20
+2026-06-18 17:24:45 [INFO] pinecone.index: Describing index stats
+2026-06-18 17:24:46 [INFO] pinecone.index: Describing index stats
+2026-06-18 17:24:46 [INFO] httpx: HTTP Request: POST https://nassaqq.cognitiveservices.azure.com/openai/deployments/text-embedding-3-small/embeddings?api-version=2024-12-01-preview "HTTP/1.1 200 OK"
+2026-06-18 17:24:46 [INFO] pinecone.index: Querying index with top_k=20
+2026-06-18 17:24:46 [INFO] pinecone.index: Describing index stats
+2026-06-18 17:24:46 [INFO] httpx: HTTP Request: POST https://nassaqq.cognitiveservices.azure.com/openai/deployments/text-embedding-3-small/embeddings?api-version=2024-12-01-preview "HTTP/1.1 200 OK"
+2026-06-18 17:24:46 [INFO] pinecone.index: Querying index with top_k=20
+2026-06-18 17:24:47 [INFO] httpx: HTTP Request: POST https://nassaqq.cognitiveservices.azure.com/openai/deployments/text-embedding-3-small/embeddings?api-version=2024-12-01-preview "HTTP/1.1 200 OK"
+2026-06-18 17:24:47 [INFO] pinecone.index: Querying index with top_k=20
+2026-06-18 17:24:47 [INFO] pinecone.index: Describing index stats
+2026-06-18 17:24:47 [INFO] httpx: HTTP Request: POST https://nassaqq.cognitiveservices.azure.com/openai/deployments/text-embedding-3-small/embeddings?api-version=2024-12-01-preview "HTTP/1.1 200 OK"
+2026-06-18 17:24:47 [INFO] pinecone.index: Querying index with top_k=20
+2026-06-18 17:24:57 [INFO] pinecone.index: Describing index stats
+2026-06-18 17:24:58 [INFO] httpx: HTTP Request: POST https://nassaqq.cognitiveservices.azure.com/openai/deployments/text-embedding-3-small/embeddings?api-version=2024-12-01-preview "HTTP/1.1 200 OK"
+2026-06-18 17:24:58 [INFO] pinecone.index: Querying index with top_k=20
+2026-06-18 17:25:31 [INFO] azure.core.pipeline.policies.http_logging_policy: Request URL: 'https://nassaqq.blob.core.windows.net/demo/8576c43d-e6a6-45af-aee4-ae5cc62dee30?sp=REDACTED&st=REDACTED&se=REDACTED&spr=REDACTED&sv=REDACTED&sr=REDACTED&sig=REDACTED'
+Request method: 'HEAD'
+Request headers:
+    'x-ms-version': 'REDACTED'
+    'Accept': 'application/xml'
+    'User-Agent': 'azsdk-python-storage-blob/12.28.0 Python/3.11.14 (Windows-10-10.0.26200-SP0)'
+    'x-ms-date': 'REDACTED'
+    'x-ms-client-request-id': '8fcc3da8-6b21-11f1-b560-e00af66009f2'
+No body was attached to the request
+2026-06-18 17:25:31 [INFO] azure.core.pipeline.policies.http_logging_policy: Response status: 200
+Response headers:
+    'Content-Length': '77503'
+    'Content-Type': 'application/pdf'
+    'Content-MD5': 'REDACTED'
+    'Last-Modified': 'Thu, 18 Jun 2026 14:17:38 GMT'
+    'Accept-Ranges': 'REDACTED'
+    'ETag': '"0x8DECD445A243018"'
+    'Server': 'Windows-Azure-Blob/1.0 Microsoft-HTTPAPI/2.0'
+    'x-ms-request-id': '08c106ec-301e-003d-7b2e-ff56d8000000'
+    'x-ms-client-request-id': '8fcc3da8-6b21-11f1-b560-e00af66009f2'
+    'x-ms-version': 'REDACTED'
+    'x-ms-meta-original_filename': 'REDACTED'
+    'x-ms-meta-content_type': 'REDACTED'
+    'x-ms-creation-time': 'REDACTED'
+    'x-ms-lease-status': 'REDACTED'
+    'x-ms-lease-state': 'REDACTED'
+    'x-ms-blob-type': 'REDACTED'
+    'x-ms-server-encrypted': 'REDACTED'
+    'x-ms-access-tier': 'REDACTED'
+    'x-ms-access-tier-inferred': 'REDACTED'
+    'Date': 'Thu, 18 Jun 2026 14:25:31 GMT'
+2026-06-18 17:25:31 [INFO] azure.core.pipeline.policies.http_logging_policy: Request URL: 'https://nassaqq.blob.core.windows.net/demo/8576c43d-e6a6-45af-aee4-ae5cc62dee30?sp=REDACTED&st=REDACTED&se=REDACTED&spr=REDACTED&sv=REDACTED&sr=REDACTED&sig=REDACTED'
+Request method: 'GET'
+Request headers:
+    'x-ms-range': 'REDACTED'
+    'x-ms-version': 'REDACTED'
+    'Accept': 'application/xml'
+    'User-Agent': 'azsdk-python-storage-blob/12.28.0 Python/3.11.14 (Windows-10-10.0.26200-SP0)'
+    'x-ms-date': 'REDACTED'
+    'x-ms-client-request-id': '8fd74b2c-6b21-11f1-b6fb-e00af66009f2'
+No body was attached to the request
+2026-06-18 17:25:31 [INFO] azure.core.pipeline.policies.http_logging_policy: Response status: 206
+Response headers:
+    'Content-Length': '77503'
+    'Content-Type': 'application/pdf'
+    'Content-Range': 'REDACTED'
+    'Last-Modified': 'Thu, 18 Jun 2026 14:17:38 GMT'
+    'Accept-Ranges': 'REDACTED'
+    'ETag': '"0x8DECD445A243018"'
+    'Server': 'Windows-Azure-Blob/1.0 Microsoft-HTTPAPI/2.0'
+    'x-ms-request-id': '08c10705-301e-003d-0c2e-ff56d8000000'
+    'x-ms-client-request-id': '8fd74b2c-6b21-11f1-b6fb-e00af66009f2'
+    'x-ms-version': 'REDACTED'
+    'x-ms-meta-original_filename': 'REDACTED'
+    'x-ms-meta-content_type': 'REDACTED'
+    'x-ms-creation-time': 'REDACTED'
+    'x-ms-blob-content-md5': 'REDACTED'
+    'x-ms-lease-status': 'REDACTED'
+    'x-ms-lease-state': 'REDACTED'
+    'x-ms-blob-type': 'REDACTED'
+    'x-ms-server-encrypted': 'REDACTED'
+    'x-ms-access-tier': 'REDACTED'
+    'x-ms-access-tier-inferred': 'REDACTED'
+    'Date': 'Thu, 18 Jun 2026 14:25:31 GMT'
+2026-06-18 17:25:31 [INFO] azure.core.pipeline.policies.http_logging_policy: Request URL: 'https://nassaqq.blob.core.windows.net/demo/8576c43d-e6a6-45af-aee4-ae5cc62dee30?sp=REDACTED&st=REDACTED&se=REDACTED&spr=REDACTED&sv=REDACTED&sr=REDACTED&sig=REDACTED'
+Request method: 'HEAD'
+Request headers:
+    'x-ms-version': 'REDACTED'
+    'Accept': 'application/xml'
+    'User-Agent': 'azsdk-python-storage-blob/12.28.0 Python/3.11.14 (Windows-10-10.0.26200-SP0)'
+    'x-ms-date': 'REDACTED'
+    'x-ms-client-request-id': '8ff35fc0-6b21-11f1-a830-e00af66009f2'
+No body was attached to the request
+2026-06-18 17:25:31 [INFO] azure.core.pipeline.policies.http_logging_policy: Response status: 200
+Response headers:
+    'Content-Length': '77503'
+    'Content-Type': 'application/pdf'
+    'Content-MD5': 'REDACTED'
+    'Last-Modified': 'Thu, 18 Jun 2026 14:17:38 GMT'
+    'Accept-Ranges': 'REDACTED'
+    'ETag': '"0x8DECD445A243018"'
+    'Server': 'Windows-Azure-Blob/1.0 Microsoft-HTTPAPI/2.0'
+    'x-ms-request-id': '08c1073d-301e-003d-332e-ff56d8000000'
+    'x-ms-client-request-id': '8ff35fc0-6b21-11f1-a830-e00af66009f2'
+    'x-ms-version': 'REDACTED'
+    'x-ms-meta-original_filename': 'REDACTED'
+    'x-ms-meta-content_type': 'REDACTED'
+    'x-ms-creation-time': 'REDACTED'
+    'x-ms-lease-status': 'REDACTED'
+    'x-ms-lease-state': 'REDACTED'
+    'x-ms-blob-type': 'REDACTED'
+    'x-ms-server-encrypted': 'REDACTED'
+    'x-ms-access-tier': 'REDACTED'
+    'x-ms-access-tier-inferred': 'REDACTED'
+    'Date': 'Thu, 18 Jun 2026 14:25:31 GMT'
+2026-06-18 17:25:39 [INFO] pinecone.index: Describing index stats
+2026-06-18 17:25:40 [INFO] pinecone.index: Describing index stats
+2026-06-18 17:25:41 [INFO] httpx: HTTP Request: POST https://nassaqq.cognitiveservices.azure.com/openai/deployments/text-embedding-3-small/embeddings?api-version=2024-12-01-preview "HTTP/1.1 200 OK"
+2026-06-18 17:25:41 [INFO] pinecone.index: Querying index with top_k=20
+2026-06-18 17:25:44 [INFO] httpx: HTTP Request: POST https://nassaqq.cognitiveservices.azure.com/openai/deployments/gpt-4.1-mini/chat/completions?api-version=2024-12-01-preview "HTTP/1.1 200 OK"
+2026-06-18 17:25:57 [INFO] pinecone.index: Describing index stats
+2026-06-18 17:26:09 [INFO] pinecone.index: Describing index stats
+2026-06-18 17:26:10 [INFO] httpx: HTTP Request: POST https://nassaqq.cognitiveservices.azure.com/openai/deployments/text-embedding-3-small/embeddings?api-version=2024-12-01-preview "HTTP/1.1 200 OK"
+2026-06-18 17:26:10 [INFO] pinecone.index: Querying index with top_k=20
+2026-06-18 17:26:12 [INFO] httpx: HTTP Request: POST https://nassaqq.cognitiveservices.azure.com/openai/deployments/gpt-4.1-mini/chat/completions?api-version=2024-12-01-preview "HTTP/1.1 200 OK"
+2026-06-18 17:26:36 [INFO] pinecone.index: Describing index stats
+2026-06-18 17:26:45 [INFO] pinecone.index: Describing index stats
+2026-06-18 17:26:46 [INFO] httpx: HTTP Request: POST https://nassaqq.cognitiveservices.azure.com/openai/deployments/text-embedding-3-small/embeddings?api-version=2024-12-01-preview "HTTP/1.1 200 OK"
+2026-06-18 17:26:46 [INFO] pinecone.index: Querying index with top_k=20
+2026-06-18 17:26:49 [INFO] httpx: HTTP Request: POST https://nassaqq.cognitiveservices.azure.com/openai/deployments/gpt-4.1-mini/chat/completions?api-version=2024-12-01-preview "HTTP/1.1 200 OK"
+2026-06-18 17:27:13 [INFO] pinecone.index: Describing index stats
+2026-06-18 17:27:15 [INFO] httpx: HTTP Request: POST https://nassaqq.cognitiveservices.azure.com/openai/deployments/text-embedding-3-small/embeddings?api-version=2024-12-01-preview "HTTP/1.1 200 OK"
+2026-06-18 17:27:15 [INFO] pinecone.index: Querying index with top_k=20
+2026-06-18 17:27:42 [INFO] pinecone.index: Describing index stats
+2026-06-18 17:30:17 [INFO] pymongo.client: You appear to be connected to a CosmosDB cluster. For more information regarding feature compatibility and support please visit https://www.mongodb.com/supportability/cosmosdb
+2026-06-18 17:30:18 [INFO] pinecone.client.indexes: Listing indexes
+2026-06-18 17:30:18 [INFO] httpx: HTTP Request: GET https://api.pinecone.io/indexes "HTTP/1.1 200 OK"
+2026-06-18 17:30:18 [INFO] pinecone.client.indexes: Describing index 'nassaq'
+2026-06-18 17:30:19 [INFO] httpx: HTTP Request: GET https://api.pinecone.io/indexes/nassaq "HTTP/1.1 200 OK"
+2026-06-18 17:30:19 [INFO] pinecone.index: Index client created for host https://nassaq-uujm500.svc.aped-4627-b74a.pinecone.io
+2026-06-18 17:30:25 [INFO] pymongo.client: You appear to be connected to a CosmosDB cluster. For more information regarding feature compatibility and support please visit https://www.mongodb.com/supportability/cosmosdb
+2026-06-18 17:30:25 [INFO] pinecone.client.indexes: Listing indexes
+2026-06-18 17:30:26 [INFO] httpx: HTTP Request: GET https://api.pinecone.io/indexes "HTTP/1.1 200 OK"
+2026-06-18 17:30:26 [INFO] pinecone.client.indexes: Describing index 'nassaq'
+2026-06-18 17:30:26 [INFO] httpx: HTTP Request: GET https://api.pinecone.io/indexes/nassaq "HTTP/1.1 200 OK"
+2026-06-18 17:30:26 [INFO] pinecone.index: Index client created for host https://nassaq-uujm500.svc.aped-4627-b74a.pinecone.io
+2026-06-18 17:30:26 [INFO] pinecone.index: Describing index stats
+2026-06-18 17:30:27 [INFO] pinecone.index: Querying index with top_k=10000
+2026-06-18 17:31:55 [INFO] pymongo.client: You appear to be connected to a CosmosDB cluster. For more information regarding feature compatibility and support please visit https://www.mongodb.com/supportability/cosmosdb
+2026-06-18 17:31:55 [INFO] pinecone.client.indexes: Listing indexes
+2026-06-18 17:31:56 [INFO] httpx: HTTP Request: GET https://api.pinecone.io/indexes "HTTP/1.1 200 OK"
+2026-06-18 17:31:56 [INFO] pinecone.client.indexes: Describing index 'nassaq'
+2026-06-18 17:31:57 [INFO] httpx: HTTP Request: GET https://api.pinecone.io/indexes/nassaq "HTTP/1.1 200 OK"
+2026-06-18 17:31:57 [INFO] pinecone.index: Index client created for host https://nassaq-uujm500.svc.aped-4627-b74a.pinecone.io
+2026-06-18 17:32:03 [INFO] pymongo.client: You appear to be connected to a CosmosDB cluster. For more information regarding feature compatibility and support please visit https://www.mongodb.com/supportability/cosmosdb
+2026-06-18 17:32:03 [INFO] pinecone.client.indexes: Listing indexes
+2026-06-18 17:32:04 [INFO] httpx: HTTP Request: GET https://api.pinecone.io/indexes "HTTP/1.1 200 OK"
+2026-06-18 17:32:04 [INFO] pinecone.client.indexes: Describing index 'nassaq'
+2026-06-18 17:32:05 [INFO] httpx: HTTP Request: GET https://api.pinecone.io/indexes/nassaq "HTTP/1.1 200 OK"
+2026-06-18 17:32:05 [INFO] pinecone.index: Index client created for host https://nassaq-uujm500.svc.aped-4627-b74a.pinecone.io
+2026-06-18 17:32:12 [INFO] pymongo.client: You appear to be connected to a CosmosDB cluster. For more information regarding feature compatibility and support please visit https://www.mongodb.com/supportability/cosmosdb
+2026-06-18 17:32:13 [INFO] pinecone.client.indexes: Listing indexes
+2026-06-18 17:32:14 [INFO] httpx: HTTP Request: GET https://api.pinecone.io/indexes "HTTP/1.1 200 OK"
+2026-06-18 17:32:14 [INFO] pinecone.client.indexes: Describing index 'nassaq'
+2026-06-18 17:32:14 [INFO] httpx: HTTP Request: GET https://api.pinecone.io/indexes/nassaq "HTTP/1.1 200 OK"
+2026-06-18 17:32:14 [INFO] pinecone.index: Index client created for host https://nassaq-uujm500.svc.aped-4627-b74a.pinecone.io
+2026-06-18 17:32:14 [INFO] pinecone.index: Describing index stats
+2026-06-18 17:32:15 [INFO] pinecone.index: Querying index with top_k=10000
+2026-06-18 17:33:23 [ERROR] app.api.v1.endpoints.docs: Failed to update Cosmos DB for doc_id=69: 'coroutine' object has no attribute 'get'
+2026-06-18 17:33:53 [INFO] azure.core.pipeline.policies.http_logging_policy: Request URL: 'https://nassaqq.blob.core.windows.net/demo/ecc2d559-2e7c-4740-b002-c5eb506ad499?sp=REDACTED&st=REDACTED&se=REDACTED&spr=REDACTED&sv=REDACTED&sr=REDACTED&sig=REDACTED'
+Request method: 'PUT'
+Request headers:
+    'Content-Length': '77503'
+    'x-ms-meta-original_filename': 'REDACTED'
+    'x-ms-meta-content_type': 'REDACTED'
+    'x-ms-blob-type': 'REDACTED'
+    'x-ms-blob-content-type': 'REDACTED'
+    'x-ms-version': 'REDACTED'
+    'Content-Type': 'application/octet-stream'
+    'Accept': 'application/xml'
+    'User-Agent': 'azsdk-python-storage-blob/12.28.0 Python/3.11.14 (Windows-10-10.0.26200-SP0)'
+    'x-ms-date': 'REDACTED'
+    'x-ms-client-request-id': 'bb0240c2-6b22-11f1-aa16-e00af66009f2'
+A body is sent with the request
+2026-06-18 17:33:54 [INFO] azure.core.pipeline.policies.http_logging_policy: Response status: 201
+Response headers:
+    'Content-Length': '0'
+    'Content-MD5': 'REDACTED'
+    'Last-Modified': 'Thu, 18 Jun 2026 14:33:54 GMT'
+    'ETag': '"0x8DECD469F963703"'
+    'Server': 'Windows-Azure-Blob/1.0 Microsoft-HTTPAPI/2.0'
+    'x-ms-request-id': '850d2dbf-901e-000b-452f-ffdba8000000'
+    'x-ms-client-request-id': 'bb0240c2-6b22-11f1-aa16-e00af66009f2'
+    'x-ms-version': 'REDACTED'
+    'x-ms-content-crc64': 'REDACTED'
+    'x-ms-request-server-encrypted': 'REDACTED'
+    'Date': 'Thu, 18 Jun 2026 14:33:53 GMT'
+2026-06-18 17:33:54 [INFO] azure.core.pipeline.policies.http_logging_policy: Request URL: 'https://nassaqq-ocr.cognitiveservices.azure.com//documentintelligence/documentModels/prebuilt-layout:analyze?api-version=2024-11-30&features=REDACTED&outputContentFormat=REDACTED'
+Request method: 'POST'
+Request headers:
+    'content-type': 'application/octet-stream'
+    'Accept': 'application/json'
+    'x-ms-client-request-id': 'bb596f4a-6b22-11f1-82f9-e00af66009f2'
+    'User-Agent': 'azsdk-python-ai-documentintelligence/1.0.2 Python/3.11.14 (Windows-10-10.0.26200-SP0)'
+    'Ocp-Apim-Subscription-Key': 'REDACTED'
+A body is sent with the request
+2026-06-18 17:33:54 [INFO] azure.core.pipeline.policies.http_logging_policy: Response status: 202
+Response headers:
+    'Content-Length': '0'
+    'Operation-Location': 'REDACTED'
+    'x-envoy-upstream-service-time': 'REDACTED'
+    'apim-request-id': 'REDACTED'
+    'Strict-Transport-Security': 'REDACTED'
+    'x-content-type-options': 'REDACTED'
+    'x-ms-region': 'REDACTED'
+    'Date': 'Thu, 18 Jun 2026 14:33:54 GMT'
+2026-06-18 17:33:54 [INFO] azure.core.pipeline.policies.http_logging_policy: Request URL: 'https://nassaqq-ocr.cognitiveservices.azure.com/documentintelligence/documentModels/prebuilt-layout/analyzeResults/419b79b9-7e0a-46bf-b64a-6184bf5ca27c?api-version=2024-11-30'
+Request method: 'GET'
+Request headers:
+    'x-ms-client-request-id': 'bb596f4a-6b22-11f1-82f9-e00af66009f2'
+    'User-Agent': 'azsdk-python-ai-documentintelligence/1.0.2 Python/3.11.14 (Windows-10-10.0.26200-SP0)'
+    'Ocp-Apim-Subscription-Key': 'REDACTED'
+No body was attached to the request
+2026-06-18 17:33:54 [INFO] azure.core.pipeline.policies.http_logging_policy: Response status: 200
+Response headers:
+    'Content-Length': '106'
+    'Content-Type': 'application/json; charset=utf-8'
+    'retry-after': '5'
+    'x-envoy-upstream-service-time': 'REDACTED'
+    'apim-request-id': 'REDACTED'
+    'Strict-Transport-Security': 'REDACTED'
+    'x-content-type-options': 'REDACTED'
+    'x-ms-region': 'REDACTED'
+    'Date': 'Thu, 18 Jun 2026 14:33:54 GMT'
+2026-06-18 17:33:59 [INFO] azure.core.pipeline.policies.http_logging_policy: Request URL: 'https://nassaqq-ocr.cognitiveservices.azure.com/documentintelligence/documentModels/prebuilt-layout/analyzeResults/419b79b9-7e0a-46bf-b64a-6184bf5ca27c?api-version=2024-11-30'
+Request method: 'GET'
+Request headers:
+    'x-ms-client-request-id': 'bb596f4a-6b22-11f1-82f9-e00af66009f2'
+    'User-Agent': 'azsdk-python-ai-documentintelligence/1.0.2 Python/3.11.14 (Windows-10-10.0.26200-SP0)'
+    'Ocp-Apim-Subscription-Key': 'REDACTED'
+No body was attached to the request
+2026-06-18 17:34:00 [INFO] azure.core.pipeline.policies.http_logging_policy: Response status: 200
+Response headers:
+    'Content-Length': '238713'
+    'Content-Type': 'application/json; charset=utf-8'
+    'x-envoy-upstream-service-time': 'REDACTED'
+    'apim-request-id': 'REDACTED'
+    'Strict-Transport-Security': 'REDACTED'
+    'x-content-type-options': 'REDACTED'
+    'x-ms-region': 'REDACTED'
+    'Date': 'Thu, 18 Jun 2026 14:33:59 GMT'
+2026-06-18 17:34:03 [INFO] httpx: HTTP Request: POST https://nassaqq.cognitiveservices.azure.com/openai/deployments/gpt-4.1-mini/chat/completions?api-version=2024-12-01-preview "HTTP/1.1 200 OK"
+2026-06-18 17:34:11 [INFO] pinecone.index: Querying index with top_k=1
+2026-06-18 17:34:12 [INFO] httpx: HTTP Request: POST https://nassaqq.cognitiveservices.azure.com/openai/deployments/text-embedding-3-small/embeddings?api-version=2024-12-01-preview "HTTP/1.1 200 OK"
+2026-06-18 17:34:12 [INFO] pinecone.index: Upserting 7 vectors into namespace ''
+2026-06-18 17:34:20 [INFO] pinecone.index: Describing index stats
+2026-06-18 17:34:25 [INFO] azure.core.pipeline.policies.http_logging_policy: Request URL: 'https://nassaqq.blob.core.windows.net/demo/642945fd-75e8-4222-88ef-242feefd764c?sp=REDACTED&st=REDACTED&se=REDACTED&spr=REDACTED&sv=REDACTED&sr=REDACTED&sig=REDACTED'
+Request method: 'DELETE'
+Request headers:
+    'x-ms-version': 'REDACTED'
+    'Accept': 'application/xml'
+    'User-Agent': 'azsdk-python-storage-blob/12.28.0 Python/3.11.14 (Windows-10-10.0.26200-SP0)'
+    'x-ms-date': 'REDACTED'
+    'x-ms-client-request-id': 'cdf535b7-6b22-11f1-a6a6-e00af66009f2'
+No body was attached to the request
+2026-06-18 17:34:25 [INFO] azure.core.pipeline.policies.http_logging_policy: Response status: 202
+Response headers:
+    'Content-Length': '0'
+    'Server': 'Windows-Azure-Blob/1.0 Microsoft-HTTPAPI/2.0'
+    'x-ms-request-id': '850d6c9c-901e-000b-472f-ffdba8000000'
+    'x-ms-client-request-id': 'cdf535b7-6b22-11f1-a6a6-e00af66009f2'
+    'x-ms-version': 'REDACTED'
+    'x-ms-delete-type-permanent': 'REDACTED'
+    'Date': 'Thu, 18 Jun 2026 14:34:25 GMT'
+2026-06-18 17:34:25 [INFO] pinecone.index: Querying index with top_k=1
+2026-06-18 17:34:38 [INFO] azure.core.pipeline.policies.http_logging_policy: Request URL: 'https://nassaqq.blob.core.windows.net/demo/154a7427-180c-4d26-93aa-e96de017cd95?sp=REDACTED&st=REDACTED&se=REDACTED&spr=REDACTED&sv=REDACTED&sr=REDACTED&sig=REDACTED'
+Request method: 'PUT'
+Request headers:
+    'Content-Length': '77503'
+    'x-ms-meta-original_filename': 'REDACTED'
+    'x-ms-meta-content_type': 'REDACTED'
+    'x-ms-blob-type': 'REDACTED'
+    'x-ms-blob-content-type': 'REDACTED'
+    'x-ms-version': 'REDACTED'
+    'Content-Type': 'application/octet-stream'
+    'Accept': 'application/xml'
+    'User-Agent': 'azsdk-python-storage-blob/12.28.0 Python/3.11.14 (Windows-10-10.0.26200-SP0)'
+    'x-ms-date': 'REDACTED'
+    'x-ms-client-request-id': 'd5f131f9-6b22-11f1-bab2-e00af66009f2'
+A body is sent with the request
+2026-06-18 17:34:38 [INFO] azure.core.pipeline.policies.http_logging_policy: Response status: 201
+Response headers:
+    'Content-Length': '0'
+    'Content-MD5': 'REDACTED'
+    'Last-Modified': 'Thu, 18 Jun 2026 14:34:38 GMT'
+    'ETag': '"0x8DECD46BA441507"'
+    'Server': 'Windows-Azure-Blob/1.0 Microsoft-HTTPAPI/2.0'
+    'x-ms-request-id': '850d8a07-901e-000b-442f-ffdba8000000'
+    'x-ms-client-request-id': 'd5f131f9-6b22-11f1-bab2-e00af66009f2'
+    'x-ms-version': 'REDACTED'
+    'x-ms-content-crc64': 'REDACTED'
+    'x-ms-request-server-encrypted': 'REDACTED'
+    'Date': 'Thu, 18 Jun 2026 14:34:38 GMT'
+2026-06-18 17:34:38 [INFO] azure.core.pipeline.policies.http_logging_policy: Request URL: 'https://nassaqq-ocr.cognitiveservices.azure.com//documentintelligence/documentModels/prebuilt-layout:analyze?api-version=2024-11-30&features=REDACTED&outputContentFormat=REDACTED'
+Request method: 'POST'
+Request headers:
+    'content-type': 'application/octet-stream'
+    'Accept': 'application/json'
+    'x-ms-client-request-id': 'd6069315-6b22-11f1-97e3-e00af66009f2'
+    'User-Agent': 'azsdk-python-ai-documentintelligence/1.0.2 Python/3.11.14 (Windows-10-10.0.26200-SP0)'
+    'Ocp-Apim-Subscription-Key': 'REDACTED'
+A body is sent with the request
+2026-06-18 17:34:39 [INFO] azure.core.pipeline.policies.http_logging_policy: Response status: 202
+Response headers:
+    'Content-Length': '0'
+    'Operation-Location': 'REDACTED'
+    'x-envoy-upstream-service-time': 'REDACTED'
+    'apim-request-id': 'REDACTED'
+    'Strict-Transport-Security': 'REDACTED'
+    'x-content-type-options': 'REDACTED'
+    'x-ms-region': 'REDACTED'
+    'Date': 'Thu, 18 Jun 2026 14:34:38 GMT'
+2026-06-18 17:34:39 [INFO] azure.core.pipeline.policies.http_logging_policy: Request URL: 'https://nassaqq-ocr.cognitiveservices.azure.com/documentintelligence/documentModels/prebuilt-layout/analyzeResults/ea14bfd0-367d-43ca-8193-f2db02e319f7?api-version=2024-11-30'
+Request method: 'GET'
+Request headers:
+    'x-ms-client-request-id': 'd6069315-6b22-11f1-97e3-e00af66009f2'
+    'User-Agent': 'azsdk-python-ai-documentintelligence/1.0.2 Python/3.11.14 (Windows-10-10.0.26200-SP0)'
+    'Ocp-Apim-Subscription-Key': 'REDACTED'
+No body was attached to the request
+2026-06-18 17:34:39 [INFO] azure.core.pipeline.policies.http_logging_policy: Response status: 200
+Response headers:
+    'Content-Length': '106'
+    'Content-Type': 'application/json; charset=utf-8'
+    'retry-after': '5'
+    'x-envoy-upstream-service-time': 'REDACTED'
+    'apim-request-id': 'REDACTED'
+    'Strict-Transport-Security': 'REDACTED'
+    'x-content-type-options': 'REDACTED'
+    'x-ms-region': 'REDACTED'
+    'Date': 'Thu, 18 Jun 2026 14:34:38 GMT'
+2026-06-18 17:34:44 [INFO] azure.core.pipeline.policies.http_logging_policy: Request URL: 'https://nassaqq-ocr.cognitiveservices.azure.com/documentintelligence/documentModels/prebuilt-layout/analyzeResults/ea14bfd0-367d-43ca-8193-f2db02e319f7?api-version=2024-11-30'
+Request method: 'GET'
+Request headers:
+    'x-ms-client-request-id': 'd6069315-6b22-11f1-97e3-e00af66009f2'
+    'User-Agent': 'azsdk-python-ai-documentintelligence/1.0.2 Python/3.11.14 (Windows-10-10.0.26200-SP0)'
+    'Ocp-Apim-Subscription-Key': 'REDACTED'
+No body was attached to the request
+2026-06-18 17:34:44 [INFO] azure.core.pipeline.policies.http_logging_policy: Response status: 200
+Response headers:
+    'Content-Length': '106'
+    'Content-Type': 'application/json; charset=utf-8'
+    'retry-after': '1'
+    'x-envoy-upstream-service-time': 'REDACTED'
+    'apim-request-id': 'REDACTED'
+    'Strict-Transport-Security': 'REDACTED'
+    'x-content-type-options': 'REDACTED'
+    'x-ms-region': 'REDACTED'
+    'Date': 'Thu, 18 Jun 2026 14:34:43 GMT'
+2026-06-18 17:34:45 [INFO] azure.core.pipeline.policies.http_logging_policy: Request URL: 'https://nassaqq-ocr.cognitiveservices.azure.com/documentintelligence/documentModels/prebuilt-layout/analyzeResults/ea14bfd0-367d-43ca-8193-f2db02e319f7?api-version=2024-11-30'
+Request method: 'GET'
+Request headers:
+    'x-ms-client-request-id': 'd6069315-6b22-11f1-97e3-e00af66009f2'
+    'User-Agent': 'azsdk-python-ai-documentintelligence/1.0.2 Python/3.11.14 (Windows-10-10.0.26200-SP0)'
+    'Ocp-Apim-Subscription-Key': 'REDACTED'
+No body was attached to the request
+2026-06-18 17:34:45 [INFO] azure.core.pipeline.policies.http_logging_policy: Response status: 200
+Response headers:
+    'Content-Length': '106'
+    'Content-Type': 'application/json; charset=utf-8'
+    'retry-after': '1'
+    'x-envoy-upstream-service-time': 'REDACTED'
+    'apim-request-id': 'REDACTED'
+    'Strict-Transport-Security': 'REDACTED'
+    'x-content-type-options': 'REDACTED'
+    'x-ms-region': 'REDACTED'
+    'Date': 'Thu, 18 Jun 2026 14:34:44 GMT'
+2026-06-18 17:34:46 [INFO] azure.core.pipeline.policies.http_logging_policy: Request URL: 'https://nassaqq-ocr.cognitiveservices.azure.com/documentintelligence/documentModels/prebuilt-layout/analyzeResults/ea14bfd0-367d-43ca-8193-f2db02e319f7?api-version=2024-11-30'
+Request method: 'GET'
+Request headers:
+    'x-ms-client-request-id': 'd6069315-6b22-11f1-97e3-e00af66009f2'
+    'User-Agent': 'azsdk-python-ai-documentintelligence/1.0.2 Python/3.11.14 (Windows-10-10.0.26200-SP0)'
+    'Ocp-Apim-Subscription-Key': 'REDACTED'
+No body was attached to the request
+2026-06-18 17:34:46 [INFO] azure.core.pipeline.policies.http_logging_policy: Response status: 200
+Response headers:
+    'Content-Length': '106'
+    'Content-Type': 'application/json; charset=utf-8'
+    'retry-after': '1'
+    'x-envoy-upstream-service-time': 'REDACTED'
+    'apim-request-id': 'REDACTED'
+    'Strict-Transport-Security': 'REDACTED'
+    'x-content-type-options': 'REDACTED'
+    'x-ms-region': 'REDACTED'
+    'Date': 'Thu, 18 Jun 2026 14:34:45 GMT'
+2026-06-18 17:34:47 [INFO] azure.core.pipeline.policies.http_logging_policy: Request URL: 'https://nassaqq-ocr.cognitiveservices.azure.com/documentintelligence/documentModels/prebuilt-layout/analyzeResults/ea14bfd0-367d-43ca-8193-f2db02e319f7?api-version=2024-11-30'
+Request method: 'GET'
+Request headers:
+    'x-ms-client-request-id': 'd6069315-6b22-11f1-97e3-e00af66009f2'
+    'User-Agent': 'azsdk-python-ai-documentintelligence/1.0.2 Python/3.11.14 (Windows-10-10.0.26200-SP0)'
+    'Ocp-Apim-Subscription-Key': 'REDACTED'
+No body was attached to the request
+2026-06-18 17:34:47 [INFO] azure.core.pipeline.policies.http_logging_policy: Response status: 200
+Response headers:
+    'Content-Length': '106'
+    'Content-Type': 'application/json; charset=utf-8'
+    'retry-after': '1'
+    'x-envoy-upstream-service-time': 'REDACTED'
+    'apim-request-id': 'REDACTED'
+    'Strict-Transport-Security': 'REDACTED'
+    'x-content-type-options': 'REDACTED'
+    'x-ms-region': 'REDACTED'
+    'Date': 'Thu, 18 Jun 2026 14:34:46 GMT'
+2026-06-18 17:34:48 [INFO] azure.core.pipeline.policies.http_logging_policy: Request URL: 'https://nassaqq-ocr.cognitiveservices.azure.com/documentintelligence/documentModels/prebuilt-layout/analyzeResults/ea14bfd0-367d-43ca-8193-f2db02e319f7?api-version=2024-11-30'
+Request method: 'GET'
+Request headers:
+    'x-ms-client-request-id': 'd6069315-6b22-11f1-97e3-e00af66009f2'
+    'User-Agent': 'azsdk-python-ai-documentintelligence/1.0.2 Python/3.11.14 (Windows-10-10.0.26200-SP0)'
+    'Ocp-Apim-Subscription-Key': 'REDACTED'
+No body was attached to the request
+2026-06-18 17:34:48 [INFO] azure.core.pipeline.policies.http_logging_policy: Response status: 200
+Response headers:
+    'Content-Length': '238713'
+    'Content-Type': 'application/json; charset=utf-8'
+    'x-envoy-upstream-service-time': 'REDACTED'
+    'apim-request-id': 'REDACTED'
+    'Strict-Transport-Security': 'REDACTED'
+    'x-content-type-options': 'REDACTED'
+    'x-ms-region': 'REDACTED'
+    'Date': 'Thu, 18 Jun 2026 14:34:47 GMT'
+2026-06-18 17:34:51 [INFO] httpx: HTTP Request: POST https://nassaqq.cognitiveservices.azure.com/openai/deployments/gpt-4.1-mini/chat/completions?api-version=2024-12-01-preview "HTTP/1.1 200 OK"
+2026-06-18 17:34:54 [INFO] pinecone.index: Querying index with top_k=1
+2026-06-18 17:34:56 [INFO] httpx: HTTP Request: POST https://nassaqq.cognitiveservices.azure.com/openai/deployments/text-embedding-3-small/embeddings?api-version=2024-12-01-preview "HTTP/1.1 200 OK"
+2026-06-18 17:34:56 [INFO] pinecone.index: Upserting 7 vectors into namespace ''
+2026-06-18 18:09:50 [INFO] pymongo.client: You appear to be connected to a CosmosDB cluster. For more information regarding feature compatibility and support please visit https://www.mongodb.com/supportability/cosmosdb
+2026-06-18 18:09:51 [INFO] pinecone.client.indexes: Listing indexes
+2026-06-18 18:09:52 [INFO] httpx: HTTP Request: GET https://api.pinecone.io/indexes "HTTP/1.1 200 OK"
+2026-06-18 18:09:52 [INFO] pinecone.client.indexes: Describing index 'nassaq'
+2026-06-18 18:09:52 [INFO] httpx: HTTP Request: GET https://api.pinecone.io/indexes/nassaq "HTTP/1.1 200 OK"
+2026-06-18 18:09:52 [INFO] pinecone.index: Index client created for host https://nassaq-uujm500.svc.aped-4627-b74a.pinecone.io
+2026-06-18 18:09:52 [INFO] pinecone.index: Describing index stats
+2026-06-18 18:09:53 [INFO] pinecone.index: Querying index with top_k=10000
+2026-06-18 18:10:12 [INFO] pinecone.index: Describing index stats
+2026-06-18 18:10:29 [INFO] pinecone.index: Describing index stats
+2026-06-18 18:16:09 [INFO] pinecone.index: Describing index stats
+2026-06-18 18:16:21 [INFO] pinecone.index: Describing index stats
+2026-06-18 18:16:36 [INFO] azure.core.pipeline.policies.http_logging_policy: Request URL: 'https://nassaqq.blob.core.windows.net/demo/465e4088-2e23-4f9d-8a3d-af0cc8384711?sp=REDACTED&st=REDACTED&se=REDACTED&spr=REDACTED&sv=REDACTED&sr=REDACTED&sig=REDACTED'
+Request method: 'PUT'
+Request headers:
+    'Content-Length': '101319'
+    'x-ms-meta-original_filename': 'REDACTED'
+    'x-ms-meta-content_type': 'REDACTED'
+    'x-ms-blob-type': 'REDACTED'
+    'x-ms-blob-content-type': 'REDACTED'
+    'x-ms-version': 'REDACTED'
+    'Content-Type': 'application/octet-stream'
+    'Accept': 'application/xml'
+    'User-Agent': 'azsdk-python-storage-blob/12.28.0 Python/3.11.14 (Windows-10-10.0.26200-SP0)'
+    'x-ms-date': 'REDACTED'
+    'x-ms-client-request-id': 'b285962d-6b28-11f1-805f-e00af66009f2'
+A body is sent with the request
+2026-06-18 18:16:36 [INFO] azure.core.pipeline.policies.http_logging_policy: Response status: 201
+Response headers:
+    'Content-Length': '0'
+    'Content-MD5': 'REDACTED'
+    'Last-Modified': 'Thu, 18 Jun 2026 15:16:36 GMT'
+    'ETag': '"0x8DECD4C971C2C77"'
+    'Server': 'Windows-Azure-Blob/1.0 Microsoft-HTTPAPI/2.0'
+    'x-ms-request-id': '592a3911-f01e-000d-4035-ffe817000000'
+    'x-ms-client-request-id': 'b285962d-6b28-11f1-805f-e00af66009f2'
+    'x-ms-version': 'REDACTED'
+    'x-ms-content-crc64': 'REDACTED'
+    'x-ms-request-server-encrypted': 'REDACTED'
+    'Date': 'Thu, 18 Jun 2026 15:16:36 GMT'
+2026-06-18 18:16:36 [INFO] azure.core.pipeline.policies.http_logging_policy: Request URL: 'https://nassaqq-ocr.cognitiveservices.azure.com//documentintelligence/documentModels/prebuilt-layout:analyze?api-version=2024-11-30&features=REDACTED&outputContentFormat=REDACTED'
+Request method: 'POST'
+Request headers:
+    'content-type': 'application/octet-stream'
+    'Accept': 'application/json'
+    'x-ms-client-request-id': 'b2e470b2-6b28-11f1-9739-e00af66009f2'
+    'User-Agent': 'azsdk-python-ai-documentintelligence/1.0.2 Python/3.11.14 (Windows-10-10.0.26200-SP0)'
+    'Ocp-Apim-Subscription-Key': 'REDACTED'
+A body is sent with the request
+2026-06-18 18:16:37 [INFO] azure.core.pipeline.policies.http_logging_policy: Response status: 202
+Response headers:
+    'Content-Length': '0'
+    'Operation-Location': 'REDACTED'
+    'x-envoy-upstream-service-time': 'REDACTED'
+    'apim-request-id': 'REDACTED'
+    'Strict-Transport-Security': 'REDACTED'
+    'x-content-type-options': 'REDACTED'
+    'x-ms-region': 'REDACTED'
+    'Date': 'Thu, 18 Jun 2026 15:16:37 GMT'
+2026-06-18 18:16:37 [INFO] azure.core.pipeline.policies.http_logging_policy: Request URL: 'https://nassaqq-ocr.cognitiveservices.azure.com/documentintelligence/documentModels/prebuilt-layout/analyzeResults/fe20371c-d7c8-45ba-908e-fe6f5d9b5a6b?api-version=2024-11-30'
+Request method: 'GET'
+Request headers:
+    'x-ms-client-request-id': 'b2e470b2-6b28-11f1-9739-e00af66009f2'
+    'User-Agent': 'azsdk-python-ai-documentintelligence/1.0.2 Python/3.11.14 (Windows-10-10.0.26200-SP0)'
+    'Ocp-Apim-Subscription-Key': 'REDACTED'
+No body was attached to the request
+2026-06-18 18:16:37 [INFO] azure.core.pipeline.policies.http_logging_policy: Response status: 200
+Response headers:
+    'Content-Length': '106'
+    'Content-Type': 'application/json; charset=utf-8'
+    'retry-after': '4'
+    'x-envoy-upstream-service-time': 'REDACTED'
+    'apim-request-id': 'REDACTED'
+    'Strict-Transport-Security': 'REDACTED'
+    'x-content-type-options': 'REDACTED'
+    'x-ms-region': 'REDACTED'
+    'Date': 'Thu, 18 Jun 2026 15:16:37 GMT'
+2026-06-18 18:16:41 [INFO] azure.core.pipeline.policies.http_logging_policy: Request URL: 'https://nassaqq-ocr.cognitiveservices.azure.com/documentintelligence/documentModels/prebuilt-layout/analyzeResults/fe20371c-d7c8-45ba-908e-fe6f5d9b5a6b?api-version=2024-11-30'
+Request method: 'GET'
+Request headers:
+    'x-ms-client-request-id': 'b2e470b2-6b28-11f1-9739-e00af66009f2'
+    'User-Agent': 'azsdk-python-ai-documentintelligence/1.0.2 Python/3.11.14 (Windows-10-10.0.26200-SP0)'
+    'Ocp-Apim-Subscription-Key': 'REDACTED'
+No body was attached to the request
+2026-06-18 18:16:41 [INFO] azure.core.pipeline.policies.http_logging_policy: Response status: 200
+Response headers:
+    'Content-Length': '48917'
+    'Content-Type': 'application/json; charset=utf-8'
+    'x-envoy-upstream-service-time': 'REDACTED'
+    'apim-request-id': 'REDACTED'
+    'Strict-Transport-Security': 'REDACTED'
+    'x-content-type-options': 'REDACTED'
+    'x-ms-region': 'REDACTED'
+    'Date': 'Thu, 18 Jun 2026 15:16:41 GMT'
+2026-06-18 18:16:45 [INFO] httpx: HTTP Request: POST https://nassaqq.cognitiveservices.azure.com/openai/deployments/gpt-4.1-mini/chat/completions?api-version=2024-12-01-preview "HTTP/1.1 200 OK"
+2026-06-18 18:16:48 [INFO] pinecone.index: Querying index with top_k=1
+2026-06-18 18:16:50 [INFO] httpx: HTTP Request: POST https://nassaqq.cognitiveservices.azure.com/openai/deployments/text-embedding-3-small/embeddings?api-version=2024-12-01-preview "HTTP/1.1 200 OK"
+2026-06-18 18:16:50 [INFO] pinecone.index: Upserting 4 vectors into namespace ''
+2026-06-18 18:17:00 [INFO] pinecone.index: Describing index stats
+2026-06-18 18:17:03 [INFO] pinecone.index: Describing index stats
+2026-06-18 18:20:34 [INFO] pinecone.index: Describing index stats
+2026-06-18 18:20:59 [INFO] azure.core.pipeline.policies.http_logging_policy: Request URL: 'https://nassaqq.blob.core.windows.net/demo/465e4088-2e23-4f9d-8a3d-af0cc8384711?sp=REDACTED&st=REDACTED&se=REDACTED&spr=REDACTED&sv=REDACTED&sr=REDACTED&sig=REDACTED'
+Request method: 'HEAD'
+Request headers:
+    'x-ms-version': 'REDACTED'
+    'Accept': 'application/xml'
+    'User-Agent': 'azsdk-python-storage-blob/12.28.0 Python/3.11.14 (Windows-10-10.0.26200-SP0)'
+    'x-ms-date': 'REDACTED'
+    'x-ms-client-request-id': '4f857ec8-6b29-11f1-ab3f-e00af66009f2'
+No body was attached to the request
+2026-06-18 18:21:00 [INFO] azure.core.pipeline.policies.http_logging_policy: Response status: 200
+Response headers:
+    'Content-Length': '101319'
+    'Content-Type': 'image/jpeg'
+    'Content-MD5': 'REDACTED'
+    'Last-Modified': 'Thu, 18 Jun 2026 15:16:36 GMT'
+    'Accept-Ranges': 'REDACTED'
+    'ETag': '"0x8DECD4C971C2C77"'
+    'Server': 'Windows-Azure-Blob/1.0 Microsoft-HTTPAPI/2.0'
+    'x-ms-request-id': '57b7585e-101e-0058-4b36-fff89c000000'
+    'x-ms-client-request-id': '4f857ec8-6b29-11f1-ab3f-e00af66009f2'
+    'x-ms-version': 'REDACTED'
+    'x-ms-meta-original_filename': 'REDACTED'
+    'x-ms-meta-content_type': 'REDACTED'
+    'x-ms-creation-time': 'REDACTED'
+    'x-ms-lease-status': 'REDACTED'
+    'x-ms-lease-state': 'REDACTED'
+    'x-ms-blob-type': 'REDACTED'
+    'x-ms-server-encrypted': 'REDACTED'
+    'x-ms-access-tier': 'REDACTED'
+    'x-ms-access-tier-inferred': 'REDACTED'
+    'Date': 'Thu, 18 Jun 2026 15:20:59 GMT'
+2026-06-18 18:21:00 [INFO] azure.core.pipeline.policies.http_logging_policy: Request URL: 'https://nassaqq.blob.core.windows.net/demo/465e4088-2e23-4f9d-8a3d-af0cc8384711?sp=REDACTED&st=REDACTED&se=REDACTED&spr=REDACTED&sv=REDACTED&sr=REDACTED&sig=REDACTED'
+Request method: 'GET'
+Request headers:
+    'x-ms-range': 'REDACTED'
+    'x-ms-version': 'REDACTED'
+    'Accept': 'application/xml'
+    'User-Agent': 'azsdk-python-storage-blob/12.28.0 Python/3.11.14 (Windows-10-10.0.26200-SP0)'
+    'x-ms-date': 'REDACTED'
+    'x-ms-client-request-id': '4fc359e3-6b29-11f1-a83d-e00af66009f2'
+No body was attached to the request
+2026-06-18 18:21:00 [INFO] azure.core.pipeline.policies.http_logging_policy: Response status: 206
+Response headers:
+    'Content-Length': '101319'
+    'Content-Type': 'image/jpeg'
+    'Content-Range': 'REDACTED'
+    'Last-Modified': 'Thu, 18 Jun 2026 15:16:36 GMT'
+    'Accept-Ranges': 'REDACTED'
+    'ETag': '"0x8DECD4C971C2C77"'
+    'Server': 'Windows-Azure-Blob/1.0 Microsoft-HTTPAPI/2.0'
+    'x-ms-request-id': '57b75893-101e-0058-6e36-fff89c000000'
+    'x-ms-client-request-id': '4fc359e3-6b29-11f1-a83d-e00af66009f2'
+    'x-ms-version': 'REDACTED'
+    'x-ms-meta-original_filename': 'REDACTED'
+    'x-ms-meta-content_type': 'REDACTED'
+    'x-ms-creation-time': 'REDACTED'
+    'x-ms-blob-content-md5': 'REDACTED'
+    'x-ms-lease-status': 'REDACTED'
+    'x-ms-lease-state': 'REDACTED'
+    'x-ms-blob-type': 'REDACTED'
+    'x-ms-server-encrypted': 'REDACTED'
+    'x-ms-access-tier': 'REDACTED'
+    'x-ms-access-tier-inferred': 'REDACTED'
+    'Date': 'Thu, 18 Jun 2026 15:21:00 GMT'
+2026-06-18 18:21:00 [INFO] azure.core.pipeline.policies.http_logging_policy: Request URL: 'https://nassaqq.blob.core.windows.net/demo/465e4088-2e23-4f9d-8a3d-af0cc8384711?sp=REDACTED&st=REDACTED&se=REDACTED&spr=REDACTED&sv=REDACTED&sr=REDACTED&sig=REDACTED'
+Request method: 'HEAD'
+Request headers:
+    'x-ms-version': 'REDACTED'
+    'Accept': 'application/xml'
+    'User-Agent': 'azsdk-python-storage-blob/12.28.0 Python/3.11.14 (Windows-10-10.0.26200-SP0)'
+    'x-ms-date': 'REDACTED'
+    'x-ms-client-request-id': '4fe64ca7-6b29-11f1-bd21-e00af66009f2'
+No body was attached to the request
+2026-06-18 18:21:00 [INFO] azure.core.pipeline.policies.http_logging_policy: Response status: 200
+Response headers:
+    'Content-Length': '101319'
+    'Content-Type': 'image/jpeg'
+    'Content-MD5': 'REDACTED'
+    'Last-Modified': 'Thu, 18 Jun 2026 15:16:36 GMT'
+    'Accept-Ranges': 'REDACTED'
+    'ETag': '"0x8DECD4C971C2C77"'
+    'Server': 'Windows-Azure-Blob/1.0 Microsoft-HTTPAPI/2.0'
+    'x-ms-request-id': '57b75904-101e-0058-5036-fff89c000000'
+    'x-ms-client-request-id': '4fe64ca7-6b29-11f1-bd21-e00af66009f2'
+    'x-ms-version': 'REDACTED'
+    'x-ms-meta-original_filename': 'REDACTED'
+    'x-ms-meta-content_type': 'REDACTED'
+    'x-ms-creation-time': 'REDACTED'
+    'x-ms-lease-status': 'REDACTED'
+    'x-ms-lease-state': 'REDACTED'
+    'x-ms-blob-type': 'REDACTED'
+    'x-ms-server-encrypted': 'REDACTED'
+    'x-ms-access-tier': 'REDACTED'
+    'x-ms-access-tier-inferred': 'REDACTED'
+    'Date': 'Thu, 18 Jun 2026 15:21:00 GMT'
+2026-06-18 18:24:08 [INFO] pinecone.index: Describing index stats
+2026-06-18 18:24:18 [INFO] pinecone.index: Describing index stats
+2026-06-18 18:24:19 [INFO] httpx: HTTP Request: POST https://nassaqq.cognitiveservices.azure.com/openai/deployments/text-embedding-3-small/embeddings?api-version=2024-12-01-preview "HTTP/1.1 200 OK"
+2026-06-18 18:24:19 [INFO] pinecone.index: Querying index with top_k=20
+2026-06-18 18:24:26 [INFO] httpx: HTTP Request: POST https://nassaqq.cognitiveservices.azure.com/openai/deployments/gpt-4.1-mini/chat/completions?api-version=2024-12-01-preview "HTTP/1.1 200 OK"
+2026-06-18 18:25:05 [INFO] pinecone.index: Describing index stats
+2026-06-18 18:25:08 [INFO] pinecone.index: Describing index stats
+2026-06-18 20:28:29 [INFO] pymongo.client: You appear to be connected to a CosmosDB cluster. For more information regarding feature compatibility and support please visit https://www.mongodb.com/supportability/cosmosdb
+2026-06-18 20:28:29 [INFO] pinecone.client.indexes: Listing indexes
+2026-06-18 20:28:30 [INFO] httpx: HTTP Request: GET https://api.pinecone.io/indexes "HTTP/1.1 200 OK"
+2026-06-18 20:28:30 [INFO] pinecone.client.indexes: Describing index 'nassaq'
+2026-06-18 20:28:31 [INFO] httpx: HTTP Request: GET https://api.pinecone.io/indexes/nassaq "HTTP/1.1 200 OK"
+2026-06-18 20:28:31 [INFO] pinecone.index: Index client created for host https://nassaq-uujm500.svc.aped-4627-b74a.pinecone.io
+2026-06-18 20:28:31 [INFO] pinecone.index: Describing index stats
+2026-06-18 20:28:32 [INFO] pinecone.index: Querying index with top_k=10000
+2026-06-18 21:55:33 [INFO] pinecone.index: Describing index stats

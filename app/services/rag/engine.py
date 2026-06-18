@@ -13,7 +13,7 @@ the event loop.
 from datetime import datetime, timezone
 from typing import Optional
 
-from openai import OpenAI
+from openai import AzureOpenAI
 
 from app.core.config import settings
 from .text_processor import (
@@ -27,7 +27,7 @@ from . import reranker as reranker_mod
 
 
 _store: Optional[PineconeVectorStore] = None
-_llm_client: Optional[OpenAI] = None
+_llm_client: Optional[AzureOpenAI] = None
 
 
 def get_store() -> PineconeVectorStore:
@@ -42,13 +42,14 @@ def get_store() -> PineconeVectorStore:
     return _store
 
 
-def _get_llm() -> OpenAI:
+def _get_llm() -> AzureOpenAI:
     """Return (and lazily create) the Azure OpenAI client for generation."""
     global _llm_client
     if _llm_client is None:
-        _llm_client = OpenAI(
+        _llm_client = AzureOpenAI(
             api_key=settings.AZURE_OPENAI_API_KEY,
-            base_url=settings.AZURE_OPENAI_ENDPOINT,
+            azure_endpoint=settings.AZURE_OPENAI_ENDPOINT,
+            api_version=settings.AZURE_OPENAI_API_VERSION,
         )
     return _llm_client
 
@@ -58,6 +59,7 @@ def ingest(
     document_id: str,
     cleaned_text: str,
     tables_markdown: Optional[list[str]] = None,
+    domain: str = "",
     classification: str = "",
     language: str = "unknown",
     source_file: str = "",
@@ -69,6 +71,7 @@ def ingest(
         document_id:      Unique identifier (UUID from processing history).
         cleaned_text:     Markdown-formatted text (``PipelineResult.cleaned_text``).
         tables_markdown:  Markdown table strings from OCR.
+        domain:           Classification domain label.
         classification:   Category label from classifier.
         language:         Detected language (``ar`` / ``en`` / ``mixed``).
         source_file:      Original filename.
@@ -119,6 +122,7 @@ def ingest(
                 "section_heading": chunk.section_heading,
                 "text_clean": chunk.text_clean,
                 "text_original": chunk.text_original,
+                "domain": domain,
                 "classification": classification,
                 "language": language,
                 "source_file": source_file,
@@ -144,6 +148,7 @@ def ingest(
 def search(
     query: str,
     top_k: int = 5,
+    filter_domain: Optional[str] = None,
     filter_classification: Optional[str] = None,
     filter_language: Optional[str] = None,
     filter_document_id: Optional[str] = None,
@@ -154,6 +159,7 @@ def search(
     Args:
         query:                  Natural-language query.
         top_k:                  Number of final results to return.
+        filter_domain:          Only return chunks with this domain.
         filter_classification:  Only return chunks with this label.
         filter_language:        Only return chunks with this language.
         filter_document_id:     Only return chunks from this document.
@@ -181,6 +187,10 @@ def search(
     faiss_k = settings.RAG_TOP_K_RETRIEVAL
     candidates = store.search(query_vec, k=faiss_k)
 
+    if filter_domain:
+        candidates = [
+            c for c in candidates if c.get("domain") == filter_domain
+        ]
     if filter_classification:
         candidates = [
             c for c in candidates if c.get("classification") == filter_classification
@@ -221,6 +231,7 @@ def search(
                 "source_file": candidate.get("source_file", ""),
                 "page_number": candidate.get("page_number", 1),
                 "section_heading": candidate.get("section_heading", ""),
+                "domain": candidate.get("domain", ""),
                 "classification": candidate.get("classification", ""),
                 "language": candidate.get("language", ""),
                 "search_score": pinecone_score,
@@ -245,6 +256,7 @@ Rules:
 def ask(
     query: str,
     top_k: int = 5,
+    filter_domain: Optional[str] = None,
     filter_classification: Optional[str] = None,
     filter_language: Optional[str] = None,
     filter_document_id: Optional[str] = None,
@@ -257,6 +269,7 @@ def ask(
     sources = search(
         query=query,
         top_k=top_k,
+        filter_domain=filter_domain,
         filter_classification=filter_classification,
         filter_language=filter_language,
         filter_document_id=filter_document_id,
