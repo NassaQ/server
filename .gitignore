@@ -25,3 +25,6 @@ uv.lock
 #folders
 data/
 
+
+.azure/
+startup.sh
