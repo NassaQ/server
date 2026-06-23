@@ -78,7 +78,7 @@ async def update_current_user(
         update_data["full_name"] = capitalize_full_name(update_data["full_name"])
 
     try:
-        updated_user = await user_repo.update_user(current_user, update_data)
+        updated_user = await user_repo.update_user(user, update_data)
 
     except ValueError as e:
         raise HTTPException(
@@ -153,7 +153,7 @@ async def update_user(
         user.role_id = user_update.role_id
 
     try:
-        updated_user = await user_repo.update_user(current_user, update_data)
+        updated_user = await user_repo.update_user(user, update_data)
 
     except ValueError as e:
         raise HTTPException(
