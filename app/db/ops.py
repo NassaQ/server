@@ -37,6 +37,8 @@ class UsersOps:
         return list(users)
 
     async def get_conflict(self, user_id: int, username: str | None = None, email: str | None = None) -> bool:
+        if not username and not email:
+            return False
         query = select(Users)
         if username:
             query = query.where(func.lower(Users.username) == username.lower())
@@ -44,7 +46,7 @@ class UsersOps:
         if email:
             query = query.where(Users.email == email.lower())
 
-        exist_user = (await self.db.execute(query)).scalar_one_or_none()
+        exist_user = (await self.db.execute(query)).scalars().first()
         return exist_user is not None and exist_user.user_id != user_id
 
     async def conflict_exists(self, username: str | None = None, email: str | None = None) -> bool:
